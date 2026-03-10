@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ const Contatti = () => {
         <div className="container text-center">
           <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Contattaci</h1>
           <p className="text-primary-foreground/80 max-w-xl mx-auto">
-            Hai domande o vuoi prenotare? Siamo qui per aiutarti.
+            Richiedi disponibilità per il tuo soggiorno.
           </p>
         </div>
       </section>
@@ -39,6 +39,7 @@ const Contatti = () => {
               <div className="space-y-4">
                 {[
                   { icon: Phone, label: "Telefono", value: "+39 02 000 00 000", href: "tel:+390200000000" },
+                  { icon: MessageCircle, label: "WhatsApp", value: "Scrivici su WhatsApp", href: "https://wa.me/390200000000" },
                   { icon: Mail, label: "Email", value: "info@amicidellospedale.it", href: "mailto:info@amicidellospedale.it" },
                   { icon: MapPin, label: "Indirizzo", value: "Zona Milano 2, Segrate (MI)" },
                   { icon: Clock, label: "Orari", value: "Lun - Sab: 9:00 - 19:00" },
@@ -50,7 +51,14 @@ const Contatti = () => {
                     <div>
                       <p className="text-sm font-medium">{c.label}</p>
                       {c.href ? (
-                        <a href={c.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">{c.value}</a>
+                        <a
+                          href={c.href}
+                          target={c.href.startsWith("https") ? "_blank" : undefined}
+                          rel={c.href.startsWith("https") ? "noopener noreferrer" : undefined}
+                          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {c.value}
+                        </a>
                       ) : (
                         <p className="text-sm text-muted-foreground">{c.value}</p>
                       )}
@@ -75,6 +83,23 @@ const Contatti = () => {
                   {sending ? "Invio in corso..." : "Invia messaggio"}
                 </Button>
               </form>
+            </div>
+          </div>
+
+          {/* Mappa */}
+          <div className="mt-12">
+            <h2 className="text-xl font-bold mb-4">Dove siamo</h2>
+            <div className="rounded-xl overflow-hidden h-72 card-shadow">
+              <iframe
+                title="Posizione Amici dell'Ospedale"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5594.5!2d9.264!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c7b3e0f2a6ad%3A0x2!2sOspedale+San+Raffaele!5e0!3m2!1sit!2sit!4v1"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </div>
         </div>

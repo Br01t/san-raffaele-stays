@@ -1,4 +1,4 @@
-import { Heart, Users, Star } from "lucide-react";
+import { Heart, Users, Star, Phone, Mail } from "lucide-react";
 
 const IlGestore = () => (
   <>
@@ -6,7 +6,7 @@ const IlGestore = () => (
       <div className="container text-center">
         <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Il gestore</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
-          Dietro Amici dell'Ospedale c'è una persona che conosce bene le esigenze di chi vive momenti difficili.
+          Dietro Amici dell'Ospedale c'è una persona che conosce bene le esigenze di chi vive momenti delicati.
         </p>
       </div>
     </section>
@@ -17,10 +17,10 @@ const IlGestore = () => (
           <h2 className="text-2xl font-bold mb-6">La nostra storia</h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              Amici dell'Ospedale nasce dall'esperienza diretta di chi ha vissuto la necessità di trovare un alloggio comodo e vicino all'ospedale durante un momento delicato della vita.
+              Amici dell'Ospedale nasce per offrire un alloggio comodo e accogliente a chi deve soggiornare vicino al San Raffaele per motivi di salute o lavoro.
             </p>
             <p>
-              Sappiamo quanto sia importante avere un punto di appoggio sicuro, pulito e accogliente quando un familiare è ricoverato o quando si devono affrontare cicli di cure che richiedono soggiorni prolungati.
+              L'idea è nata dall'esperienza diretta di chi ha vissuto la necessità di trovare un posto sicuro e vicino all'ospedale durante un momento delicato della vita. Sappiamo quanto sia importante avere un punto di appoggio pulito, accogliente e a portata di mano quando un familiare è ricoverato o quando si devono affrontare cicli di cure che richiedono soggiorni prolungati.
             </p>
             <p>
               Per questo abbiamo creato questo servizio: per offrire a familiari, pazienti e personale sanitario un'alternativa confortevole e accessibile agli hotel, con la flessibilità e il calore di una vera casa.
@@ -31,10 +31,11 @@ const IlGestore = () => (
           </div>
         </div>
 
+        {/* Valori */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
           {[
-            { icon: Heart, title: "Passione", desc: "Mettiamo il cuore in ogni dettaglio per garantire il massimo comfort." },
-            { icon: Users, title: "Esperienza", desc: "Anni di esperienza nell'accoglienza di famiglie e pazienti." },
+            { icon: Heart, title: "Passione", desc: "Mettiamo il cuore in ogni dettaglio per garantire il massimo comfort ai nostri ospiti." },
+            { icon: Users, title: "Esperienza", desc: "Anni di esperienza nell'accoglienza di famiglie, pazienti e professionisti sanitari." },
             { icon: Star, title: "Affidabilità", desc: "Recensioni positive da parte di centinaia di ospiti soddisfatti." },
           ].map((v) => (
             <div key={v.title} className="bg-card rounded-xl p-6 card-shadow text-center">
@@ -43,6 +44,21 @@ const IlGestore = () => (
               <p className="text-sm text-muted-foreground">{v.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* Contatto diretto */}
+        <div className="mt-12 bg-accent rounded-xl p-6 md:p-8">
+          <h2 className="text-xl font-bold mb-4">Contatto diretto</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-primary" />
+              <a href="tel:+390200000000" className="text-muted-foreground hover:text-primary transition-colors">+39 02 000 00 000</a>
+            </div>
+            <div className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-primary" />
+              <a href="mailto:info@amicidellospedale.it" className="text-muted-foreground hover:text-primary transition-colors">info@amicidellospedale.it</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
