@@ -49,7 +49,7 @@ const Index = () => (
     {/* Hero */}
     <section className="relative overflow-hidden">
       <div className="absolute inset-0">
-        <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=984,h=984,fit=crop/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg" alt="Appartamento luminoso vicino all'Ospedale San Raffaele a Milano" className="w-full h-full object-cover" />
+        <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg" alt="Appartamento luminoso vicino all'Ospedale San Raffaele a Milano" className="w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-foreground/50" />
       </div>
       <div className="relative container py-24 md:py-36 lg:py-44 text-center">
