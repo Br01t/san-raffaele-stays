@@ -66,8 +66,12 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-xs opacity-50">
-        © {new Date().getFullYear()} Amici dell'Ospedale. Tutti i diritti riservati.
+      <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs opacity-50">
+        <span>© {new Date().getFullYear()} Amici dell'Ospedale. Tutti i diritti riservati.</span>
+        <div className="flex gap-4">
+          <Link to="/privacy-policy" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
+          <Link to="/cookie-policy" className="hover:opacity-100 transition-opacity">Cookie Policy</Link>
+        </div>
       </div>
     </div>
   </footer>
