@@ -69,21 +69,39 @@ const GuidaZona = () => (
     </section>
 
     <section className="py-16 md:py-24">
-      <div className="container max-w-4xl">
-        <div className="space-y-8">
+      <div className="container">
+        {/* Intro con immagine */}
+        <div className="flex flex-col md:flex-row gap-8 items-center mb-16">
+          <div className="w-full md:w-1/2">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Tutto a portata di mano</h2>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Il quartiere di Milano 2 offre una vasta gamma di servizi essenziali e aree verdi curatissime, pensate per garantire il massimo comfort a chi soggiorna vicino al San Raffaele. Dalla spesa quotidiana ai trasporti, ecco i principali punti di interesse.
+            </p>
+          </div>
+          <div className="w-full md:w-1/2 h-64 md:h-80 rounded-2xl overflow-hidden card-shadow">
+            <img 
+              src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=984,h=984,fit=crop/A0xr56pZqkuyoQl8/img_1885-dWx04wb2nbu1qBDK.jpg" 
+              alt="Milano 2 e dintorni" 
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+            />
+          </div>
+        </div>
+
+        {/* Griglia servizi */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sections.map((s) => (
-            <div key={s.title} className="bg-card rounded-xl p-6 md:p-8 card-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                  <s.icon className="w-5 h-5 text-primary" />
+            <div key={s.title} className="bg-card rounded-xl p-6 md:p-8 card-shadow flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                  <s.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold">{s.title}</h2>
+                <h3 className="text-xl font-bold">{s.title}</h3>
               </div>
-              <ul className="space-y-2">
+              <ul className="space-y-3 flex-grow">
                 {s.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>{item}</span>
+                    <span className="leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
