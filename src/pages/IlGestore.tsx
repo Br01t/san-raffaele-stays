@@ -47,17 +47,26 @@ const IlGestore = () => (
         </div>
 
         {/* Contatto diretto */}
-        <div className="mt-12 bg-accent rounded-xl p-6 md:p-8">
-          <h2 className="text-xl font-bold mb-4">Contatto diretto</h2>
-          <div className="space-y-3 text-sm">
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-primary" />
-              <a href="tel:+390200000000" className="text-muted-foreground hover:text-primary transition-colors">+39 02 000 00 000</a>
+        <div className="mt-12 bg-accent rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
+          <div className="w-full md:w-auto">
+            <h2 className="text-xl font-bold mb-4">Contatto diretto</h2>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-primary" />
+                <a href="tel:+390200000000" className="text-muted-foreground hover:text-primary transition-colors">+39 02 000 00 000</a>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-primary" />
+                <a href="mailto:info@amicidellospedale.it" className="text-muted-foreground hover:text-primary transition-colors">info@amicidellospedale.it</a>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-primary" />
-              <a href="mailto:info@amicidellospedale.it" className="text-muted-foreground hover:text-primary transition-colors">info@amicidellospedale.it</a>
-            </div>
+          </div>
+          <div className="w-32 h-32 md:w-40 md:h-40 shrink-0">
+            <img 
+              src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=984,h=984,fit=crop/A0xr56pZqkuyoQl8/p1024981-Yg253388a7cGqwEB.jpg" 
+              alt="Il gestore" 
+              className="w-full h-full object-cover rounded-full shadow-lg border-4 border-background"
+            />
           </div>
         </div>
       </div>
