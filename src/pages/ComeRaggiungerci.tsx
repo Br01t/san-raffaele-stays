@@ -47,7 +47,7 @@ const ComeRaggiungerci = () => (
             <MapPin className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-semibold text-lg mb-1">Indirizzo appartamenti</h2>
+            <h2 className="font-display text-primary text-lg mb-1">Indirizzo appartamenti</h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Zona Milano 2 – Segrate (MI)<br />
               Vicino Ospedale San Raffaele, Milano
