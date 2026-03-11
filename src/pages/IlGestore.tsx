@@ -14,7 +14,7 @@ const IlGestore = () => (
     <section className="py-16 md:py-24">
       <div className="container max-w-3xl">
         <div className="bg-card rounded-xl p-8 md:p-12 card-shadow">
-          <h2 className="text-2xl font-bold mb-6">La nostra storia</h2>
+          <h2 className="font-display text-primary text-2xl mb-6">La nostra storia</h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
               Amici dell'Ospedale nasce per offrire un alloggio comodo e accogliente a chi deve soggiornare vicino al San Raffaele per motivi di salute o lavoro.
