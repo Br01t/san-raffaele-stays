@@ -65,7 +65,7 @@ const Index = () => (
           </div>
           <div>
             <img
-              src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
+              src="src/assets/laghetto.webp"
               alt="Appartamento luminoso vicino all'Ospedale San Raffaele a Milano"
               className="w-full rounded-2xl shadow-lg object-cover h-72 md:h-96"
             />
@@ -75,26 +75,27 @@ const Index = () => (
     </section>
 
     {/* Vantaggi - circular cards style */}
-    <section className="relative py-16 md:py-24 overflow-hidden">
-      <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+    <section className="relative overflow-hidden">
+      {/* Background image */}
+      <div className="w-full h-[420px] md:h-[480px]">
+        <img
+          src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
+          alt="Panorama Milano 2"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      {/* Circles overlapping the image from above */}
+      <div className="container absolute inset-x-0 top-0 left-1/2 -translate-x-1/2 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
           {vantaggi.map((v) => (
             <div key={v.title} className="flex flex-col items-center text-center">
-              <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-8">
+              <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-8 shadow-lg">
                 <h3 className="font-display text-primary text-lg md:text-xl mb-3">{v.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
               </div>
             </div>
           ))}
         </div>
-      </div>
-      {/* Background image peek */}
-      <div className="w-full h-64 md:h-80 mt-8">
-        <img
-          src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
-          alt="Panorama Milano 2"
-          className="w-full h-full object-cover"
-        />
       </div>
     </section>
 
