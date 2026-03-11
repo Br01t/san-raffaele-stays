@@ -82,7 +82,7 @@ const ComeRaggiungerci = () => (
         </div>
 
         {/* Indicazioni */}
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Come arrivare</h2>
+        <h2 className="font-display text-primary text-2xl md:text-3xl mb-8 text-center">Come arrivare</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {directions.map((d) => (
             <div key={d.title} className="bg-card rounded-xl p-6 lg:p-8 card-shadow flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
