@@ -7,7 +7,7 @@ const Footer = () => (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Brand */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 font-bold text-lg">
+          <div className="flex items-center gap-2 font-display text-lg">
             <Heart className="w-5 h-5" />
             Amici dell'Ospedale
           </div>
@@ -18,7 +18,7 @@ const Footer = () => (
 
         {/* Links */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-sm uppercase tracking-wider opacity-60">Navigazione</h3>
+          <h3 className="font-display text-sm uppercase tracking-wider opacity-60">Navigazione</h3>
           <ul className="space-y-2 text-sm opacity-80">
             <li><Link to="/" className="hover:opacity-100 transition-opacity">Home</Link></li>
             <li><Link to="/alloggi" className="hover:opacity-100 transition-opacity">Alloggi</Link></li>
@@ -31,7 +31,7 @@ const Footer = () => (
 
         {/* Contact */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-sm uppercase tracking-wider opacity-60">Contatti</h3>
+          <h3 className="font-display text-sm uppercase tracking-wider opacity-60">Contatti</h3>
           <ul className="space-y-3 text-sm opacity-80">
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 shrink-0" />
@@ -50,8 +50,8 @@ const Footer = () => (
 
         {/* Map */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-sm uppercase tracking-wider opacity-60">Dove siamo</h3>
-          <div className="rounded-lg overflow-hidden h-40">
+          <h3 className="font-display text-sm uppercase tracking-wider opacity-60">Dove siamo</h3>
+          <div className="rounded-xl overflow-hidden h-40">
             <iframe
               title="Posizione Amici dell'Ospedale"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2797.2!2d9.264!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDMwJzE4LjAiTiA5wrAxNSc1MC40IkU!5e0!3m2!1sit!2sit!4v1"

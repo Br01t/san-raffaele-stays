@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <nav className="container flex items-center justify-between h-16 md:h-18">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg text-primary">
+        <Link to="/" className="flex items-center gap-2 font-display text-lg text-primary">
           <Heart className="w-6 h-6 fill-primary" />
           <span>Amici dell'Ospedale</span>
         </Link>
@@ -29,7 +29,7 @@ const Navbar = () => {
             <li key={l.to}>
               <Link
                 to={l.to}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
+                className={`px-3 py-2 rounded-full text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground ${
                   location.pathname === l.to ? "bg-accent text-accent-foreground" : "text-muted-foreground"
                 }`}
               >
@@ -58,7 +58,7 @@ const Navbar = () => {
                 <Link
                   to={l.to}
                   onClick={() => setOpen(false)}
-                  className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors hover:bg-accent ${
+                  className={`block px-3 py-2.5 rounded-full text-sm font-medium transition-colors hover:bg-accent ${
                     location.pathname === l.to ? "bg-accent text-accent-foreground" : "text-muted-foreground"
                   }`}
                 >
