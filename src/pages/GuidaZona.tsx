@@ -61,7 +61,7 @@ const GuidaZona = () => (
   <>
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Guida alla zona</h1>
+        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Guida alla zona</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
           Una guida utile per chi soggiorna nei nostri appartamenti a Milano 2. Tutto ciò che ti serve a portata di mano.
         </p>
@@ -73,7 +73,7 @@ const GuidaZona = () => (
         {/* Intro con immagine */}
         <div className="flex flex-col md:flex-row gap-8 items-center mb-16">
           <div className="w-full md:w-1/2">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Tutto a portata di mano</h2>
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4">Tutto a portata di mano</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Il quartiere di Milano 2 offre una vasta gamma di servizi essenziali e aree verdi curatissime, pensate per garantire il massimo comfort a chi soggiorna vicino al San Raffaele. Dalla spesa quotidiana ai trasporti, ecco i principali punti di interesse.
             </p>
@@ -95,7 +95,7 @@ const GuidaZona = () => (
                 <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
                   <s.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold">{s.title}</h3>
+                <h3 className="font-display text-primary text-xl">{s.title}</h3>
               </div>
               <ul className="space-y-3 flex-grow">
                 {s.items.map((item) => (

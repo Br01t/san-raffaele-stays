@@ -23,7 +23,7 @@ const Contatti = () => {
     <>
       <section className="hero-gradient py-16 md:py-20">
         <div className="container text-center">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Contattaci</h1>
+          <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Contattaci</h1>
           <p className="text-primary-foreground/80 max-w-xl mx-auto">
             Richiedi disponibilità per il tuo soggiorno.
           </p>
@@ -35,7 +35,7 @@ const Contatti = () => {
           <div className="grid md:grid-cols-5 gap-8">
             {/* Info */}
             <div className="md:col-span-2 space-y-6">
-              <h2 className="text-xl font-bold">Informazioni di contatto</h2>
+              <h2 className="font-display text-primary text-xl">Informazioni di contatto</h2>
               <div className="space-y-4">
                 {[
                   { icon: Phone, label: "Telefono", value: "+39 02 000 00 000", href: "tel:+390200000000" },
@@ -71,7 +71,7 @@ const Contatti = () => {
             {/* Form */}
             <div className="md:col-span-3">
               <form onSubmit={handleSubmit} className="bg-card rounded-xl p-6 md:p-8 card-shadow space-y-5">
-                <h2 className="text-xl font-bold">Inviaci un messaggio</h2>
+                <h2 className="font-display text-primary text-xl">Inviaci un messaggio</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Input placeholder="Nome" required name="name" />
                   <Input placeholder="Cognome" required name="surname" />
@@ -79,7 +79,7 @@ const Contatti = () => {
                 <Input type="email" placeholder="Email" required name="email" />
                 <Input type="tel" placeholder="Telefono (opzionale)" name="phone" />
                 <Textarea placeholder="Il tuo messaggio..." required name="message" rows={5} />
-                <Button type="submit" className="w-full" size="lg" disabled={sending}>
+                <Button type="submit" className="w-full rounded-full" size="lg" disabled={sending}>
                   {sending ? "Invio in corso..." : "Invia messaggio"}
                 </Button>
               </form>
@@ -88,7 +88,7 @@ const Contatti = () => {
 
           {/* Mappa */}
           <div className="mt-12">
-            <h2 className="text-xl font-bold mb-4">Dove siamo</h2>
+            <h2 className="font-display text-primary text-xl mb-4">Dove siamo</h2>
             <div className="rounded-xl overflow-hidden h-72 card-shadow">
               <iframe
                 title="Posizione Amici dell'Ospedale"

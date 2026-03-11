@@ -4,7 +4,7 @@ const IlGestore = () => (
   <>
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Il gestore</h1>
+        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Il gestore</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
           Dietro Amici dell'Ospedale c'è una persona che conosce bene le esigenze di chi vive momenti delicati.
         </p>
@@ -14,7 +14,7 @@ const IlGestore = () => (
     <section className="py-16 md:py-24">
       <div className="container max-w-3xl">
         <div className="bg-card rounded-xl p-8 md:p-12 card-shadow">
-          <h2 className="text-2xl font-bold mb-6">La nostra storia</h2>
+          <h2 className="font-display text-primary text-2xl mb-6">La nostra storia</h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
               Amici dell'Ospedale nasce per offrire un alloggio comodo e accogliente a chi deve soggiornare vicino al San Raffaele per motivi di salute o lavoro.
@@ -49,7 +49,7 @@ const IlGestore = () => (
         {/* Contatto diretto */}
         <div className="mt-12 bg-accent rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
           <div className="w-full md:w-auto">
-            <h2 className="text-xl font-bold mb-4">Contatto diretto</h2>
+            <h2 className="font-display text-primary text-xl mb-4">Contatto diretto</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />

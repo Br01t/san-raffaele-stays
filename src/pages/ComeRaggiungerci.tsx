@@ -32,7 +32,7 @@ const ComeRaggiungerci = () => (
   <>
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Come raggiungerci</h1>
+        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Come raggiungerci</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
           I nostri appartamenti si trovano a Milano 2, Segrate — a pochi minuti dall'Ospedale San Raffaele.
         </p>
@@ -47,7 +47,7 @@ const ComeRaggiungerci = () => (
             <MapPin className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-semibold text-lg mb-1">Indirizzo appartamenti</h2>
+            <h2 className="font-display text-primary text-lg mb-1">Indirizzo appartamenti</h2>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Zona Milano 2 – Segrate (MI)<br />
               Vicino Ospedale San Raffaele, Milano
@@ -82,7 +82,7 @@ const ComeRaggiungerci = () => (
         </div>
 
         {/* Indicazioni */}
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Come arrivare</h2>
+        <h2 className="font-display text-primary text-2xl md:text-3xl mb-8 text-center">Come arrivare</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {directions.map((d) => (
             <div key={d.title} className="bg-card rounded-xl p-6 lg:p-8 card-shadow flex flex-col h-full hover:-translate-y-1 transition-transform duration-300">
@@ -90,7 +90,7 @@ const ComeRaggiungerci = () => (
                 <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
                   <d.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-bold text-xl">{d.title}</h3>
+                <h3 className="font-display text-primary text-xl">{d.title}</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed flex-grow">{d.desc}</p>
             </div>
