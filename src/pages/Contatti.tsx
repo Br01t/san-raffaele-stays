@@ -35,7 +35,7 @@ const Contatti = () => {
           <div className="grid md:grid-cols-5 gap-8">
             {/* Info */}
             <div className="md:col-span-2 space-y-6">
-              <h2 className="text-xl font-bold">Informazioni di contatto</h2>
+              <h2 className="font-display text-primary text-xl">Informazioni di contatto</h2>
               <div className="space-y-4">
                 {[
                   { icon: Phone, label: "Telefono", value: "+39 02 000 00 000", href: "tel:+390200000000" },
