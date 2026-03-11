@@ -32,7 +32,7 @@ const ComeRaggiungerci = () => (
   <>
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Come raggiungerci</h1>
+        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Come raggiungerci</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
           I nostri appartamenti si trovano a Milano 2, Segrate — a pochi minuti dall'Ospedale San Raffaele.
         </p>
