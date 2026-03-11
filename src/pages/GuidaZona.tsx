@@ -95,7 +95,7 @@ const GuidaZona = () => (
                 <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
                   <s.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold">{s.title}</h3>
+                <h3 className="font-display text-primary text-xl">{s.title}</h3>
               </div>
               <ul className="space-y-3 flex-grow">
                 {s.items.map((item) => (

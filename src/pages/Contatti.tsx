@@ -88,7 +88,7 @@ const Contatti = () => {
 
           {/* Mappa */}
           <div className="mt-12">
-            <h2 className="text-xl font-bold mb-4">Dove siamo</h2>
+            <h2 className="font-display text-primary text-xl mb-4">Dove siamo</h2>
             <div className="rounded-xl overflow-hidden h-72 card-shadow">
               <iframe
                 title="Posizione Amici dell'Ospedale"

@@ -49,7 +49,7 @@ const IlGestore = () => (
         {/* Contatto diretto */}
         <div className="mt-12 bg-accent rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 justify-between">
           <div className="w-full md:w-auto">
-            <h2 className="text-xl font-bold mb-4">Contatto diretto</h2>
+            <h2 className="font-display text-primary text-xl mb-4">Contatto diretto</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />

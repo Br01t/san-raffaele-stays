@@ -90,7 +90,7 @@ const ComeRaggiungerci = () => (
                 <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center shrink-0">
                   <d.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-bold text-xl">{d.title}</h3>
+                <h3 className="font-display text-primary text-xl">{d.title}</h3>
               </div>
               <p className="text-muted-foreground leading-relaxed flex-grow">{d.desc}</p>
             </div>
