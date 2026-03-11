@@ -73,7 +73,7 @@ const GuidaZona = () => (
         {/* Intro con immagine */}
         <div className="flex flex-col md:flex-row gap-8 items-center mb-16">
           <div className="w-full md:w-1/2">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Tutto a portata di mano</h2>
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4">Tutto a portata di mano</h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Il quartiere di Milano 2 offre una vasta gamma di servizi essenziali e aree verdi curatissime, pensate per garantire il massimo comfort a chi soggiorna vicino al San Raffaele. Dalla spesa quotidiana ai trasporti, ecco i principali punti di interesse.
             </p>
