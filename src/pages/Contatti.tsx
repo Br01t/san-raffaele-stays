@@ -71,7 +71,7 @@ const Contatti = () => {
             {/* Form */}
             <div className="md:col-span-3">
               <form onSubmit={handleSubmit} className="bg-card rounded-xl p-6 md:p-8 card-shadow space-y-5">
-                <h2 className="text-xl font-bold">Inviaci un messaggio</h2>
+                <h2 className="font-display text-primary text-xl">Inviaci un messaggio</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Input placeholder="Nome" required name="name" />
                   <Input placeholder="Cognome" required name="surname" />
