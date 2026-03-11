@@ -79,7 +79,7 @@ const Contatti = () => {
                 <Input type="email" placeholder="Email" required name="email" />
                 <Input type="tel" placeholder="Telefono (opzionale)" name="phone" />
                 <Textarea placeholder="Il tuo messaggio..." required name="message" rows={5} />
-                <Button type="submit" className="w-full" size="lg" disabled={sending}>
+                <Button type="submit" className="w-full rounded-full" size="lg" disabled={sending}>
                   {sending ? "Invio in corso..." : "Invia messaggio"}
                 </Button>
               </form>
