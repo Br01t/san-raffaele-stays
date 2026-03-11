@@ -61,7 +61,7 @@ const GuidaZona = () => (
   <>
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Guida alla zona</h1>
+        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Guida alla zona</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
           Una guida utile per chi soggiorna nei nostri appartamenti a Milano 2. Tutto ciò che ti serve a portata di mano.
         </p>
