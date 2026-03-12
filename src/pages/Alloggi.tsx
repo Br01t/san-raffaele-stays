@@ -49,13 +49,13 @@ const apartments: ApartmentData[] = [
 const ImageGrid = ({ images, name }: { images: string[]; name: string }) => {
   const displayImages = images.slice(0, 9);
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-xl overflow-hidden">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 rounded-xl overflow-hidden">
       {displayImages.map((img, i) => (
         <img
           key={i}
           src={img}
           alt={`${name} - foto ${i + 1}`}
-          className="w-full h-28 md:h-36 object-cover hover:opacity-90 transition-opacity"
+          className="w-full h-24 sm:h-28 md:h-36 object-cover hover:opacity-90 transition-opacity"
         />
       ))}
     </div>
@@ -64,55 +64,55 @@ const ImageGrid = ({ images, name }: { images: string[]; name: string }) => {
 
 const Alloggi = () => (
   <>
-    <section className="py-12 md:py-16 bg-background">
-      <div className="container">
-        <h1 className="font-display text-primary text-3xl md:text-4xl text-center mb-12">I nostri alloggi</h1>
+    <section className="py-8 sm:py-12 md:py-16 bg-background">
+      <div className="container px-4">
+        <h1 className="font-display text-primary text-2xl sm:text-3xl md:text-4xl text-center mb-8 sm:mb-12">I nostri alloggi</h1>
 
-        <div className="space-y-16">
+        <div className="space-y-10 sm:space-y-16">
           {apartments.map((apt) => (
-            <article key={apt.name} className="bg-card rounded-2xl p-6 md:p-10 card-shadow">
-              <div className="grid md:grid-cols-2 gap-8">
+            <article key={apt.name} className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 card-shadow">
+              <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
                 {/* Left: name + images */}
                 <div>
-                  <h2 className="font-display text-primary text-2xl mb-6">{apt.name}</h2>
+                  <h2 className="font-display text-primary text-xl sm:text-2xl mb-4 sm:mb-6">{apt.name}</h2>
                   <ImageGrid images={apt.images} name={apt.name} />
                 </div>
 
                 {/* Right: details */}
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   <div>
-                    <h3 className="font-display text-primary text-lg mb-2">Ubicazione</h3>
-                    <ul className="list-disc list-inside text-muted-foreground text-sm leading-relaxed">
+                    <h3 className="font-display text-primary text-base sm:text-lg mb-2">Ubicazione</h3>
+                    <ul className="list-disc list-inside text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       <li>{apt.location}</li>
                     </ul>
                   </div>
 
                   <div>
-                    <h3 className="font-display text-primary text-lg mb-2">Servizi</h3>
-                    <ul className="list-disc list-inside text-muted-foreground text-sm leading-relaxed">
+                    <h3 className="font-display text-primary text-base sm:text-lg mb-2">Servizi</h3>
+                    <ul className="list-disc list-inside text-muted-foreground text-xs sm:text-sm leading-relaxed">
                       <li>{apt.services.join(", ")}.</li>
                       <li>{apt.beds}</li>
                     </ul>
                   </div>
 
                   <div>
-                    <h3 className="font-display text-primary text-lg mb-3">Prezzi</h3>
-                    <div className="flex flex-wrap gap-4">
+                    <h3 className="font-display text-primary text-base sm:text-lg mb-3">Prezzi</h3>
+                    <div className="flex flex-wrap gap-3 sm:gap-4">
                       {apt.extras.map((e) => (
-                        <div key={e} className="w-28 h-28 rounded-full bg-muted flex items-center justify-center p-3">
-                          <span className="font-display text-primary text-xs text-center leading-tight">{e}</span>
+                        <div key={e} className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-muted flex items-center justify-center p-2 sm:p-3">
+                          <span className="font-display text-primary text-[10px] sm:text-xs text-center leading-tight">{e}</span>
                         </div>
                       ))}
-                      <div className="w-36 h-28 rounded-full bg-muted flex flex-col items-center justify-center p-3">
+                      <div className="w-28 h-24 sm:w-36 sm:h-28 rounded-full bg-muted flex flex-col items-center justify-center p-2 sm:p-3">
                         {apt.prices.map((p) => (
-                          <span key={p.label} className="text-sm font-semibold text-foreground">{p.label} : {p.price}</span>
+                          <span key={p.label} className="text-xs sm:text-sm font-semibold text-foreground">{p.label} : {p.price}</span>
                         ))}
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-2">
-                    <Button asChild className="rounded-full px-8">
+                    <Button asChild className="rounded-full px-6 sm:px-8 w-full sm:w-auto">
                       <Link to="/contatti">Richiedi disponibilità</Link>
                     </Button>
                   </div>
