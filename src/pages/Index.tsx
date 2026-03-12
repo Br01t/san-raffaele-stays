@@ -193,7 +193,7 @@ const Index = () => {
           {/* Nuova Sezione Recensioni */}
           <div className="border-t border-border pt-16 md:pt-24 lg:pt-32">
             <div className="text-center mb-16">
-              <h2 className="font-display text-primary text-3xl md:text-5xl mb-4 uppercase">Recensioni</h2>
+              <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4 uppercase">Recensioni</h2>
               <div className="w-24 h-1 bg-primary/20 mx-auto rounded-full" />
             </div>
 
