@@ -99,16 +99,16 @@ const Index = () => (
     </section>
 
     {/* Anteprima Alloggi */}
-    <section className="py-16 md:py-24 bg-background">
-      <div className="container">
-        <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4">I nostri appartamenti</h2>
-        <p className="text-muted-foreground text-center max-w-xl mx-auto mb-12">
+    <section className="py-10 sm:py-16 md:py-24 bg-background">
+      <div className="container px-4">
+        <h2 className="font-display text-primary text-xl sm:text-2xl md:text-3xl text-center mb-3 md:mb-4">I nostri appartamenti</h2>
+        <p className="text-muted-foreground text-center max-w-xl mx-auto mb-8 sm:mb-12 text-sm sm:text-base">
           Spazi luminosi, arredati con cura e pronti per accoglierti.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {apartments.map((apt) => (
             <div key={apt.name} className="bg-card rounded-2xl overflow-hidden card-shadow hover:card-shadow-hover transition-shadow group">
-              <div className="overflow-hidden h-56">
+              <div className="overflow-hidden h-48 sm:h-56">
                 <img
                   src={apt.img}
                   alt={apt.name}
@@ -116,10 +116,10 @@ const Index = () => (
                   loading="lazy"
                 />
               </div>
-              <div className="p-6">
-                <h3 className="font-display text-primary text-lg mb-2">{apt.name}</h3>
-                <p className="text-sm text-muted-foreground mb-3 leading-relaxed">{apt.desc}</p>
-                <p className="text-primary font-semibold mb-4">{apt.price}</p>
+              <div className="p-4 sm:p-6">
+                <h3 className="font-display text-primary text-base sm:text-lg mb-2">{apt.name}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-3 leading-relaxed">{apt.desc}</p>
+                <p className="text-primary font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{apt.price}</p>
                 <Button variant="outline" size="sm" asChild className="w-full rounded-full">
                   <Link to={apt.link}>Scopri di più <ArrowRight className="w-4 h-4 ml-1" /></Link>
                 </Button>
