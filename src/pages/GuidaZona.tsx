@@ -93,8 +93,41 @@ const GuidaZona = () => (
       </div>
     </section>
 
+    {/* Quick Navigation Menu */}
+    <nav className="bg-background py-8 border-b border-border">
+      <div className="container max-w-2xl px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a 
+            href="#ospedale" 
+            className="flex items-center gap-4 p-4 rounded-2xl bg-accent/50 border border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all group shadow-sm"
+          >
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <Hospital className="w-5 h-5 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs uppercase tracking-wider font-bold text-primary/70">Scopri L'</p>
+              <p className="font-display text-primary font-bold">Ospedale S. Raffaele</p>
+            </div>
+          </a>
+          
+          <a 
+            href="#quartiere" 
+            className="flex items-center gap-4 p-4 rounded-2xl bg-accent/50 border border-primary/10 hover:border-primary/40 hover:bg-primary/5 transition-all group shadow-sm"
+          >
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <Trees className="w-5 h-5 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs uppercase tracking-wider font-bold text-primary/70">Il Quartiere &</p>
+              <p className="font-display text-primary font-bold">I Servizi di Milano 2</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </nav>
+
     {/* Articolo Ospedale */}
-    <section className="py-16 md:py-24 bg-accent/30">
+    <section id="ospedale" className="py-16 md:py-24 bg-accent/30 scroll-mt-20">
       <div className="container">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -187,7 +220,7 @@ const GuidaZona = () => (
       </div>
     </section>
           {/* Sezione Unificata: Il Quartiere e i suoi Servizi */}
-    <section className="py-16 md:py-24 overflow-hidden">
+    <section id="quartiere" className="py-16 md:py-24 overflow-hidden scroll-mt-20">
       <div className="container">
         <div className="flex flex-col lg:flex-row gap-12 items-center mb-20">
           <div className="w-full lg:w-1/2 space-y-6">

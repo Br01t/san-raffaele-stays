@@ -199,7 +199,7 @@ const Index = () => (
             <img 
               src={gestoreImg} 
               alt="Il gestore Gabriele" 
-              className="w-full h-full object-cover rounded-full shadow-xl border-4 border-background/20"
+              className="w-full h-full object-cover object-top rounded-full shadow-xl border-4 border-background/20"
             />
           </div>
         </div>

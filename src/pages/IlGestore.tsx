@@ -66,7 +66,7 @@ const IlGestore = () => (
             <img 
               src={gestoreImg} 
               alt="Il gestore" 
-              className="w-full h-full object-cover rounded-full shadow-lg border-4 border-background"
+              className="w-full h-full object-cover object-top rounded-full shadow-lg border-4 border-background"
             />
           </div>
         </div>
