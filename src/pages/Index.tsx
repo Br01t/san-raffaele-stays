@@ -78,7 +78,7 @@ const Index = () => (
     {/* Vantaggi - circular cards style */}
     <section className="relative overflow-hidden">
       {/* Background image */}
-      <div className="w-full h-[420px] md:h-[480px]">
+      <div className="w-full h-[620px] md:h-[680px]">
         <img
           src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
           alt="Panorama Milano 2"
