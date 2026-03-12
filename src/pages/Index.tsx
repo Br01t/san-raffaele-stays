@@ -47,20 +47,20 @@ const zonaPois = [
 const Index = () => (
   <>
     {/* Hero */}
-    <section className="bg-background py-16 md:py-24">
-      <div className="container">
-        <div className="grid md:grid-cols-2 gap-10 items-center">
+    <section className="bg-background py-10 sm:py-16 md:py-24">
+      <div className="container px-4">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center">
           <div>
-            <h1 className="font-display text-primary text-3xl md:text-5xl leading-tight mb-2">
+            <h1 className="font-display text-primary text-2xl sm:text-3xl md:text-5xl leading-tight mb-2">
               Appartamenti
             </h1>
-            <p className="text-xl md:text-2xl font-semibold text-foreground mb-6">
+            <p className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-4 sm:mb-6">
               nei pressi dell'Ospedale San Raffaele!
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-8">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 sm:mb-8">
               AMICI DELL'OSPEDALE offre affitti a breve termine di alloggi, nelle vicinanze dell'<strong>Ospedale San Raffaele</strong>, Milano 2. I nostri appartamenti sono pensati per i parenti e i pazienti che hanno bisogno di sistemazioni comode e funzionali.
             </p>
-            <Button size="lg" asChild className="rounded-full px-8">
+            <Button size="lg" asChild className="rounded-full px-6 sm:px-8">
               <Link to="/contatti">Contattaci</Link>
             </Button>
           </div>
@@ -68,7 +68,7 @@ const Index = () => (
             <img
               src={laghettoImg}
               alt="Appartamento luminoso vicino all'Ospedale San Raffaele a Milano"
-              className="w-full rounded-2xl shadow-lg object-cover h-72 md:h-96"
+              className="w-full rounded-2xl shadow-lg object-cover h-56 sm:h-72 md:h-96"
             />
           </div>
         </div>
