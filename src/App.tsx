@@ -10,6 +10,7 @@ import ComeRaggiungerci from "./pages/ComeRaggiungerci";
 import IlGestore from "./pages/IlGestore";
 import GuidaZona from "./pages/GuidaZona";
 import Contatti from "./pages/Contatti";
+import Recensioni from "./pages/Recensioni";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
