@@ -1,4 +1,7 @@
-import { Car, Train, Bus, Plane, MapPin } from "lucide-react";
+import { Car, Train, Bus, Plane, MapPin, X } from "lucide-react";
+import metroMapImg from "@/assets/MAPPA ATM.webp";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 const directions = [
   {
@@ -60,7 +63,7 @@ const ComeRaggiungerci = () => (
           <div className="rounded-xl overflow-hidden h-80 card-shadow">
             <iframe
               title="Mappa - Come raggiungerci"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5594.5!2d9.264!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c7b3e0f2a6ad%3A0x2!2sOspedale+San+Raffaele!5e0!3m2!1sit!2sit!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -69,16 +72,33 @@ const ComeRaggiungerci = () => (
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
-          <div className="rounded-xl overflow-hidden h-80 card-shadow group relative cursor-pointer" onClick={() => window.open('https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/metro-milano-mappa.jpg-AMqpKMJ1WBU678QO.webp', '_blank')}>
-            <img 
-              src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/metro-milano-mappa.jpg-AMqpKMJ1WBU678QO.webp" 
-              alt="Mappa della Metropolitana di Milano" 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <span className="text-white font-medium bg-black/50 px-4 py-2 rounded-lg backdrop-blur-sm">Clicca per ingrandire la mappa Metro</span>
-            </div>
-          </div>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="rounded-xl overflow-hidden h-80 card-shadow group relative cursor-pointer">
+                <img 
+                  src={metroMapImg} 
+                  alt="Mappa della Metropolitana di Milano" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-white font-medium bg-black/50 px-4 py-2 rounded-lg backdrop-blur-sm">Clicca per ingrandire la mappa Metro</span>
+                </div>
+              </div>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-black/90 shadow-none flex items-center justify-center [&>button]:hidden">
+              <div className="relative w-full h-full flex items-center justify-center">
+                <DialogPrimitive.Close className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8">
+                  <X className="h-8 w-8" />
+                </DialogPrimitive.Close>
+                <img
+                  src={metroMapImg}
+                  alt="Mappa Metro Ingrandita"
+                  className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Indicazioni */}

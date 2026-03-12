@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import miniLogo from "@/assets/MINI_LOGO_-removebg-preview.webp";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -19,8 +20,8 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <nav className="container flex items-center justify-between h-16 md:h-18">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg text-primary">
-          <Heart className="w-6 h-6 fill-primary" />
+        <Link to="/" className="flex items-center gap-3 font-display text-xl text-primary">
+          <img src={miniLogo} alt="Logo" className="w-14 h-14 object-contain" />
           <span>Amici dell'Ospedale</span>
         </Link>
 

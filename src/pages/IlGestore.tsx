@@ -1,4 +1,5 @@
 import { Heart, Users, Star, Phone, Mail } from "lucide-react";
+import gestoreImg from "@/assets/foto VISO PERSONALE.webp";
 
 const IlGestore = () => (
   <>
@@ -63,7 +64,7 @@ const IlGestore = () => (
           </div>
           <div className="w-32 h-32 md:w-40 md:h-40 shrink-0">
             <img 
-              src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=984,h=984,fit=crop/A0xr56pZqkuyoQl8/p1024981-Yg253388a7cGqwEB.jpg" 
+              src={gestoreImg} 
               alt="Il gestore" 
               className="w-full h-full object-cover rounded-full shadow-lg border-4 border-background"
             />

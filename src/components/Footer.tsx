@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Heart, Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import miniLogo from "@/assets/MINI_LOGO_-removebg-preview.webp";
 
 const Footer = () => (
   <footer className="bg-foreground text-primary-foreground">
@@ -7,8 +8,8 @@ const Footer = () => (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Brand */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 font-display text-lg">
-            <Heart className="w-5 h-5" />
+          <div className="flex items-center gap-3 font-display text-lg text-primary-foreground">
+            <img src={miniLogo} alt="Logo" className="w-12 h-12 object-contain brightness-0 invert" />
             Amici dell'Ospedale
           </div>
           <p className="text-sm opacity-75 leading-relaxed">
@@ -55,7 +56,7 @@ const Footer = () => (
           <div className="rounded-xl overflow-hidden h-40">
             <iframe
               title="Posizione Amici dell'Ospedale"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2797.2!2d9.264!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDMwJzE4LjAiTiA5wrAxNSc1MC40IkU!5e0!3m2!1sit!2sit!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
               width="100%"
               height="100%"
               style={{ border: 0 }}
