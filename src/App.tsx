@@ -31,6 +31,7 @@ const App = () => (
             <Route path="/il-gestore" element={<IlGestore />} />
             <Route path="/guida-zona" element={<GuidaZona />} />
             <Route path="/contatti" element={<Contatti />} />
+            <Route path="/recensioni" element={<Recensioni />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
           </Route>
