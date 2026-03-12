@@ -5,6 +5,7 @@ import heroImg from "@/assets/hero-apartment.jpg";
 import bedroomImg from "@/assets/apartment-bedroom.jpg";
 import kitchenImg from "@/assets/apartment-kitchen.jpg";
 import livingImg from "@/assets/apartment-living.jpg";
+import laghettoImg from "@/assets/laghetto.webp";
 
 const vantaggi = [
   { title: "Posizione Ottimale", desc: "100 Metri da via Olgettina, 60. Presenti tutti i servizi nelle vicinanze. Bar, ristoranti, farmacia e banca." },
@@ -65,7 +66,7 @@ const Index = () => (
           </div>
           <div>
             <img
-              src="src/assets/laghetto.webp"
+              src={laghettoImg}
               alt="Appartamento luminoso vicino all'Ospedale San Raffaele a Milano"
               className="w-full rounded-2xl shadow-lg object-cover h-72 md:h-96"
             />
