@@ -119,8 +119,9 @@ const ComeRaggiungerci = () => (
                               <div className="rounded-xl overflow-hidden card-shadow group/map relative cursor-pointer border border-border max-w-2xl h-48 md:h-64">
                                 <img 
                                   src={metroMapImg} 
-                                  alt="Mappa della Metropolitana di Milano" 
+                                  alt="Mappa della Metropolitana di Milano - Visualizzazione schematica" 
                                   className="w-full h-full object-cover group-hover/map:scale-105 transition-transform duration-700"
+                                  loading="lazy"
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/map:opacity-100 transition-opacity flex items-center justify-center">
                                   <div className="bg-white text-primary font-medium px-6 py-2 rounded-full shadow-xl flex items-center gap-2">
@@ -132,13 +133,14 @@ const ComeRaggiungerci = () => (
                             </DialogTrigger>
                             <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-black/90 shadow-none flex items-center justify-center [&>button]:hidden">
                               <div className="relative w-full h-full flex items-center justify-center">
-                                <DialogPrimitive.Close className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8">
-                                  <X className="h-8 w-8" />
+                                <DialogPrimitive.Close className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8 outline-none focus-visible:ring-2 focus-visible:ring-white">
+                                  <X className="h-8 w-8" aria-hidden="true" />
                                 </DialogPrimitive.Close>
                                 <img
                                   src={metroMapImg}
-                                  alt="Mappa Metro Ingrandita"
+                                  alt="Mappa Metropolitana di Milano Ingrandita"
                                   className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                                  loading="lazy"
                                 />
                               </div>
                             </DialogContent>

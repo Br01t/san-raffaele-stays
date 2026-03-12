@@ -27,31 +27,34 @@ const Gallery = ({ images, name }: GalleryProps) => {
       >
         <img
           src={images[0]}
-          alt={`${name} - foto principale`}
+          alt={`${name} - Vista principale alloggio`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
         />
-        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
       </div>
 
       {/* Griglia miniature sotto */}
       <div className="grid grid-cols-4 gap-2">
         {images.slice(1, 5).map((img, i) => (
-          <div 
+          <button 
             key={i + 1} 
-            className="relative cursor-pointer group overflow-hidden rounded-lg h-16 sm:h-20 md:h-24"
+            className="relative cursor-pointer group overflow-hidden rounded-lg h-16 sm:h-20 md:h-24 block w-full outline-none focus-visible:ring-2 focus-visible:ring-primary"
             onClick={() => handleOpen(i + 1)}
+            aria-label={`Visualizza foto ${i + 2} di ${name}`}
           >
             <img
               src={img}
-              alt={`${name} - foto ${i + 2}`}
+              alt={`${name} - Miniatura foto ${i + 2}`}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              loading="lazy"
             />
             {i === 3 && images.length > 5 && (
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs sm:text-sm font-semibold">
                 +{images.length - 5}
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>
@@ -62,10 +65,10 @@ const Gallery = ({ images, name }: GalleryProps) => {
             {/* Custom Close Button */}
             <button 
               onClick={() => setOpen(false)}
-              className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8"
-              aria-label="Chiudi galleria"
+              className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8 outline-none focus-visible:ring-2 focus-visible:ring-white"
+              aria-label="Chiudi galleria immagini"
             >
-              <X className="h-8 w-8" />
+              <X className="h-8 w-8" aria-hidden="true" />
             </button>
 
             <Carousel 
@@ -80,14 +83,21 @@ const Gallery = ({ images, name }: GalleryProps) => {
                   <CarouselItem key={i} className="flex items-center justify-center">
                     <img
                       src={img}
-                      alt={`${name} - zoom ${i + 1}`}
+                      alt={`${name} - Dettaglio alloggio foto ${i + 1}`}
                       className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                      loading="lazy"
                     />
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="left-4 md:-left-12 bg-white/90 hover:bg-white border-none text-primary h-12 w-12 sm:h-14 sm:w-14 shadow-lg scale-110 md:scale-125" />
-              <CarouselNext className="right-4 md:-right-12 bg-white/90 hover:bg-white border-none text-primary h-12 w-12 sm:h-14 sm:w-14 shadow-lg scale-110 md:scale-125" />
+              <CarouselPrevious 
+                className="left-4 md:-left-12 bg-white/90 hover:bg-white border-none text-primary h-12 w-12 sm:h-14 sm:w-14 shadow-lg scale-110 md:scale-125" 
+                aria-label="Foto precedente"
+              />
+              <CarouselNext 
+                className="right-4 md:-right-12 bg-white/90 hover:bg-white border-none text-primary h-12 w-12 sm:h-14 sm:w-14 shadow-lg scale-110 md:scale-125" 
+                aria-label="Foto successiva"
+              />
             </Carousel>
           </div>
         </DialogContent>

@@ -40,7 +40,7 @@ const IlGestore = () => (
             { icon: Star, title: "Affidabilità", desc: "Recensioni positive da parte di centinaia di ospiti soddisfatti." },
           ].map((v) => (
             <div key={v.title} className="bg-card rounded-xl p-6 card-shadow text-center">
-              <v.icon className="w-10 h-10 text-primary mx-auto mb-4" />
+              <v.icon className="w-10 h-10 text-primary mx-auto mb-4" aria-hidden="true" />
               <h3 className="font-semibold mb-2">{v.title}</h3>
               <p className="text-sm text-muted-foreground">{v.desc}</p>
             </div>
@@ -53,20 +53,21 @@ const IlGestore = () => (
             <h2 className="font-display text-primary text-xl mb-4">Contatto diretto</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-primary" />
-                <a href="tel:+390200000000" className="text-muted-foreground hover:text-primary transition-colors">+39 02 000 00 000</a>
+                <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
+                <a href="tel:+390200000000" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Chiama il numero fisso">+39 02 000 00 000</a>
               </div>
               <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-primary" />
-                <a href="mailto:info@amicidellospedale.it" className="text-muted-foreground hover:text-primary transition-colors">info@amicidellospedale.it</a>
+                <Mail className="w-5 h-5 text-primary" aria-hidden="true" />
+                <a href="mailto:info@amicidellospedale.it" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Invia un'email">info@amicidellospedale.it</a>
               </div>
             </div>
           </div>
           <div className="w-32 h-32 md:w-40 md:h-40 shrink-0">
             <img 
               src={gestoreImg} 
-              alt="Il gestore" 
+              alt="Gabriele, il gestore di Amici dell'Ospedale" 
               className="w-full h-full object-cover object-top rounded-full shadow-lg border-4 border-background"
+              loading="lazy"
             />
           </div>
         </div>

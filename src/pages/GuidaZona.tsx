@@ -170,11 +170,12 @@ const GuidaZona = () => (
                 </div>
               </div>
               
-              <div className="md:col-span-1 rounded-2xl overflow-hidden card-shadow bg-card p-1 border border-primary/5 flex items-center justify-center aspect-square md:aspect-auto">
+                <div className="md:col-span-1 rounded-2xl overflow-hidden card-shadow bg-card p-1 border border-primary/5 flex items-center justify-center aspect-square md:aspect-auto">
                 <img
                   src={researchImg}
-                  alt="Percorsi Ospedale"
+                  alt="Dipartimento Ricerca Ospedale San Raffaele"
                   className="w-full h-full object-cover rounded-xl"
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -184,28 +185,30 @@ const GuidaZona = () => (
           <div className="lg:col-span-7 order-1 lg:order-2">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="rounded-[2.5rem] overflow-hidden card-shadow bg-card p-2.5 cursor-pointer group relative border border-white/20">
+                <div className="rounded-[2.5rem] overflow-hidden card-shadow bg-card p-2.5 cursor-pointer group relative border border-white/20" aria-label="Ingrandisci mappa ospedale">
                   <img
                     src={sanRaffaeleMap}
-                    alt="Mappa dell'Ospedale San Raffaele"
+                    alt="Mappa settori e reparti dell'Ospedale San Raffaele - Visualizzazione orientativa"
                     className="w-full h-auto rounded-[2rem] group-hover:scale-[1.02] transition-transform duration-1000 ease-in-out"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                     <div className="bg-white/90 text-primary text-xs font-bold px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <Hospital className="w-4 h-4" /> INGRANDISCI MAPPA
+                      <Hospital className="w-4 h-4" aria-hidden="true" /> INGRANDISCI MAPPA
                     </div>
                   </div>
                 </div>
               </DialogTrigger>
               <DialogContent className="max-w-[98vw] max-h-[98vh] p-0 border-none bg-black/95 shadow-none flex items-center justify-center [&>button]:hidden">
                 <div className="relative w-full h-full flex items-center justify-center">
-                  <DialogPrimitive.Close className="absolute top-6 right-6 z-[60] bg-white text-primary p-3 rounded-full hover:bg-primary hover:text-white transition-all shadow-2xl">
-                    <X className="h-6 w-6" />
+                  <DialogPrimitive.Close className="absolute top-6 right-6 z-[60] bg-white text-primary p-3 rounded-full hover:bg-primary hover:text-white transition-all shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label="Chiudi mappa ospedale">
+                    <X className="h-6 w-6" aria-hidden="true" />
                   </DialogPrimitive.Close>
                   <img
                     src={sanRaffaeleMap}
-                    alt="Mappa Ospedale Ingrandita"
+                    alt="Mappa Ospedale San Raffaele Ingrandita"
                     className="max-w-full max-h-[92vh] object-contain rounded-lg"
+                    loading="lazy"
                   />
                 </div>
               </DialogContent>
@@ -226,7 +229,7 @@ const GuidaZona = () => (
           <div className="w-full lg:w-1/2 space-y-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Trees className="w-6 h-6 text-primary" />
+                <Trees className="w-6 h-6 text-primary" aria-hidden="true" />
               </div>
               <h2 className="font-display text-primary text-2xl md:text-3xl font-bold">Vivere a Milano 2: Un'Oasi di Servizi</h2>
             </div>
@@ -243,7 +246,7 @@ const GuidaZona = () => (
               {milano2Features.map((f) => (
                 <div key={f.text} className="flex flex-col items-center text-center bg-card rounded-2xl p-4 card-shadow border border-primary/5 hover:bg-primary/5 transition-colors">
                   <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center mb-3">
-                    <f.icon className="w-5 h-5 text-primary" />
+                    <f.icon className="w-5 h-5 text-primary" aria-hidden="true" />
                   </div>
                   <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground/80 leading-tight">{f.text}</span>
                 </div>
@@ -260,15 +263,17 @@ const GuidaZona = () => (
               <div className="rounded-3xl overflow-hidden card-shadow transform -rotate-2 hover:rotate-0 transition-transform duration-700">
                 <img
                   src={laghettoImg}
-                  alt="Il laghetto dei cigni a Milano 2"
+                  alt="Il laghetto dei cigni a Milano 2 - Oasi di pace a Segrate"
                   className="w-full h-64 md:h-80 object-cover"
+                  loading="lazy"
                 />
               </div>
               <div className="rounded-3xl overflow-hidden card-shadow transform rotate-2 hover:rotate-0 transition-transform duration-700 mt-8">
                 <img
                   src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=984,h=984,fit=crop/A0xr56pZqkuyoQl8/img_1885-dWx04wb2nbu1qBDK.jpg"
-                  alt="Milano 2 e dintorni"
+                  alt="Architettura caratteristica di Milano 2"
                   className="w-full h-64 md:h-80 object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -276,7 +281,7 @@ const GuidaZona = () => (
             <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-2xl hidden md:block border border-primary/5 max-w-[200px]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5 text-white" />
+                  <ShoppingBag className="w-5 h-5 text-white" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-primary italic">Tutto quello che ti serve</p>

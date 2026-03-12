@@ -38,15 +38,15 @@ const Contatti = () => {
               <h2 className="font-display text-primary text-xl">Informazioni di contatto</h2>
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: "Telefono", value: "+39 02 000 00 000", href: "tel:+390200000000" },
-                  { icon: MessageCircle, label: "WhatsApp", value: "Scrivici su WhatsApp", href: "https://wa.me/390200000000" },
-                  { icon: Mail, label: "Email", value: "info@amicidellospedale.it", href: "mailto:info@amicidellospedale.it" },
+                  { icon: Phone, label: "Telefono", value: "+39 02 000 00 000", href: "tel:+390200000000", aria: "Chiama il numero fisso" },
+                  { icon: MessageCircle, label: "WhatsApp", value: "Scrivici su WhatsApp", href: "https://wa.me/390200000000", aria: "Inizia una chat su WhatsApp" },
+                  { icon: Mail, label: "Email", value: "info@amicidellospedale.it", href: "mailto:info@amicidellospedale.it", aria: "Invia un'email" },
                   { icon: MapPin, label: "Indirizzo", value: "Zona Milano 2, Segrate (MI)" },
                   { icon: Clock, label: "Orari", value: "Lun - Sab: 9:00 - 19:00" },
                 ].map((c) => (
                   <div key={c.label} className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                      <c.icon className="w-5 h-5 text-primary" />
+                      <c.icon className="w-5 h-5 text-primary" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{c.label}</p>
@@ -56,6 +56,7 @@ const Contatti = () => {
                           target={c.href.startsWith("https") ? "_blank" : undefined}
                           rel={c.href.startsWith("https") ? "noopener noreferrer" : undefined}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                          aria-label={c.aria}
                         >
                           {c.value}
                         </a>
