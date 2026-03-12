@@ -49,13 +49,13 @@ const apartments: ApartmentData[] = [
 const ImageGrid = ({ images, name }: { images: string[]; name: string }) => {
   const displayImages = images.slice(0, 9);
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-xl overflow-hidden">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 rounded-xl overflow-hidden">
       {displayImages.map((img, i) => (
         <img
           key={i}
           src={img}
           alt={`${name} - foto ${i + 1}`}
-          className="w-full h-28 md:h-36 object-cover hover:opacity-90 transition-opacity"
+          className="w-full h-24 sm:h-28 md:h-36 object-cover hover:opacity-90 transition-opacity"
         />
       ))}
     </div>
