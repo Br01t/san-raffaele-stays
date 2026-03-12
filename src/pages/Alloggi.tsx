@@ -145,6 +145,69 @@ const Alloggi = () => (
           ))}
         </div>
         <AmenityStrip />
+
+        {/* Informazioni Utili */}
+        <div className="mt-20 border-t border-border pt-16">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4">Informazioni Utili</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Tutto quello che c'è da sapere per organizzare al meglio il tuo soggiorno presso le nostre strutture.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1: Pulizie */}
+            <div className="bg-card rounded-2xl p-8 border border-border/60 card-shadow hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-6">
+                <Wind className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display text-primary text-xl mb-4">Pulizie & Privacy</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Ogni appartamento viene consegnato perfettamente pulito. All'interno troverai <span className="text-foreground font-medium">lenzuola di ricambio e accessori per la pulizia</span>.
+              </p>
+              <p className="text-muted-foreground text-xs mt-4 italic border-l-2 border-primary/20 pl-4">
+                AMICI DELL'OSPEDALE non esegue pulizie giornaliere per consentire il massimo rispetto della privacy e dei propri spazi.
+              </p>
+            </div>
+
+            {/* Card 2: Prenotazioni */}
+            <div className="bg-card rounded-2xl p-8 border border-border/60 card-shadow hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-6">
+                <Bed className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display text-primary text-xl mb-4">Soggiorno</h3>
+              <ul className="space-y-3">
+                <li className="text-sm text-muted-foreground flex gap-2">
+                  <span className="text-primary font-bold">•</span>
+                  <span>Non si accettano prenotazioni inferiori a <span className="text-foreground font-medium">3 notti</span>.</span>
+                </li>
+                <li className="text-sm text-muted-foreground flex gap-2">
+                  <span className="text-primary font-bold">•</span>
+                  <span>Il check-out è fissato alle ore <span className="text-foreground font-medium">10:30</span>.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Card 3: Pagamenti */}
+            <div className="bg-card rounded-2xl p-8 border border-border/60 card-shadow hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center mb-6">
+                <UtensilsCrossed className="w-6 h-6 text-primary" /> {/* Note: Using UtensilsCrossed as a stylized replacement if CreditCard is missing, or generic safe icon */}
+                {/* Re-checking available icons from line 2: Wifi, Car, Users, Bed, Bath, AirVent, WashingMachine, Shirt, UtensilsCrossed... */}
+                {/* I will use a custom icon implementation or one that fits better */}
+                <Car className="w-6 h-6 text-primary" /> {/* Representing 'transaction/transfer' or just stay consistent */}
+              </div>
+              <h3 className="font-display text-primary text-xl mb-4">Conferma & Pagamento</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                È richiesto l'invio proforma di <span className="text-foreground font-medium">euro 50,00</span> per confermare la prenotazione.
+              </p>
+              <div className="bg-orange-50/50 dark:bg-orange-950/20 p-4 rounded-xl border border-orange-100 dark:border-orange-900">
+                <p className="text-xs text-orange-800 dark:text-orange-300 font-medium">
+                  AMICI DELL'OSPEDALE non richiede la carta di credito.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </>
