@@ -9,7 +9,6 @@ const navLinks = [
   { to: "/come-raggiungerci", label: "Come raggiungerci" },
   { to: "/il-gestore", label: "Il gestore" },
   { to: "/guida-zona", label: "Guida alla zona" },
-  { to: "/recensioni", label: "Recensioni" },
   { to: "/contatti", label: "Contatti" },
 ];
 
@@ -20,9 +19,9 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <nav className="container flex items-center justify-between h-16 md:h-18">
-        <Link to="/" className="flex items-center gap-3 font-display text-xl text-primary">
-          <img src={miniLogo} alt="Logo" className="w-14 h-14 object-contain" />
-          <span>Amici dell'Ospedale</span>
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 font-display text-lg sm:text-xl text-primary shrink-0">
+          <img src={miniLogo} alt="Logo" className="w-10 h-10 sm:w-14 sm:h-14 object-contain" />
+          <span className="leading-tight">Amici dell'Ospedale</span>
         </Link>
 
         {/* Desktop */}
