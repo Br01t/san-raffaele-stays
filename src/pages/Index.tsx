@@ -75,24 +75,22 @@ const Index = () => (
       </div>
     </section>
 
-    {/* Vantaggi - circular cards style */}
+    {/* Vantaggi */}
     <section className="relative overflow-hidden">
-      {/* Background image */}
-      <div className="w-full h-[620px] md:h-[680px]">
+      <div className="w-full h-auto min-h-[500px] sm:h-[580px] md:h-[680px]">
         <img
           src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
           alt="Panorama Milano 2"
           className="w-full h-full object-cover"
         />
       </div>
-      {/* Circles overlapping the image from above */}
       <div className="container absolute inset-x-0 top-0 left-1/2 -translate-x-1/2 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 pt-6 sm:pt-8">
           {vantaggi.map((v) => (
             <div key={v.title} className="flex flex-col items-center text-center">
-              <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-8 shadow-lg">
-                <h3 className="font-display text-primary text-lg md:text-xl mb-3">{v.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
+              <div className="w-40 h-40 sm:w-44 sm:h-44 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-5 sm:p-6 md:p-8 shadow-lg">
+                <h3 className="font-display text-primary text-sm sm:text-base md:text-lg lg:text-xl mb-1 sm:mb-2 md:mb-3">{v.title}</h3>
+                <p className="text-xs sm:text-xs md:text-sm text-muted-foreground leading-snug sm:leading-relaxed">{v.desc}</p>
               </div>
             </div>
           ))}
