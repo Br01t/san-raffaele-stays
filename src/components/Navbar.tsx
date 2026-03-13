@@ -20,8 +20,8 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <nav className="container flex items-center justify-between h-16 md:h-18">
         <Link to="/" className="flex items-center gap-2 sm:gap-3 font-display text-lg sm:text-xl text-primary shrink-0">
-          <img src={miniLogo} alt="Logo" className="w-10 h-10 sm:w-14 sm:h-14 object-contain" />
-          <span className="leading-tight">Amici dell'Ospedale</span>
+          <img src={miniLogo} alt="Logo Amici del San Raffaele" className="w-10 h-10 sm:w-14 sm:h-14 object-contain" />
+          <span className="leading-tight">Amici del San Raffaele</span>
         </Link>
 
         {/* Desktop */}

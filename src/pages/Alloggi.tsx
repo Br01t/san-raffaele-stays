@@ -45,7 +45,7 @@ interface ApartmentData {
 
 const apartments: ApartmentData[] = [
   {
-    name: "Amici 1",
+    name: "AMICI 1",
     location: "Accogliente bilocale situato in posizione tranquilla a Milano 2, a pochissimi passi dall'ingresso dell'Ospedale San Raffaele.",
     services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice"],
     beds: "1 letto matrimoniale, 1 divano letto. Totale 3 posti letto.",
@@ -57,8 +57,8 @@ const apartments: ApartmentData[] = [
     images: [amici1_1, amici1_2, amici1_3, amici1_4, amici1_5, amici1_6, amici1_7, amici1_8],
   },
   {
-    name: "Amici 2",
-    location: "L'Alloggio AMICI 2 si posiziona tra le primi residenze nelle vicinanze del San Raffaele. Dal terrazzo è possibile vedere l'OSR. L'entra di Via Olgettina dista circa 150 metri.",
+    name: "AMICI 2",
+    location: "L'Alloggio AMICI 2 si posiziona tra le primi residenze nelle vicinanze del San Raffaele. Dal terrazzo è possibile vedere l'OSR. L'entrata di Via Olgettina dista circa 150 metri.",
     services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice", "Terrazzo"],
     beds: "1 letto matrimoniale, 1 letto singolo, 1 divano letto. Per un totale di 4 posti letto. O anche 4 posti letto + 1 bambino/a.",
     prices: [
@@ -70,7 +70,7 @@ const apartments: ApartmentData[] = [
     images: [amici2_1, amici2_2, amici2_3, amici2_4, amici2_5, amici2_6],
   },
   {
-    name: "Amici 3",
+    name: "AMICI 3",
     location: "Alloggio moderno e funzionale situato a brevissima distanza dall'Ospedale San Raffaele, ideale per soggiorni brevi in totale relax.",
     services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice"],
     beds: "1 letto matrimoniale, 1 divano letto. Per un totale di 3-4 posti letto.",
@@ -92,7 +92,7 @@ const Alloggi = () => (
         <div className="space-y-10 sm:space-y-16">
           {apartments.map((apt) => (
             <article key={apt.name} className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 card-shadow">
-              <h2 className="font-display text-primary text-xl sm:text-2xl mb-4 sm:mb-6 uppercase tracking-wider">{apt.name}</h2>
+              <h2 className="font-display text-primary text-xl sm:text-2xl mb-4 sm:mb-6">{apt.name}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 border-b border-border pb-8 mb-8 last:border-0 last:pb-0 last:mb-0">
                 {/* Left: images (50% width, full height) */}
                 <div className="h-full">
@@ -166,7 +166,7 @@ const Alloggi = () => (
                 Ogni appartamento viene consegnato perfettamente pulito. All'interno troverai <span className="text-foreground font-medium">lenzuola di ricambio e accessori per la pulizia</span>.
               </p>
               <p className="text-muted-foreground text-xs mt-4 italic border-l-2 border-primary/20 pl-4">
-                AMICI DELL'OSPEDALE non esegue pulizie giornaliere per consentire il massimo rispetto della privacy e dei propri spazi.
+                AMICI DEL SAN RAFFAELE non esegue pulizie giornaliere per consentire il massimo rispetto della privacy e dei propri spazi.
               </p>
             </div>
 
@@ -202,7 +202,7 @@ const Alloggi = () => (
               </p>
               <div className="bg-orange-50/50 dark:bg-orange-950/20 p-4 rounded-xl border border-orange-100 dark:border-orange-900">
                 <p className="text-xs text-orange-800 dark:text-orange-300 font-medium">
-                  AMICI DELL'OSPEDALE non richiede la carta di credito.
+                  AMICI DEL SAN RAFFAELE non richiede la carta di credito.
                 </p>
               </div>
             </div>

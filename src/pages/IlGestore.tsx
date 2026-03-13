@@ -7,7 +7,7 @@ const IlGestore = () => (
       <div className="container text-center">
         <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Il gestore</h1>
         <p className="text-primary-foreground/80 max-w-xl mx-auto">
-          Dietro Amici dell'Ospedale c'è una persona che conosce bene le esigenze di chi vive momenti delicati.
+          Dietro Amici del San Raffaele c'è una persona che conosce bene le esigenze di chi vive momenti delicati.
         </p>
       </div>
     </section>
@@ -18,7 +18,7 @@ const IlGestore = () => (
           <h2 className="font-display text-primary text-2xl mb-6">La nostra storia</h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              Amici dell'Ospedale nasce per offrire un alloggio comodo e accogliente a chi deve soggiornare vicino al San Raffaele per motivi di salute o lavoro.
+              Amici del San Raffaele nasce per offrire un alloggio comodo e accogliente a chi deve soggiornare vicino al San Raffaele per motivi di salute o lavoro.
             </p>
             <p>
               L'idea è nata dall'esperienza diretta di chi ha vissuto la necessità di trovare un posto sicuro e vicino all'ospedale durante un momento delicato della vita. Sappiamo quanto sia importante avere un punto di appoggio pulito, accogliente e a portata di mano quando un familiare è ricoverato o quando si devono affrontare cicli di cure che richiedono soggiorni prolungati.
@@ -65,7 +65,7 @@ const IlGestore = () => (
           <div className="w-32 h-32 md:w-40 md:h-40 shrink-0">
             <img 
               src={gestoreImg} 
-              alt="Gabriele, il gestore di Amici dell'Ospedale" 
+              alt="Gabriele, il gestore di Amici del San Raffaele" 
               className="w-full h-full object-cover object-top rounded-full shadow-lg border-4 border-background"
               loading="lazy"
             />

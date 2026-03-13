@@ -10,7 +10,7 @@ const PrivacyPolicy = () => (
         <div className="bg-card rounded-xl p-8 md:p-12 card-shadow prose prose-sm max-w-none text-muted-foreground">
           <h2 className="text-foreground">Informativa sulla privacy</h2>
           <p>
-            Amici dell'Ospedale rispetta la tua privacy. I dati personali raccolti tramite il modulo di contatto vengono utilizzati esclusivamente per rispondere alle tue richieste e non vengono ceduti a terzi.
+            Amici del San Raffaele rispetta la tua privacy. I dati personali raccolti tramite il modulo di contatto vengono utilizzati esclusivamente per rispondere alle tue richieste e non vengono ceduti a terzi.
           </p>
           <p>
             Per maggiori informazioni sui tuoi diritti in materia di protezione dei dati personali, puoi contattarci all'indirizzo email info@amicidellospedale.it.

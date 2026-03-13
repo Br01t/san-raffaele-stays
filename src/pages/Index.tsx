@@ -18,21 +18,21 @@ const vantaggi = [
 
 const apartments = [
   {
-    name: "Amici 1",
+    name: "AMICI 1",
     desc: "Bilocale luminoso con camera matrimoniale e cucina attrezzata. Perfetto per soggiorni singoli o di coppia.",
     price: "da €80/notte",
     img: amici1_1,
     link: "/alloggi",
   },
   {
-    name: "Amici 2",
+    name: "AMICI 2",
     desc: "Trilocale spazioso con terrazzo vista Ospedale. Ideale per famiglie o soggiorni prolungati.",
     price: "da €90/notte",
     img: amici2_1,
     link: "/alloggi",
   },
   {
-    name: "Amici 3",
+    name: "AMICI 3",
     desc: "Monolocale moderno e funzionale con tutti i comfort. La soluzione pratica per brevi soggiorni.",
     price: "da €75/notte",
     img: amici3_1,
@@ -67,7 +67,7 @@ const Index = () => {
             Appartamenti nei pressi dell'Ospedale San Raffaele
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-6">
-            <b>AMICI DELL'OSPEDALE</b> offre affitti a breve termine di alloggi, nelle vicinanze dell'<strong>Ospedale San Raffaele</strong>, Milano 2. I nostri appartamenti sono pensati per i parenti e i pazienti che hanno bisogno di sistemazioni comode e funzionali.
+            <b>AMICI DEL SAN RAFFAELE</b> offre affitti a breve termine di alloggi, nelle vicinanze dell'<strong>Ospedale San Raffaele</strong>, Milano 2. I nostri appartamenti sono pensati per i parenti e i pazienti che hanno bisogno di sistemazioni comode e funzionali.
           </p>
           <Button size="lg" asChild className="rounded-full px-8">
             <Link to="/contatti" aria-label="Contattaci per informazioni">Contattaci</Link>
@@ -114,9 +114,9 @@ const Index = () => {
       {/* Anteprima Alloggi */}
       <section className="py-10 sm:py-16 md:py-24 bg-background">
         <div className="container px-4">
-          <h2 className="font-display text-primary text-xl sm:text-2xl md:text-3xl text-center mb-3 md:mb-4 uppercase">I nostri appartamenti</h2>
+          <h2 className="font-display text-primary text-xl sm:text-2xl md:text-3xl text-center mb-3 md:mb-4">I nostri appartamenti</h2>
           <p className="text-muted-foreground text-center max-w-xl mx-auto mb-8 sm:mb-12 text-sm sm:text-base">
-            Spazi luminosi, arredati con cura e pronti per accoglierti.
+            Spazi luminosi, arredati con cura e pronti per accoglierti. Tutti i nostri appartamenti si trovano a circa <span className="text-primary font-bold">150 metri a piedi</span> dall'ingresso dell'Ospedale San Raffaele.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {apartments.map((apt) => (
@@ -148,9 +148,9 @@ const Index = () => {
       <section className="section-gradient py-16 md:py-24">
         <div className="container px-4">
           <div className="max-w-3xl mx-auto text-center mb-10 md:mb-12">
-            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4 text-center uppercase">La nostra posizione</h2>
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4 text-center">La nostra posizione</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              Gli appartamenti Amici dell'Ospedale si trovano a Milano 2, una zona residenziale tranquilla a pochi minuti dall'Ospedale San Raffaele, facilmente raggiungibile a piedi o con i mezzi.
+              Gli appartamenti Amici del San Raffaele si trovano a Milano 2, una zona residenziale tranquilla a pochi minuti dall'Ospedale San Raffaele, facilmente raggiungibile a piedi o con i mezzi.
             </p>
             <Button variant="outline" asChild className="rounded-full">
               <Link to="/come-raggiungerci" aria-label="Visualizza indicazioni stradali">Come raggiungerci <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
@@ -174,7 +174,7 @@ const Index = () => {
       {/* Guida alla zona preview */}
       <section className="py-16 md:py-24 bg-background">
         <div className="container">
-          <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4 uppercase">Servizi nella zona</h2>
+          <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4">Servizi nella zona</h2>
           <p className="text-muted-foreground text-center max-w-xl mx-auto mb-12">
             Milano 2 offre tutto ciò di cui hai bisogno durante il tuo soggiorno.
           </p>
@@ -195,7 +195,7 @@ const Index = () => {
           {/* Nuova Sezione Recensioni */}
           <div className="border-t border-border pt-16 md:pt-24 lg:pt-32">
             <div className="text-center mb-16">
-              <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4 uppercase">Recensioni</h2>
+              <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4">Recensioni</h2>
               <div className="w-24 h-1 bg-primary/20 mx-auto rounded-full" aria-hidden="true" />
             </div>
 
@@ -356,7 +356,7 @@ const Index = () => {
             <div className="w-32 h-32 md:w-48 md:h-48 shrink-0">
               <img 
                 src={gestoreImg} 
-                alt="Gabriele, il gestore di Amici dell'Ospedale" 
+                alt="Gabriele, il gestore di Amici del San Raffaele" 
                 className="w-full h-full object-cover object-top rounded-full shadow-xl border-4 border-background/20"
                 loading="lazy"
               />
