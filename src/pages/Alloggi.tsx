@@ -144,6 +144,9 @@ const Alloggi = () => (
             </article>
           ))}
         </div>
+        <h3 className="font-display text-primary text-xl text-center mt-12 mb-6">
+            Comfort degli appartamenti
+        </h3>
         <AmenityStrip />
 
         {/* Informazioni Utili */}
