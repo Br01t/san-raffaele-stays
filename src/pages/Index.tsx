@@ -140,6 +140,9 @@ const Index = () => {
               </article>
             ))}
           </div>
+          <h3 className="font-display text-primary text-xl text-center mt-12 mb-6">
+            Comfort degli appartamenti
+          </h3>
           <AmenityStrip />
         </div>
       </section>
@@ -174,15 +177,15 @@ const Index = () => {
       {/* Guida alla zona preview */}
       <section className="py-16 md:py-24 bg-background">
         <div className="container">
-          <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4">Servizi nella zona</h2>
+          <h2 className="font-display text-primary text-2xl md:text-3xl text-center mb-4">Guida alla zona</h2>
           <p className="text-muted-foreground text-center max-w-xl mx-auto mb-12">
             Milano 2 offre tutto ciò di cui hai bisogno durante il tuo soggiorno.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-10 mb-8">
             {zonaPois.map((p) => (
-              <div key={p.label} className="bg-card rounded-2xl p-6 card-shadow text-center">
-                <p.icon className="w-10 h-10 text-primary mx-auto mb-3" aria-hidden="true" />
-                <span className="text-sm font-medium">{p.label}</span>
+              <div key={p.label} className="flex items-center gap-2 text-muted-foreground">
+                <p.icon className="w-5 h-5 text-primary" />
+                <span className="text-sm">{p.label}</span>
               </div>
             ))}
           </div>
