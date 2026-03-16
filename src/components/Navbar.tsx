@@ -6,7 +6,7 @@ import miniLogo from "@/assets/MINI_LOGO_-removebg-preview.webp";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/alloggi", label: "Alloggi" },
-  { to: "/come-raggiungerci", label: "Come raggiungerci" },
+  { to: "/come-raggiungerci", label: "Come arrivare" },
   { to: "/guida-zona", label: "Guida alla zona" },
   { to: "/contatti", label: "Contatti" },
 ];

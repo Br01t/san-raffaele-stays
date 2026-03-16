@@ -120,23 +120,6 @@ const Contatti = () => {
             </div>
           </div>
 
-          {/* Mappa */}
-          <div className="mt-12 mb-20">
-            <h2 className="font-display text-primary text-xl mb-4">Dove siamo</h2>
-            <div className="rounded-xl overflow-hidden h-72 card-shadow">
-              <iframe
-                title="Posizione Amici del San Raffaele"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5594.5!2d9.264!3d45.505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c7b3e0f2a6ad%3A0x2!2sOspedale+San+Raffaele!5e0!3m2!1sit!2sit!4v1"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-          </div>
-
           {/* Il Gestore - Merged Content */}
           <div className="border-t border-border pt-20">
             <div className="max-w-3xl mx-auto">

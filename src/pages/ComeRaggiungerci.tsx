@@ -59,7 +59,7 @@ const ComeRaggiungerci = () => {
 
       <section className="hero-gradient py-12 md:py-16">
         <div className="container text-center">
-          <h1 className="font-display text-3xl md:text-5xl text-primary-foreground mb-4">Come raggiungerci</h1>
+          <h1 className="font-display text-3xl md:text-5xl text-primary-foreground mb-4">Come arrivare</h1>
           <p className="text-primary-foreground/90 max-w-2xl mx-auto text-lg">
             Tutte le indicazioni per raggiungere i nostri appartamenti a Milano 2, Segrate.
           </p>
