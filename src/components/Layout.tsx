@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import CookieConsent from "./CookieConsent";
 
 const Layout = () => (
   <div className="flex flex-col min-h-screen">
@@ -9,6 +10,7 @@ const Layout = () => (
       <Outlet />
     </main>
     <Footer />
+    <CookieConsent />
   </div>
 );
 

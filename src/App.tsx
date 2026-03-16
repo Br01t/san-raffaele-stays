@@ -8,13 +8,10 @@ import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import Alloggi from "./pages/Alloggi";
 import ComeRaggiungerci from "./pages/ComeRaggiungerci";
-import IlGestore from "./pages/IlGestore";
 import GuidaZona from "./pages/GuidaZona";
 import Contatti from "./pages/Contatti";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,12 +28,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/alloggi" element={<Alloggi />} />
             <Route path="/come-raggiungerci" element={<ComeRaggiungerci />} />
-            <Route path="/il-gestore" element={<IlGestore />} />
             <Route path="/guida-zona" element={<GuidaZona />} />
             <Route path="/contatti" element={<Contatti />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
           </Route>
           <Route path="*" element={<NotFound />} />

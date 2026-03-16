@@ -75,12 +75,12 @@ const Index = () => {
           <h1 className="font-display text-primary text-3xl sm:text-4xl md:text-5xl leading-tight mb-10 max-w-2xl mx-auto">
             Appartamenti e Alloggi vicino San Raffaele Milano
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-6">
-            <b>AMICI DEL SAN RAFFAELE</b> offre un servizio di <strong>alloggio vicino San Raffaele Milano</strong> con affitti a breve termine progettati per pazienti e familiari. Se stai cercando dove <strong>dormire vicino San Raffaele</strong>, i nostri <strong>appartamenti vicino San Raffaele</strong> offrono comfort, silenzio e una posizione imbattibile a Milano 2.
+          <p className="text-lg sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-6">
+            Appartamenti a <b>150 metri dall Ospedale San Raffaele</b> ideali per pazienti e familiari.
           </p>
 
           <Button size="lg" asChild className="rounded-full px-8">
-            <Link to="/contatti" aria-label="Contattaci per informazioni">Contattaci</Link>
+            <a href="https://wa.me/393486065567" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp">Contattaci</a>
           </Button>
         </div>
         {/* Full-width panoramic image */}
@@ -164,9 +164,11 @@ const Index = () => {
       <section className="section-gradient py-16 md:py-24">
         <div className="container px-4">
           <div className="max-w-3xl mx-auto text-center mb-10 md:mb-12">
-            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4 text-center">La nostra posizione</h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              Gli appartamenti Amici dell'Ospedale si trovano a Milano 2, in una zona residenziale tranquilla a pochi minuti a piedi dall&#39;Ospedale San Raffaele, raggiungibile comodamente a piedi direttamente dagli appartamenti.
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-8 text-center">La nostra posizione</h2>
+            <p className="text-muted-foreground font-medium mb-6 flex flex-wrap justify-center gap-4 text-sm md:text-base">
+              <span>✅ 3 minuti a piedi dall'ospedale</span>
+              <span>✅ zona tranquilla</span>
+              <span>✅ assistenza per arrivare in ospedale + mappa</span>
             </p>
             <Button variant="outline" asChild className="rounded-full">
               <Link to="/come-raggiungerci" aria-label="Visualizza indicazioni stradali">Come raggiungerci <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
@@ -366,7 +368,7 @@ const Index = () => {
                 Contattaci per disponibilità e informazioni. Gabriele sarà felice di aiutarvi.
               </p>
               <Button size="lg" variant="secondary" asChild className="rounded-full px-8">
-                <Link to="/contatti" aria-label="Richiedi informazioni a Gabriele">Richiedi informazioni</Link>
+                <a href="https://wa.me/393486065567" target="_blank" rel="noopener noreferrer" aria-label="Richiedi informazioni su WhatsApp">Richiedi informazioni</a>
               </Button>
             </div>
             <div className="w-32 h-32 md:w-48 md:h-48 shrink-0">

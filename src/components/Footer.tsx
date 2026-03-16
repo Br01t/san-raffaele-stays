@@ -24,9 +24,7 @@ const Footer = () => (
             <li><Link to="/" className="hover:opacity-100 transition-opacity">Home</Link></li>
             <li><Link to="/alloggi" className="hover:opacity-100 transition-opacity">Alloggi</Link></li>
             <li><Link to="/come-raggiungerci" className="hover:opacity-100 transition-opacity">Come raggiungerci</Link></li>
-            <li><Link to="/il-gestore" className="hover:opacity-100 transition-opacity">Il gestore</Link></li>
             <li><Link to="/guida-zona" className="hover:opacity-100 transition-opacity">Guida alla zona</Link></li>
-            <li><Link to="/blog" className="hover:opacity-100 transition-opacity">Blog</Link></li>
             <li><Link to="/contatti" className="hover:opacity-100 transition-opacity">Contatti</Link></li>
           </ul>
         </div>
@@ -37,11 +35,7 @@ const Footer = () => (
           <ul className="space-y-3 text-sm opacity-80">
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 shrink-0" />
-              <a href="tel:+390200000000" className="hover:opacity-100">+39 02 000 00 000</a>
-            </li>
-            <li className="flex items-center gap-2">
-              <Mail className="w-4 h-4 shrink-0" />
-              <a href="mailto:info@amicidellospedale.it" className="hover:opacity-100">info@amicidellospedale.it</a>
+              <a href="tel:+393486065567" className="hover:opacity-100">+39 348 606 5567</a>
             </li>
             <li className="flex items-start gap-2">
               <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
