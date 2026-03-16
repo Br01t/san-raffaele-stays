@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle, CheckCircle2, ShieldCheck, User } from "lucide-react";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,14 +22,18 @@ const Contatti = () => {
 
   return (
     <>
-      <section className="hero-gradient py-16 md:py-20">
+      <SEO 
+        title="Contatti: Richiedi Disponibilità Alloggio San Raffaele" 
+        description="Contattaci per informazioni e prenotazioni di appartamenti e alloggi vicino al San Raffaele Milano. Risposta rapida e assistenza diretta." 
+      />
+      <div className="min-h-screen bg-background py-16 md:py-24">
         <div className="container text-center">
           <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Contattaci</h1>
           <p className="text-primary-foreground/80 max-w-xl mx-auto">
             Richiedi disponibilità per il tuo soggiorno.
           </p>
         </div>
-      </section>
+      </div>
 
       <section className="py-16 md:py-24">
         <div className="container max-w-4xl">

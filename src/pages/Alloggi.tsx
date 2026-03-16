@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import AmenityStrip from "@/components/AmenityStrip";
 import Gallery from "@/components/Gallery";
+import SEO from "@/components/SEO";
+
 
 // Amici 1 specific images
 import amici1_1 from "@/assets/Screenshot 2026-03-12 alle 15.28.04.webp";
@@ -46,37 +48,40 @@ interface ApartmentData {
 const apartments: ApartmentData[] = [
   {
     name: "AMICI 1",
-    location: "Accogliente bilocale situato in posizione tranquilla a Milano 2, a pochissimi passi dall'ingresso dell'Ospedale San Raffaele.",
-    services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice"],
-    beds: "1 letto matrimoniale, 1 divano letto. Totale 3 posti letto.",
+    location: "L'alloggio AMICI 1 si posiziona tra le prime soluzioni per chi cerca un alloggio vicino San Raffaele Milano. Dal terrazzo è possibile vedere l'OSR (Ospedale San Raffaele). L'entrata di Via Olgettina dista circa 150 metri.",
+
+    services: ["TV", "ARIA CONDIZIONATA", "WI-FI", "PHON IN CAMERA", "CUCINA ATTREZZATA", "BAGNO PRIVATO", "DOCCA", "LAVATRICE", "TERRAZZO"],
+    beds: "1 LETTO MATRIMONIALE, 1 LETTO SINGOLO, 1 DIVANO LETTO. Per un totale di 4 posti letto. O anche 4 posti letto + 1 bambino/a.",
     prices: [
-      { label: "2 Pers.", price: "80 €" },
-      { label: "3 Pers.", price: "90 €" },
+      { label: "2 Pers.", price: "90€" },
+      { label: "3 Pers.", price: "95€" },
+      { label: "4 Pers.", price: "110€" },
     ],
     extras: ["Nessun costo pulizie", "Notte regalo per chi si ospedalizza"],
     images: [amici1_1, amici1_2, amici1_3, amici1_4, amici1_5, amici1_6, amici1_7, amici1_8],
   },
   {
     name: "AMICI 2",
-    location: "L'Alloggio AMICI 2 si posiziona tra le primi residenze nelle vicinanze del San Raffaele. Dal terrazzo è possibile vedere l'OSR. L'entrata di Via Olgettina dista circa 150 metri.",
-    services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice", "Terrazzo"],
-    beds: "1 letto matrimoniale, 1 letto singolo, 1 divano letto. Per un totale di 4 posti letto. O anche 4 posti letto + 1 bambino/a.",
+    location: "L'alloggio AMICI 2 si posiziona tra le primi residenze nelle vicinanze del San Raffaele. Dal terrazzo è possibile vedere l'OSR. L'entrata di Via Olgettina dista circa 100 metri.",
+    services: ["TV", "ARIA CONDIZIONATA", "WI-FI", "PHON IN CAMERA", "CUCINA ATTREZZATA", "BAGNO PRIVATO", "DOCCA", "LAVATRICE", "TERRAZZO"],
+    beds: "2 LETTI MATRIMONIALE, 1 LETTO SINGOLO, 1 DIVANO LETTO. Per un totale di 4 posti letto. O anche 4 posti letto + 1 bambino/a.",
     prices: [
-      { label: "2 Pers.", price: "90 €" },
-      { label: "3 Pers.", price: "95 €" },
-      { label: "4 Pers.", price: "110 €" },
+      { label: "2 Pers.", price: "90€" },
+      { label: "3 Pers.", price: "95€" },
+      { label: "4 Pers.", price: "110€" },
     ],
     extras: ["Nessun costo pulizie", "Notte regalo per chi si ospedalizza"],
     images: [amici2_1, amici2_2, amici2_3, amici2_4, amici2_5, amici2_6],
   },
   {
     name: "AMICI 3",
-    location: "Alloggio moderno e funzionale situato a brevissima distanza dall'Ospedale San Raffaele, ideale per soggiorni brevi in totale relax.",
-    services: ["TV", "Aria condizionata", "Wi-Fi", "Phon in camera", "Cucina attrezzata", "Bagno privato", "Doccia", "Lavatrice"],
-    beds: "1 letto matrimoniale, 1 divano letto. Per un totale di 3-4 posti letto.",
+    location: "L'alloggio AMICI 3 si posiziona tra le primi residenze nelle vicinanze del San Raffaele tra il Supermercato Viaggiator Goloso e l'entrata di Via Olgettina che dista circa 150 metri.",
+    services: ["TV", "ARIA CONDIZIONATA", "WI-FI", "PHON IN CAMERA", "CUCINA ATTREZZATA", "BAGNO PRIVATO", "DOCCA", "LAVATRICE"],
+    beds: "1 LETTO MATRIMONIALE, 1 LETTO SINGOLO. Per un totale di 3 posti letto.",
     prices: [
-      { label: "2 Pers.", price: "75 €" },
-      { label: "3 Pers.", price: "85 €" },
+      { label: "2 Pers.", price: "90€" },
+      { label: "3 Pers.", price: "95€" },
+      { label: "4 Pers.", price: "110€" },
     ],
     extras: ["Nessun costo pulizie", "Notte regalo per chi si ospedalizza"],
     images: [amici3_1, amici3_2, amici3_3, amici3_4, amici3_5, amici3_6, amici3_7, amici3_8],
@@ -85,9 +90,14 @@ const apartments: ApartmentData[] = [
 
 const Alloggi = () => (
   <>
+    <SEO 
+      title="Alloggio vicino San Raffaele Milano: I Nostri Appartamenti" 
+      description="Scopri il miglior alloggio vicino San Raffaele Milano. Appartamenti confortevoli e funzionali, l'alternativa perfetta al classico B&B San Raffaele per soggiorni di cura." 
+    />
     <section className="py-8 sm:py-12 md:py-16 bg-background">
       <div className="container px-4">
-        <h1 className="font-display text-primary text-2xl sm:text-3xl md:text-4xl text-center mb-8 sm:mb-12">I nostri alloggi</h1>
+        <h1 className="font-display text-primary text-2xl sm:text-3xl md:text-4xl text-center mb-8 sm:mb-12">Alloggio vicino San Raffaele Milano: I Nostri Appartamenti</h1>
+
 
         <div className="space-y-10 sm:space-y-16">
           {apartments.map((apt) => (
@@ -118,7 +128,7 @@ const Alloggi = () => (
                     </div>
 
                     <div className="">
-                      <h3 className="font-display text-primary text-base sm:text-lg mb-3">Prezzi</h3>
+                      <h3 className="font-display text-primary text-base sm:text-lg mb-3 text-center">Prezzi</h3>
                       <div className="flex flex-wrap gap-3 sm:gap-4 justify-center text-center">
                         {apt.extras.map((e) => (
                           <div key={e} className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-muted flex items-center justify-center p-2 sm:p-3">
@@ -152,10 +162,11 @@ const Alloggi = () => (
         {/* Informazioni Utili */}
         <div className="mt-20 border-t border-border pt-16">
           <div className="text-center mb-12">
-            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4">Informazioni Utili</h2>
+            <h2 className="font-display text-primary text-2xl md:text-3xl mb-4">Dormire vicino San Raffaele: Informazioni Utili</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Tutto quello che c'è da sapere per organizzare al meglio il tuo soggiorno presso le nostre strutture.
+              Organizzare il soggiorno per motivi medici richiede praticità. Ecco tutto quello che c'è da sapere per il tuo <strong>alloggio vicino San Raffaele Milano</strong>.
             </p>
+
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -182,11 +193,11 @@ const Alloggi = () => (
               <ul className="space-y-3">
                 <li className="text-sm text-muted-foreground flex gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>Non si accettano prenotazioni inferiori a <span className="text-foreground font-medium">3 notti</span>.</span>
+                  <span><span className="text-foreground font-medium">Non accettiamo prenotazioni inferiori a 5 giorni.</span> Se hai bisogno di un soggiorno più breve, chiamaci comunque: saremo felici di consigliarti colleghi che dispongono di soluzioni più adatte alle tue esigenze.</span>
                 </li>
                 <li className="text-sm text-muted-foreground flex gap-2">
                   <span className="text-primary font-bold">•</span>
-                  <span>Il check-out è fissato alle ore <span className="text-foreground font-medium">10:30</span>.</span>
+                  <span>Il <span className="text-foreground font-medium">check-out</span> è fissato alle ore <span className="text-foreground font-medium">10:00</span>.</span>
                 </li>
               </ul>
             </div>

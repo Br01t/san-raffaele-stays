@@ -9,6 +9,8 @@ import amici2_1 from "@/assets/AMICI 2 - 1.webp";
 import amici3_1 from "@/assets/IMG_2802.webp";
 import amici1_1 from "@/assets/Screenshot 2026-03-12 alle 15.28.04.webp";
 import gestoreImg from "@/assets/foto VISO PERSONALE.webp";
+import SEO from "@/components/SEO";
+
 
 const vantaggi = [
   { title: "Posizione Ottimale", desc: "100 Metri da via Olgettina, 60. Presenti tutti i servizi nelle vicinanze. Bar, ristoranti, farmacia e banca." },
@@ -19,22 +21,25 @@ const vantaggi = [
 const apartments = [
   {
     name: "AMICI 1",
-    desc: "Bilocale luminoso con camera matrimoniale e cucina attrezzata. Perfetto per soggiorni singoli o di coppia.",
-    price: "da €80/notte",
+    desc: "Bilocale luminoso con terrazzo, camera matrimoniale, letto singolo, divano letto e cucina completamente attrezzata. Perfetto per soggiorni familiari, di coppia o per chi viaggia da solo.",
+    price: "da €90/notte",
+    distance: "150m da via Olgettina",
     img: amici1_1,
     link: "/alloggi",
   },
   {
     name: "AMICI 2",
-    desc: "Trilocale spazioso con terrazzo vista Ospedale. Ideale per famiglie o soggiorni prolungati.",
+    desc: "Bilocale molto spazioso con terrazzo e vista sull’Ospedale. Dispone di una camera padronale con letto matrimoniale e di un secondo letto matrimoniale separato nel soggiorno. Ideale per famiglie e per soggiorni prolungati.",
     price: "da €90/notte",
+    distance: "100m da via Olgettina",
     img: amici2_1,
     link: "/alloggi",
   },
   {
     name: "AMICI 3",
-    desc: "Monolocale moderno e funzionale con tutti i comfort. La soluzione pratica per brevi soggiorni.",
-    price: "da €75/notte",
+    desc: "Bilocale moderno e funzionale con tutti i comfort. Una soluzione pratica e accogliente per brevi soggiorni, a soli 150 metri da via Olgettina e dall’Ospedale San Raffaele.",
+    price: "da €90/notte",
+    distance: "150m da via Olgettina",
     img: amici3_1,
     link: "/alloggi",
   },
@@ -61,14 +66,19 @@ const Index = () => {
   return (
     <>
       {/* Hero */}
+      <SEO 
+        title="Appartamenti e Alloggi vicino San Raffaele Milano" 
+        description="Cerchi un alloggio vicino al San Raffaele Milano? Amici del San Raffaele offre appartamenti vicino al San Raffaele, ideali per dormire vicino all'ospedale. B&B San Raffaele con tutti i comfort." 
+      />
       <section className="bg-background pt-10 sm:pt-16 md:pt-8">
         <div className="container px-4 text-center mb-8 sm:mb-12">
           <h1 className="font-display text-primary text-3xl sm:text-4xl md:text-5xl leading-tight mb-10 max-w-2xl mx-auto">
-            Appartamenti nei pressi dell'Ospedale San Raffaele
+            Appartamenti e Alloggi vicino San Raffaele Milano
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-6">
-            <b>AMICI DEL SAN RAFFAELE</b> offre affitti a breve termine di alloggi, nelle vicinanze dell'<strong>Ospedale San Raffaele</strong>, Milano 2. I nostri appartamenti sono pensati per i parenti e i pazienti che hanno bisogno di sistemazioni comode e funzionali.
+            <b>AMICI DEL SAN RAFFAELE</b> offre un servizio di <strong>alloggio vicino San Raffaele Milano</strong> con affitti a breve termine progettati per pazienti e familiari. Se stai cercando dove <strong>dormire vicino San Raffaele</strong>, i nostri <strong>appartamenti vicino San Raffaele</strong> offrono comfort, silenzio e una posizione imbattibile a Milano 2.
           </p>
+
           <Button size="lg" asChild className="rounded-full px-8">
             <Link to="/contatti" aria-label="Contattaci per informazioni">Contattaci</Link>
           </Button>
@@ -114,7 +124,8 @@ const Index = () => {
       {/* Anteprima Alloggi */}
       <section className="py-10 sm:py-16 md:py-24 bg-background">
         <div className="container px-4">
-          <h2 className="font-display text-primary text-xl sm:text-2xl md:text-3xl text-center mb-3 md:mb-4">I nostri appartamenti</h2>
+          <h2 className="font-display text-primary text-xl sm:text-2xl md:text-3xl text-center mb-3 md:mb-4">Dormire vicino San Raffaele: Le Nostre Soluzioni</h2>
+
           <p className="text-muted-foreground text-center max-w-xl mx-auto mb-8 sm:mb-12 text-sm sm:text-base">
             Spazi luminosi, arredati con cura e pronti per accoglierti. Tutti i nostri appartamenti si trovano a circa <span className="text-primary font-bold">150 metri a piedi</span> dall'ingresso dell'Ospedale San Raffaele.
           </p>
@@ -132,7 +143,9 @@ const Index = () => {
                 <div className="p-4 sm:p-6">
                   <h3 className="font-display text-primary text-base sm:text-lg mb-2">{apt.name}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3 leading-relaxed">{apt.desc}</p>
-                  <p className="text-primary font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{apt.price}</p>
+                  <p className="text-primary font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
+                    {apt.price} <span className="text-xs sm:text-sm text-muted-foreground font-normal ml-2">— {apt.distance}</span>
+                  </p>
                   <Button variant="outline" size="sm" asChild className="w-full rounded-full">
                     <Link to={apt.link} aria-label={`Scopri di più su ${apt.name}`}>Scopri di più <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
                   </Button>
@@ -153,7 +166,7 @@ const Index = () => {
           <div className="max-w-3xl mx-auto text-center mb-10 md:mb-12">
             <h2 className="font-display text-primary text-2xl md:text-3xl mb-4 text-center">La nostra posizione</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              Gli appartamenti Amici del San Raffaele si trovano a Milano 2, una zona residenziale tranquilla a pochi minuti dall'Ospedale San Raffaele, facilmente raggiungibile a piedi o con i mezzi.
+              Gli appartamenti Amici dell'Ospedale si trovano a Milano 2, in una zona residenziale tranquilla a pochi minuti a piedi dall&#39;Ospedale San Raffaele, raggiungibile comodamente a piedi direttamente dagli appartamenti.
             </p>
             <Button variant="outline" asChild className="rounded-full">
               <Link to="/come-raggiungerci" aria-label="Visualizza indicazioni stradali">Come raggiungerci <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
@@ -365,6 +378,14 @@ const Index = () => {
               />
             </div>
           </div>
+        </div>
+      </section>
+      <section className="bg-slate-900 py-16 md:py-24 shadow-inner">
+        <div className="relative container px-4 text-center">
+          <p className="font-display text-2xl md:text-4xl text-white leading-tight max-w-3xl mx-auto italic">
+            "Il tuo punto di appoggio durante il tuo soggiorno."
+          </p>
+          <div className="w-24 h-1 bg-primary/30 mx-auto mt-10 rounded-full" />
         </div>
       </section>
     </>

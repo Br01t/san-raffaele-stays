@@ -9,6 +9,7 @@ const navLinks = [
   { to: "/come-raggiungerci", label: "Come raggiungerci" },
   { to: "/il-gestore", label: "Il gestore" },
   { to: "/guida-zona", label: "Guida alla zona" },
+  { to: "/blog", label: "Blog" },
   { to: "/contatti", label: "Contatti" },
 ];
 

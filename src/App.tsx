@@ -13,6 +13,8 @@ import GuidaZona from "./pages/GuidaZona";
 import Contatti from "./pages/Contatti";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,8 @@ const App = () => (
             <Route path="/guida-zona" element={<GuidaZona />} />
             <Route path="/contatti" element={<Contatti />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/cookie-policy" element={<CookiePolicy />} />
           </Route>
           <Route path="*" element={<NotFound />} />

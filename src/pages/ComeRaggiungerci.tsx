@@ -1,38 +1,18 @@
-import { Car, Train, Bus, Plane, MapPin, X } from "lucide-react";
+import { Car, Bus, Plane, MapPin, Train, X, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
+
 import metroMapImg from "@/assets/MAPPA ATM.webp";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
-const directions = [
-  {
-    icon: Train,
-    title: "Da Milano centro",
-    desc: "Prendi la metropolitana M2 (linea verde) fino a Cascina Gobba, poi autobus 923 o 925 verso Milano 2. In alternativa, treno S5/S6 dalla Stazione Centrale fino a Segrate (circa 20 minuti). Gli appartamenti si trovano a pochi minuti a piedi dalla fermata.",
-  },
-  {
-    icon: Plane,
-    title: "Da aeroporto Linate",
-    desc: "L'aeroporto di Linate dista circa 10-15 minuti in auto da Milano 2. In taxi o con servizio di trasferimento, il tragitto è rapido e diretto. In alternativa, bus ATM 73 fino a San Babila, poi metro M2 fino a Cascina Gobba e autobus per Milano 2.",
-  },
-  {
-    icon: Bus,
-    title: "Con autobus",
-    desc: "Le linee 923 e 925 collegano la zona Milano 2 all'Ospedale San Raffaele e alla metropolitana M2 (Cascina Gobba). Le fermate si trovano a breve distanza dagli appartamenti.",
-  },
-  {
-    icon: Car,
-    title: "In auto",
-    desc: "Dalla Tangenziale Est di Milano, uscita Segrate/Milano 2. Segui le indicazioni per Milano 2. Gli appartamenti dispongono di parcheggio. Nelle immediate vicinanze sono presenti anche colonnine per la ricarica di auto elettriche. L'Ospedale San Raffaele si raggiunge in circa 5 minuti di auto.",
-  },
-  {
-    icon: Train,
-    title: "Con la metro",
-    desc: "La fermata più vicina è Cascina Gobba (M2, linea verde). Da lì, gli appartamenti di Milano 2 sono raggiungibili in autobus (linee 923, 925) o in taxi in pochi minuti. L'Ospedale San Raffaele ha una fermata dedicata sulla M2.",
-  },
-];
-
 const ComeRaggiungerci = () => (
   <>
+    <SEO 
+      title="Come Arrivare al San Raffaele: Mezzi, Parcheggio e Navette" 
+      description="Guida completa su come arrivare all'Ospedale San Raffaele da aeroporti e stazioni. Informazioni su parcheggio San Raffaele e trasporti a Milano 2." 
+    />
+
     <section className="hero-gradient py-12 md:py-16">
       <div className="container text-center">
         <h1 className="font-display text-3xl md:text-5xl text-primary-foreground mb-4">Come raggiungerci</h1>
@@ -83,75 +63,135 @@ const ComeRaggiungerci = () => (
         </div>
 
         {/* Directions Section */}
-        <div className="space-y-12">
+        <div className="space-y-12 mb-16">
           <div className="text-center">
-            <h2 className="font-display text-primary text-3xl md:text-4xl mb-2">Come arrivare</h2>
+            <h2 className="font-display text-primary text-3xl md:text-4xl mb-2">Come raggiungerci</h2>
             <div className="w-20 h-1 bg-primary/20 mx-auto rounded-full" />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 items-stretch">
-            {directions.map((d, index) => (
-              <div 
-                key={d.title} 
-                className={`group flex ${d.title.toLowerCase() === "con la metro" ? "md:col-span-2" : ""}`}
-              >
-                <div className="bg-card rounded-2xl p-6 md:p-8 border border-border/60 hover:border-primary/40 hover:shadow-md transition-all duration-300 w-full flex flex-col">
-                  <div className="flex flex-col md:flex-row gap-6 items-start">
-                    <div className="w-14 h-14 rounded-2xl bg-accent/50 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors duration-500">
-                      <d.icon className="w-7 h-7 text-primary group-hover:text-white transition-colors" />
-                    </div>
-                    
-                    <div className="flex-1 space-y-4">
-                      <h3 className="font-display text-primary text-2xl">{d.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed text-lg">
-                        {d.desc}
-                      </p>
-
-                      {/* Integrated Metro Map ONLY for 'Con la metro' directions */}
-                      {d.title.toLowerCase() === "con la metro" && (
-                        <div className="mt-8 pt-6 border-t border-border/50">
-                          <p className="text-sm font-semibold text-primary mb-4 flex items-center gap-2 uppercase tracking-widest">
-                            <Train className="w-4 h-4" />
-                            Mappa Metro Milano
-                          </p>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <div className="rounded-xl overflow-hidden card-shadow group/map relative cursor-pointer border border-border max-w-2xl h-48 md:h-64">
-                                <img 
-                                  src={metroMapImg} 
-                                  alt="Mappa della Metropolitana di Milano - Visualizzazione schematica" 
-                                  className="w-full h-full object-cover group-hover/map:scale-105 transition-transform duration-700"
-                                  loading="lazy"
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/map:opacity-100 transition-opacity flex items-center justify-center">
-                                  <div className="bg-white text-primary font-medium px-6 py-2 rounded-full shadow-xl flex items-center gap-2">
-                                    <X className="w-4 h-4 rotate-45" />
-                                    Vedi Mappa Metro
-                                  </div>
-                                </div>
-                              </div>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-black/90 shadow-none flex items-center justify-center [&>button]:hidden">
-                              <div className="relative w-full h-full flex items-center justify-center">
-                                <DialogPrimitive.Close className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors md:top-8 md:right-8 outline-none focus-visible:ring-2 focus-visible:ring-white">
-                                  <X className="h-8 w-8" aria-hidden="true" />
-                                </DialogPrimitive.Close>
-                                <img
-                                  src={metroMapImg}
-                                  alt="Mappa Metropolitana di Milano Ingrandita"
-                                  className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                                  loading="lazy"
-                                />
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+          <div className="grid grid-cols-1 gap-8">
+            {/* CARD 1: CON METRO E BUS */}
+            <div className="bg-card rounded-[2rem] p-6 md:p-10 border border-border/60 card-shadow">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="w-14 h-14 rounded-2xl bg-accent/50 flex items-center justify-center shrink-0">
+                  <Bus className="w-7 h-7 text-primary" />
+                </div>
+                <div className="flex-1 space-y-6">
+                  <h3 className="font-display text-primary text-2xl uppercase">CON METRO E BUS</h3>
+                  
+                  {/* Mappa Section for Metro */}
+                  <div className="pt-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="rounded-xl overflow-hidden card-shadow group relative cursor-pointer border border-border max-w-lg h-40 md:h-56">
+                          <img 
+                            src={metroMapImg} 
+                            alt="Mappa della Metropolitana di Milano" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-white text-primary text-[10px] font-bold px-4 py-2 rounded-full shadow-xl">VEDI MAPPA METRO</span>
+                          </div>
                         </div>
-                      )}
-                    </div>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-black/90 shadow-none flex items-center justify-center [&>button]:hidden">
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <DialogPrimitive.Close className="absolute top-4 right-4 z-[60] bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white">
+                            <X className="h-8 w-8" aria-hidden="true" />
+                          </DialogPrimitive.Close>
+                          <img
+                            src={metroMapImg}
+                            alt="Mappa Metropolitana di Milano Ingrandita"
+                            className="max-width-full max-height-[90vh] object-contain rounded-lg"
+                            loading="lazy"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+
+                  <div className="text-muted-foreground leading-relaxed space-y-4 text-base md:text-lg">
+                    <p>
+                      <strong className="text-foreground">AMICI DEL SAN RAFFAELE</strong> è raggiungibile tramite Metropolitana linea verde M2: fermata <strong className="text-foreground">Cascina Gobba</strong> e a seguire 2 opzioni:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2">
+                      <li>uscire dalla stazione della metro e prendere <strong className="text-foreground">Autobus 925</strong> fino alla fermata <strong className="text-foreground">UFFICIO POSTALE MILANO 2</strong></li>
+                      <li>rimanere all’interno della stazione di Cascina Gobba e prendere <strong className="text-foreground">Metro Leggera</strong> che porta direttamente all’interno dell’Ospedale. I biglietti si acquistano alle macchinette alla stazione della metro leggera (costo biglietto €1,30 per 2 corse all’interno delle 24h).</li>
+                    </ul>
+                    <p>
+                      Da li proseguire verso l'Uscita di via Olgettina, 60. Svoltare a destra e sorpassare la rotonda proseguendo verso Milano 2. Le residenze limitrofe sono gli alloggi <strong className="text-foreground">'AMICI DEL SAN RAFFAELE'</strong>.
+                    </p>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* CARD 2: IN AUTO */}
+            <div className="bg-card rounded-[2rem] p-6 md:p-10 border border-border/60 card-shadow">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="w-14 h-14 rounded-2xl bg-accent/50 flex items-center justify-center shrink-0">
+                  <Car className="w-7 h-7 text-primary" />
+                </div>
+                <div className="flex-1 space-y-6">
+                  <h3 className="font-display text-primary text-2xl uppercase">IN AUTO</h3>
+                  
+                  {/* Mappa Section for Navigation */}
+                  <div className="pt-2">
+                    <div className="rounded-xl overflow-hidden h-40 md:h-56 border border-border max-w-lg">
+                      <iframe
+                        title="Indicazioni Auto - Amici del San Raffaele"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-muted-foreground leading-relaxed space-y-4 text-base md:text-lg">
+                    <p>
+                      <strong className="text-foreground">AMICI DEL SAN RAFFAELE</strong> è raggiungibile tramite <strong className="text-foreground">Tangenziale Est</strong>, imboccando:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2">
+                      <li>da nord <strong className="text-foreground">Uscita Cascina Gobba</strong>;</li>
+                      <li>da sud <strong className="text-foreground">Uscita Segrate</strong>.</li>
+                    </ul>
+                    <p>
+                      Inserendo <strong className="text-foreground">VIA RESIDENZA SPIGA</strong> arriverete nelle immediate vicinanze sia dell'ospedale che degli alloggi.
+                    </p>
+                    <p>
+                      In base all'alloggio vi verra fornito un  <strong className="text-foreground">posto auto</strong>. È presente anche una stazione di ricarica per auto elettriche nelle vicinanze.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 3: DAGLI AEROPORTI */}
+            <div className="bg-primary rounded-[2rem] p-6 md:p-10 card-shadow text-primary-foreground">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <Plane className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1 space-y-6">
+                  <h3 className="font-display text-2xl uppercase">DAGLI AEROPORTI</h3>
+                  <p className="text-primary-foreground/90 leading-relaxed text-base md:text-lg">
+                    Visita il nostro blog per scoprire come raggiungerci da tutti gli aeroporti e dalle principali stazioni della zona. Troverai tutte le informazioni utili per arrivare facilmente agli appartamenti.
+                  </p>
+                  <div className="pt-4">
+                    <Link 
+                      to="/blog" 
+                      className="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-full font-bold hover:bg-white/90 transition-all text-sm group"
+                    >
+                      SCOPRI DI PIÙ <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

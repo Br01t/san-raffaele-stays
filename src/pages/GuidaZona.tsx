@@ -1,4 +1,6 @@
-import { ShoppingBag, Coffee, Trees, Pill, Bus, Building2, MapPin, Hospital, Home, ShieldCheck, Footprints, Bike, Camera, X } from "lucide-react";
+import { ShoppingBag, Coffee, Trees, Pill, Bus, Building2, MapPin, Hospital, Home, ShieldCheck, Footprints, Bike, Camera, X, Landmark, ArrowRight, Info, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
 import sanRaffaeleMap from "@/assets/san-raffaele-MAPPA.webp";
 import researchImg from "@/assets/ospande-san-raffaele-research-department-.webp";
 import laghettoImg from "@/assets/laghetto.webp";
@@ -10,9 +12,9 @@ const sections = [
     icon: ShoppingBag,
     title: "Supermercati",
     items: [
+      "Viaggiator Goloso, Unes - a pochi passi di distanza",
       "Supermercato Esselunga – raggiungibile in auto in pochi minuti",
       "Carrefour Express – all'interno del centro commerciale Milano 2",
-      "Conad City – a Segrate, facilmente raggiungibile",
     ],
   },
   {
@@ -79,19 +81,24 @@ const milano2Features = [
   { icon: Bike, text: "5 km di piste ciclabili" },
   { icon: Home, text: "28 residenze nel quartiere" },
   { icon: ShieldCheck, text: "Telecamere e vigilanza attiva" },
-  { icon: Camera, text: "Servizio di teleallarme" },
 ];
 
 const GuidaZona = () => (
   <>
-    <section className="hero-gradient py-16 md:py-20">
-      <div className="container text-center">
-        <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Guida alla zona</h1>
-        <p className="text-primary-foreground/80 max-w-xl mx-auto">
-          Una guida utile per chi soggiorna nei nostri appartamenti a Milano 2. Tutto ciò che ti serve a portata di mano.
-        </p>
-      </div>
-    </section>
+    <SEO 
+      title="Guida Milano 2 e Servizi vicino San Raffaele" 
+      description="Scopri tutti i servizi di Milano 2 vicino all'Ospedale San Raffaele: ristoranti, supermercati, farmacie e aree verdi per il tuo soggiorno." 
+    />
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Hero Section */}
+      <section className="hero-gradient py-16 md:py-20 text-center">
+        <div className="container">
+          <h1 className="font-display text-3xl md:text-5xl text-primary-foreground mb-6">Guida alla zona</h1>
+          <p className="text-primary-foreground/80 max-w-2xl mx-auto text-lg leading-relaxed">
+            Soggiornare a Milano 2 significa avere tutto ciò che serve a pochi passi. Scopri i servizi e l'organizzazione dell'Ospedale San Raffaele.
+          </p>
+        </div>
+      </section>
 
     {/* Quick Navigation Menu */}
     <nav className="bg-background py-8 border-b border-border">
@@ -324,6 +331,7 @@ const GuidaZona = () => (
         </div>
       </div>
     </section>
+    </div>
   </>
 );
 

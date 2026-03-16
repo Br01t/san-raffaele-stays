@@ -1,8 +1,15 @@
 import { Heart, Users, Star, Phone, Mail } from "lucide-react";
+import SEO from "@/components/SEO";
 import gestoreImg from "@/assets/foto VISO PERSONALE.webp";
+
 
 const IlGestore = () => (
   <>
+    <SEO 
+      title="Il Gestore: Accoglienza e Supporto San Raffaele" 
+      description="Conosci Gabriele, il gestore di Amici del San Raffaele. Accoglienza calorosa e supporto per pazienti e familiari a Milano 2." 
+    />
+
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
         <h1 className="font-display text-3xl md:text-4xl text-primary-foreground mb-4">Il gestore</h1>
