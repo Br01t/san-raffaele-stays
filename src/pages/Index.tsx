@@ -106,7 +106,7 @@ const Index = () => {
       <section className="bg-background pt-10 sm:pt-16 md:pt-8">
         <div className="container px-4 text-center mb-8 sm:mb-12">
           <h1 className="font-display text-primary text-3xl sm:text-4xl md:text-5xl leading-tight mb-10 max-w-2xl mx-auto">
-            Appartamenti e Alloggi vicino San Raffaele Milano
+            Appartamenti vicino all'Ospedale San Raffaele
           </h1>
           <p className="text-lg sm:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-6">
             Appartamenti a <b>150 metri dall Ospedale San Raffaele</b> ideali per pazienti e familiari.
