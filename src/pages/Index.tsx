@@ -145,7 +145,7 @@ const Index = () => {
             {vantaggi.map((v) => (
               <div key={v.title} className="flex flex-col items-center text-center">
                 <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-8 shadow-lg">
-                  <h3 className="font-display text-primary text-lg md:text-xl mb-3">{v.title}</h3>
+                  <h2 className="font-display text-primary text-lg md:text-xl mb-3">{v.title}</h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
                 </div>
               </div>
