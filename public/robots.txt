@@ -28,3 +28,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://amicidelsanraffaele.com/sitemap.xml
