@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { blogArticles } from "@/data/blog-posts";
 import { Button } from "@/components/ui/button";
+import LazyMap from "@/components/LazyMap";
 
 import blog1 from "@/assets/FOTO BLOG 1 .webp";
 import blog2 from "@/assets/FOTO BLOG 2.webp";
@@ -92,15 +93,10 @@ const ComeRaggiungerci = () => {
 
             <div className="lg:col-span-2 min-h-[400px]">
               <div className="rounded-2xl overflow-hidden h-full card-shadow border border-border">
-                <iframe
+                <LazyMap
                   title="Mappa - Come raggiungerci - Amici del San Raffaele"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full"
                 />
               </div>
             </div>
@@ -183,14 +179,10 @@ const ComeRaggiungerci = () => {
                     {/* Mappa Section for Navigation */}
                     <div className="pt-2">
                       <div className="rounded-xl overflow-hidden h-40 md:h-56 border border-border max-w-lg">
-                        <iframe
+                        <LazyMap
                           title="Indicazioni Auto - Amici del San Raffaele"
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          loading="lazy"
+                          className="w-full h-full"
                         />
                       </div>
                     </div>

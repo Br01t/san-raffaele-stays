@@ -10,7 +10,8 @@ import amici3_1 from "@/assets/IMG_2802.webp";
 import amici1_1 from "@/assets/Screenshot 2026-03-12 alle 15.28.04.webp";
 import gestoreImg from "@/assets/foto VISO PERSONALE.webp";
 import SEO from "@/components/SEO";
-
+import sfondoZyro from "@/assets/sfondo-7-AR0V6pe9anhE5ZLe.webp";
+import LazyMap from "@/components/LazyMap";
 
 const vantaggi = [
   { title: "Posizione Ottimale", desc: "100 Metri da via Olgettina, 60. Presenti tutti i servizi nelle vicinanze. Bar, ristoranti, farmacia e banca." },
@@ -132,7 +133,7 @@ const Index = () => {
         {/* Background image fills the entire section */}
         <div className="absolute inset-0">
           <img
-            src="https://assets.zyrosite.com/cdn-cgi/image/format=auto/A0xr56pZqkuyoQl8/sfondo-7-AR0V6pe9anhE5ZLe.jpg"
+            src={sfondoZyro}
             alt="Sfondo panoramico Milano 2"
             className="w-full h-full object-cover object-center"
             loading="lazy"
@@ -207,15 +208,10 @@ const Index = () => {
             </Button>
           </div>
           <div className="rounded-2xl overflow-hidden h-72 sm:h-80 md:h-[400px] card-shadow max-w-4xl mx-auto">
-            <iframe
+            <LazyMap
               title="Mappa posizione appartamenti Milano 2"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2796.390195682343!2d9.266786299999998!3d45.5022233!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c71d2fe74f4d%3A0x89a6a46181c3d221!2sAmici%20dell'Ospedale%20Appartamenti%20B%26B!5e0!3m2!1sit!2sit!4v1773334327379!5m2!1sit!2sit"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full"
             />
           </div>
         </div>
