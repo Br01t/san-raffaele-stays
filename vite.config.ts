@@ -19,16 +19,16 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     ViteImageOptimizer({
       webp: {
-        quality: 75,
+        quality: 65,
       },
       jpeg: {
-        quality: 75,
+        quality: 65,
       },
       jpg: {
-        quality: 75,
+        quality: 65,
       },
       png: {
-        quality: 80,
+        quality: 70,
       },
     }),
   ].filter(Boolean),
@@ -37,4 +37,14 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+          'ui': ['lucide-react', 'class-variance-authority', 'clsx', 'tailwind-merge'],
+        }
+      }
+    }
+  }
 }));

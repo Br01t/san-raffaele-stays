@@ -5,7 +5,7 @@ const PrivacyPolicy = () => (
     <SEO title="Privacy Policy - Amici del San Raffaele" description="Informativa sulla privacy di Amici del San Raffaele, in conformità con il GDPR." />
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Privacy Policy</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">Privacy Policy</h1>
         <p className="text-primary-foreground/80 max-w-2xl mx-auto">
           Informativa resa ai sensi dell'art. 13 del Regolamento UE 2016/679 (GDPR)
         </p>

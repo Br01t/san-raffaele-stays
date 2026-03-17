@@ -5,7 +5,7 @@ const CookiePolicy = () => (
     <SEO title="Cookie Policy - Amici del San Raffaele" description="Informativa estesa sui cookie utilizzati dal sito Amici del San Raffaele." />
     <section className="hero-gradient py-16 md:py-20">
       <div className="container text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-primary-foreground mb-4">Cookie Policy</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">Cookie Policy</h1>
         <p className="text-primary-foreground/80 max-w-2xl mx-auto">
           Informazioni trasparenti sull'utilizzo dei cookie in questo sito.
         </p>
