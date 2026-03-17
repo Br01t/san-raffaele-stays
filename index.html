@@ -17,15 +17,47 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LodgingBusiness",
-      "name": "Amici del San Raffaele",
-      "description": "Affitto appartamenti temporanei vicino all'Ospedale San Raffaele a Milano",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Segrate",
-        "addressRegion": "MI",
-        "addressCountry": "IT"
-      }
+      "@graph": [
+        {
+          "@type": "LodgingBusiness",
+          "@id": "https://amicidelsanraffaele.it/#business",
+          "name": "Amici del San Raffaele",
+          "description": "Affitto appartamenti temporanei vicino all'Ospedale San Raffaele a Milano per parenti de degenti e pazienti.",
+          "telephone": "+393486065567",
+          "url": "https://amicidelsanraffaele.it",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Via Fratelli Cervi, Milano Due",
+            "addressLocality": "Segrate",
+            "addressRegion": "MI",
+            "postalCode": "20090",
+            "addressCountry": "IT"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 45.5022233,
+            "longitude": 9.2667863
+          },
+          "image": "https://amicidelsanraffaele.it/og-image.webp",
+          "priceRange": "€€",
+          "contactPoint": {
+             "@type": "ContactPoint",
+             "telephone": "+393486065567",
+             "contactType": "Gestore prenotazioni"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://amicidelsanraffaele.it/#organization",
+          "name": "Amici del San Raffaele",
+          "url": "https://amicidelsanraffaele.it",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+393486065567",
+            "contactType": "Gestore Appartamenti"
+          }
+        }
+      ]
     }
     </script>
   </head>

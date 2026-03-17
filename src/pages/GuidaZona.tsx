@@ -136,11 +136,27 @@ const GuidaZona = () => {
     }
   };
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Guida Milano 2 e Servizi vicino San Raffaele",
+    "description": "Scopri tutti i servizi di Milano 2 vicino all'Ospedale San Raffaele: ristoranti, supermercati, farmacie e aree verdi per il tuo soggiorno.",
+    "author": {
+      "@type": "Organization",
+      "name": "Amici del San Raffaele"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Amici del San Raffaele"
+    }
+  };
+
   return (
     <>
       <SEO 
         title="Guida Milano 2 e Servizi vicino San Raffaele" 
         description="Scopri tutti i servizi di Milano 2 vicino all'Ospedale San Raffaele: ristoranti, supermercati, farmacie e aree verdi per il tuo soggiorno." 
+        schema={JSON.stringify(articleSchema)}
       />
       <div className="min-h-screen bg-background text-foreground">
         {/* Hero Section */}

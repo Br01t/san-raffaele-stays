@@ -3,9 +3,10 @@ import { useEffect } from "react";
 interface SEOProps {
   title: string;
   description?: string;
+  schema?: string;
 }
 
-const SEO = ({ title, description }: SEOProps) => {
+const SEO = ({ title, description, schema }: SEOProps) => {
   useEffect(() => {
     // Update the document title
     document.title = `${title} | Amici del San Raffaele`;
@@ -22,7 +23,22 @@ const SEO = ({ title, description }: SEOProps) => {
         document.head.appendChild(metaDescription);
       }
     }
-  }, [title, description]);
+
+    // Inject JSON-LD Schema
+    if (schema) {
+      const scriptId = "json-ld-schema";
+      let script = document.getElementById(scriptId) as HTMLScriptElement;
+      if (script) {
+        script.textContent = schema;
+      } else {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.type = "application/ld+json";
+        script.textContent = schema;
+        document.head.appendChild(script);
+      }
+    }
+  }, [title, description, schema]);
 
   return null;
 };

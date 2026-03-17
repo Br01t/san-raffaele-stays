@@ -63,12 +63,44 @@ const Index = () => {
     }
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Quanto distano gli appartamenti dall'Ospedale San Raffaele?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tutti i nostri appartamenti distano circa 150 metri dall'ingresso dell'Ospedale San Raffaele, raggiungibile in 3 minuti a piedi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "I vostri alloggi offrono il servizio navetta per la stazione e l'aeroporto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sì, offriamo un servizio diretto di trasporto da/per le stazioni ferroviarie e gli aeroporti. Il cliente verrà accompagnato direttamente nell'alloggio."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quali servizi sono inclusi nell'affitto dell'appartamento?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Gli appartamenti includono aria condizionata, Wi-Fi, televisione, cucina completamente attrezzata, lavatrice e contatto diretto con il gestore."
+        }
+      }
+    ]
+  };
+
   return (
     <>
       {/* Hero */}
       <SEO 
         title="Appartamenti e Alloggi vicino San Raffaele Milano" 
         description="Cerchi un alloggio vicino al San Raffaele Milano? Amici del San Raffaele offre appartamenti vicino al San Raffaele, ideali per dormire vicino all'ospedale. B&B San Raffaele con tutti i comfort." 
+        schema={JSON.stringify(faqSchema)}
       />
       <section className="bg-background pt-10 sm:pt-16 md:pt-8">
         <div className="container px-4 text-center mb-8 sm:mb-12">
@@ -323,16 +355,16 @@ const Index = () => {
                         text: "Cercavamo tranquillità e praticità, e qui abbiamo trovato entrambe. L'appartamento è molto luminoso e arieggiato. Poter andare a piedi in ospedale è stato un vantaggio enorme.",
                     }
                   ].map((review, i) => (
-                    <div 
+                    <article 
                       key={i}
                       className="min-w-[85vw] sm:min-w-[400px] md:min-w-[450px] snap-center bg-card rounded-[2rem] p-6 sm:p-8 md:p-10 card-shadow border border-primary/5 flex flex-col h-full hover:border-primary/20 transition-all duration-500"
                     >
                       <Quote className="w-8 h-8 sm:w-12 sm:h-12 text-primary/10 mb-4 sm:mb-6 shrink-0" aria-hidden="true" />
-                      <p className="text-muted-foreground leading-relaxed italic mb-8 sm:mb-10 flex-grow text-base sm:text-lg">
+                      <blockquote className="text-muted-foreground leading-relaxed italic mb-8 sm:mb-10 flex-grow text-base sm:text-lg">
                         "{review.text}"
-                      </p>
+                      </blockquote>
                       <div className="flex items-center justify-between border-t border-border/50 pt-6 mt-auto">
-                        <div className="flex items-center gap-4">
+                        <cite className="flex items-center gap-4 not-italic">
                           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-lg">
                             {review.name[0]}
                           </div>
@@ -340,14 +372,14 @@ const Index = () => {
                             <p className="font-bold text-primary">{review.name}</p>
                             <p className="text-xs uppercase tracking-widest text-muted-foreground">{review.date}</p>
                           </div>
-                        </div>
-                        <div className="flex gap-0.5">
+                        </cite>
+                        <div className="flex gap-0.5" aria-label={`Valutazione 5 stelle`}>
                           {[...Array(5)].map((_, i) => (
                             <Star key={i} className="w-3 h-3 fill-primary text-primary" aria-hidden="true" />
                           ))}
                         </div>
                       </div>
-                    </div>
+                    </article>
                   ))}
                 </div>
               </div>
