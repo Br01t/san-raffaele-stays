@@ -14,6 +14,26 @@
     <meta property="og:description" content="Alloggi confortevoli a pochi minuti dall'Ospedale San Raffaele di Milano." />
     <meta property="og:type" content="website" />
 
+    </script>
+    <!-- Optimize for Performance: Primary font preconnect -->
+    <link rel="preconnect" href="https://amicidelsanraffaele.com" crossorigin />
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <form name="contact" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input name="bot-field" />
+      <input type="text" name="name" />
+      <input type="text" name="surname" />
+      <input type="email" name="email" />
+      <input type="tel" name="phone" />
+      <textarea name="message"></textarea>
+    </form>
+
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- SEO & Structured Data (Moved to bottom to improve FCP) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -60,20 +80,5 @@
       ]
     }
     </script>
-  </head>
-
-  <body>
-    <div id="root"></div>
-
-    <form name="contact" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
-      <input name="bot-field" />
-      <input type="text" name="name" />
-      <input type="text" name="surname" />
-      <input type="email" name="email" />
-      <input type="tel" name="phone" />
-      <textarea name="message"></textarea>
-    </form>
-
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
