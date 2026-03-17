@@ -369,7 +369,7 @@ const Index = () => {
                             <p className="text-xs uppercase tracking-widest text-muted-foreground">{review.date}</p>
                           </div>
                         </cite>
-                        <div className="flex gap-0.5" aria-label={`Valutazione 5 stelle`}>
+                        <div className="flex gap-0.5" role="img" aria-label={`Valutazione 5 stelle`}>
                           {[...Array(5)].map((_, i) => (
                             <Star key={i} className="w-3 h-3 fill-primary text-primary" aria-hidden="true" />
                           ))}
