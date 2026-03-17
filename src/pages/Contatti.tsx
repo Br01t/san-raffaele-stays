@@ -18,7 +18,7 @@ const Contatti = () => {
 
     const formData = new FormData(e.currentTarget);
     try {
-      await fetch("/san-raffaele-stays/", {
+      await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         // @ts-ignore
