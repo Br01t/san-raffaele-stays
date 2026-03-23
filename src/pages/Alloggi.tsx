@@ -146,7 +146,7 @@ const Alloggi = () => (
 
                   <div className="pt-6 flex justify-center mt-auto border-t border-border/50">
                     <Button asChild className="rounded-full px-6 sm:px-8 w-full sm:w-auto">
-                      <a href="https://wa.me/393486065567" target="_blank" rel="noopener noreferrer">Richiedi disponibilità</a>
+                      <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer">Richiedi disponibilità</a>
                     </Button>
                   </div>
                 </div>

@@ -61,8 +61,8 @@ const Contatti = () => {
               <h2 className="font-display text-primary text-xl">Informazioni di contatto</h2>
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: "Telefono", value: "+39 348 606 5567", href: "tel:+393486065567", aria: "Chiama il numero" },
-                  { icon: MessageCircle, label: "WhatsApp", value: "Scrivici su WhatsApp", href: "https://wa.me/393486065567", aria: "Inizia una chat su WhatsApp" },
+                  { icon: Phone, label: "Telefono", value: "+39 345 795 6159", href: "tel:+393457956159", aria: "Chiama il numero" },
+                  { icon: MessageCircle, label: "WhatsApp", value: "Scrivici su WhatsApp", href: "https://wa.me/393457956159", aria: "Inizia una chat su WhatsApp" },
                   { icon: MapPin, label: "Indirizzo", value: "Zona Milano 2, Segrate (MI)" },
                   { icon: Clock, label: "Orari", value: "Lun - Sab: 9:00 - 19:00" },
                 ].map((c) => (
@@ -164,11 +164,11 @@ const Contatti = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 justify-center md:justify-start">
                       <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
-                      <a href="tel:+393486065567" className="text-foreground font-medium hover:text-primary transition-colors">+39 348 606 5567</a>
+                      <a href="tel:+393457956159" className="text-foreground font-medium hover:text-primary transition-colors">+39 345 795 6159</a>
                     </div>
                     <div className="flex items-center gap-3 justify-center md:justify-start">
                       <MessageCircle className="w-5 h-5 text-primary" aria-hidden="true" />
-                      <a href="https://wa.me/393486065567" className="text-foreground font-medium hover:text-primary transition-colors">Chat su WhatsApp</a>
+                      <a href="https://wa.me/393457956159" className="text-foreground font-medium hover:text-primary transition-colors">Chat su WhatsApp</a>
                     </div>
                   </div>
                 </div>

@@ -113,7 +113,7 @@ const Index = () => {
           </p>
 
           <Button size="lg" asChild className="rounded-full px-8">
-            <a href="https://wa.me/393486065567" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp">Contattaci</a>
+            <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp">Contattaci</a>
           </Button>
         </div>
         {/* Full-width panoramic image */}
@@ -396,7 +396,7 @@ const Index = () => {
                 Contattaci per disponibilità e informazioni. Gabriele sarà felice di aiutarvi.
               </p>
               <Button size="lg" variant="secondary" asChild className="rounded-full px-8">
-                <a href="https://wa.me/393486065567" target="_blank" rel="noopener noreferrer" aria-label="Richiedi informazioni su WhatsApp">Richiedi informazioni</a>
+                <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer" aria-label="Richiedi informazioni su WhatsApp">Richiedi informazioni</a>
               </Button>
             </div>
             <div className="w-32 h-32 md:w-48 md:h-48 shrink-0">
