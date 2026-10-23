@@ -4,8 +4,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AuthGuard } from "./components/admin/AuthGuard";
+import { AdminLayout } from "./components/admin/AdminLayout";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
+
+// Public pages
 const Index = React.lazy(() => import("./pages/Index"));
 const Alloggi = React.lazy(() => import("./pages/Alloggi"));
 const ComeRaggiungerci = React.lazy(() => import("./pages/ComeRaggiungerci"));
@@ -15,31 +20,89 @@ const PrivacyPolicy = React.lazy(() => import("./pages/PrivacyPolicy"));
 const CookiePolicy = React.lazy(() => import("./pages/CookiePolicy"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
+// Admin pages
+const AdminLogin = React.lazy(() =>
+  import("./pages/admin/AdminLogin").then((m) => ({ default: m.AdminLogin }))
+);
+const AdminDashboard = React.lazy(() =>
+  import("./pages/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))
+);
+const AdminApartments = React.lazy(() =>
+  import("./pages/admin/AdminApartments").then((m) => ({ default: m.AdminApartments }))
+);
+const AdminCalendar = React.lazy(() =>
+  import("./pages/admin/AdminCalendar").then((m) => ({ default: m.AdminCalendar }))
+);
+const AdminMonthlyData = React.lazy(() =>
+  import("./pages/admin/AdminMonthlyData").then((m) => ({ default: m.AdminMonthlyData }))
+);
+const AdminEventsNotes = React.lazy(() =>
+  import("./pages/admin/AdminEventsNotes").then((m) => ({ default: m.AdminEventsNotes }))
+);
+const AdminAnalytics = React.lazy(() =>
+  import("./pages/admin/AdminAnalytics").then((m) => ({ default: m.AdminAnalytics }))
+);
+const AdminSettings = React.lazy(() =>
+  import("./pages/admin/AdminSettings").then((m) => ({ default: m.AdminSettings }))
+);
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <React.Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/alloggi" element={<Alloggi />} />
-              <Route path="/come-raggiungerci" element={<ComeRaggiungerci />} />
-              <Route path="/guida-zona" element={<GuidaZona />} />
-              <Route path="/contatti" element={<Contatti />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/cookie-policy" element={<CookiePolicy />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </React.Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <React.Suspense
+            fallback={
+              <div className="h-screen w-screen flex items-center justify-center bg-background">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            }
+          >
+            <Routes>
+              {/* Public Routes */}
+              <Route element={<Layout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/alloggi" element={<Alloggi />} />
+                <Route path="/come-raggiungerci" element={<ComeRaggiungerci />} />
+                <Route path="/guida-zona" element={<GuidaZona />} />
+                <Route path="/contatti" element={<Contatti />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/cookie-policy" element={<CookiePolicy />} />
+              </Route>
+
+              {/* Admin Login */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+
+              {/* Protected Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <AuthGuard>
+                    <AdminLayout />
+                  </AuthGuard>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="appartamenti" element={<AdminApartments />} />
+                <Route path="calendario" element={<AdminCalendar />} />
+                <Route path="dati-mensili" element={<AdminMonthlyData />} />
+                <Route path="eventi" element={<AdminEventsNotes />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="impostazioni" element={<AdminSettings />} />
+              </Route>
+
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </React.Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

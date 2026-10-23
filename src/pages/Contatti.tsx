@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { trackEvent } from "@/lib/tracking";
 
 const Contatti = () => {
   const { toast } = useToast();
@@ -25,6 +26,7 @@ const Contatti = () => {
         body: new URLSearchParams(formData).toString(),
       });
       
+      trackEvent('form_submit', { form: 'contatti' });
       toast({ title: "Messaggio inviato!", description: "Ti risponderemo il prima possibile." });
       (e.target as HTMLFormElement).reset();
     } catch (error) {
@@ -77,6 +79,10 @@ const Contatti = () => {
                           href={c.href}
                           target={c.href.startsWith("https") ? "_blank" : undefined}
                           rel={c.href.startsWith("https") ? "noopener noreferrer" : undefined}
+                          onClick={() => {
+                            if (c.label === "Telefono") trackEvent('phone_click', { page: '/contatti' });
+                            if (c.label === "WhatsApp") trackEvent('whatsapp_click', { page: '/contatti' });
+                          }}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors"
                           aria-label={c.aria}
                         >
