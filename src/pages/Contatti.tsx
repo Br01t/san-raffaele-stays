@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Phone, Mail, MapPin, Clock, MessageCircle, CheckCircle2, ShieldCheck, User, Heart, Users, Star } from "lucide-react";
 import gestoreImg from "@/assets/foto VISO PERSONALE.webp";
 
@@ -12,6 +12,7 @@ import { trackEvent } from "@/lib/tracking";
 const Contatti = () => {
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
+  const formStarted = useRef(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,17 +20,21 @@ const Contatti = () => {
 
     const formData = new FormData(e.currentTarget);
     try {
-      await fetch("/", {
+      const res = await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         // @ts-ignore
         body: new URLSearchParams(formData).toString(),
       });
-      
+      // fetch non lancia errori su 404/405/500: va controllato res.ok,
+      // altrimenti un invio fallito verrebbe contato (e mostrato) come riuscito.
+      if (!res.ok) throw new Error(`Invio form fallito: HTTP ${res.status}`);
+
       trackEvent('form_submit', { form: 'contatti' });
       toast({ title: "Messaggio inviato!", description: "Ti risponderemo il prima possibile." });
       (e.target as HTMLFormElement).reset();
     } catch (error) {
+      trackEvent('form_error', { form: 'contatti' });
       toast({ 
         title: "Errore", 
         description: "Si è verificato un problema nell'invio del messaggio. Riprova più tardi.",
@@ -79,10 +84,7 @@ const Contatti = () => {
                           href={c.href}
                           target={c.href.startsWith("https") ? "_blank" : undefined}
                           rel={c.href.startsWith("https") ? "noopener noreferrer" : undefined}
-                          onClick={() => {
-                            if (c.label === "Telefono") trackEvent('phone_click', { page: '/contatti' });
-                            if (c.label === "WhatsApp") trackEvent('whatsapp_click', { page: '/contatti' });
-                          }}
+                          data-track-label={`contatti_${c.label.toLowerCase()}`}
                           className="text-sm text-muted-foreground hover:text-primary transition-colors"
                           aria-label={c.aria}
                         >
@@ -104,7 +106,13 @@ const Contatti = () => {
                 method="POST"
                 data-netlify="true"
                 data-netlify-honeypot="bot-field"
-                onSubmit={handleSubmit} 
+                onSubmit={handleSubmit}
+                onFocusCapture={() => {
+                  if (!formStarted.current) {
+                    formStarted.current = true;
+                    trackEvent('form_start', { form: 'contatti' });
+                  }
+                }}
                 className="bg-card rounded-xl p-6 md:p-8 card-shadow space-y-5"
               >
                 <input type="hidden" name="form-name" value="contact" />
@@ -170,11 +178,11 @@ const Contatti = () => {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 justify-center md:justify-start">
                       <Phone className="w-5 h-5 text-primary" aria-hidden="true" />
-                      <a href="tel:+393457956159" className="text-foreground font-medium hover:text-primary transition-colors">+39 345 795 6159</a>
+                      <a href="tel:+393457956159" data-track-label="contatti_gabriele_telefono" className="text-foreground font-medium hover:text-primary transition-colors">+39 345 795 6159</a>
                     </div>
                     <div className="flex items-center gap-3 justify-center md:justify-start">
                       <MessageCircle className="w-5 h-5 text-primary" aria-hidden="true" />
-                      <a href="https://wa.me/393457956159" className="text-foreground font-medium hover:text-primary transition-colors">Chat su WhatsApp</a>
+                      <a href="https://wa.me/393457956159" data-track-label="contatti_gabriele_whatsapp" className="text-foreground font-medium hover:text-primary transition-colors">Chat su WhatsApp</a>
                     </div>
                   </div>
                 </div>

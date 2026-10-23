@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   TrendingUp,
   PlusCircle,
@@ -23,7 +23,8 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ColumnHeader, TableToolbar } from '@/components/admin/ColumnHeader';
+import { ColumnDef, useTableControls } from '@/lib/table-controls';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -150,7 +151,25 @@ export const AdminMonthlyData: React.FC = () => {
     }
   };
 
-  const aptMap = new Map(apartments.map((a) => [a.id, a.name]));
+  const aptMap = useMemo(() => new Map(apartments.map((a) => [a.id, a.name])), [apartments]);
+
+  // Ordinamento e filtri per colonna del Registro Storico
+  const monthlyColumns = useMemo<ColumnDef<MonthlyData>[]>(
+    () => [
+      {
+        key: 'period',
+        type: 'select',
+        accessor: (r) => `${monthNames[r.month - 1]} ${r.year}`,
+        sortValue: (r) => r.year * 100 + r.month,
+      },
+      { key: 'apartment', type: 'select', accessor: (r) => aptMap.get(r.apartment_id) || r.apartment_id },
+      { key: 'occupancy', type: 'number', accessor: (r) => Number(r.occupancy_percentage) },
+      { key: 'price', type: 'number', accessor: (r) => Number(r.average_price) },
+      { key: 'notes', type: 'text', accessor: (r) => r.notes || '' },
+    ],
+    [aptMap]
+  );
+  const monthlyTable = useTableControls(monthlyData, monthlyColumns);
 
   // Build chart dataset grouped by Period (e.g. "08/2026", "09/2026")
   const periods = Array.from(
@@ -263,26 +282,26 @@ export const AdminMonthlyData: React.FC = () => {
               Registro Storico Dati Mensili
             </CardTitle>
             <CardDescription className="text-xs">
-              Tutti i valori registrati con etichetta "Dato Manuale" e note operative.
+              Tutti i valori registrati, con note operative.
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="p-0">
+          <TableToolbar controls={monthlyTable} />
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
-                  <th className="py-3 px-4">Periodo</th>
-                  <th className="py-3 px-4">Alloggio</th>
-                  <th className="py-3 px-4">Occupazione</th>
-                  <th className="py-3 px-4">Prezzo Medio</th>
-                  <th className="py-3 px-4">Origine</th>
-                  <th className="py-3 px-4">Note</th>
+                  <ColumnHeader label="Periodo" columnKey="period" controls={monthlyTable} />
+                  <ColumnHeader label="Alloggio" columnKey="apartment" controls={monthlyTable} />
+                  <ColumnHeader label="Occupazione" columnKey="occupancy" controls={monthlyTable} />
+                  <ColumnHeader label="Prezzo Medio" columnKey="price" controls={monthlyTable} />
+                  <ColumnHeader label="Note" columnKey="notes" controls={monthlyTable} />
                   <th className="py-3 px-4 text-right">Azioni</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {monthlyData.map((row) => (
+                {monthlyTable.rows.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4 font-bold text-slate-800">
                       {monthNames[row.month - 1]} {row.year}
@@ -305,11 +324,6 @@ export const AdminMonthlyData: React.FC = () => {
                       {row.average_price} €{' '}
                       <span className="text-[10px] text-slate-400 font-normal">/notte</span>
                     </td>
-                    <td className="py-3 px-4">
-                      <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 text-[10px]">
-                        Dato Manuale
-                      </Badge>
-                    </td>
                     <td className="py-3 px-4 text-slate-600 max-w-xs truncate">
                       {row.notes || '—'}
                     </td>
@@ -325,6 +339,15 @@ export const AdminMonthlyData: React.FC = () => {
                     </td>
                   </tr>
                 ))}
+                {monthlyTable.rows.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-400">
+                      {monthlyTable.totalRows === 0
+                        ? 'Nessun dato mensile registrato.'
+                        : 'Nessuna riga corrisponde ai filtri selezionati.'}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
