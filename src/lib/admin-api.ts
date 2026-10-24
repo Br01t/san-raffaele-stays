@@ -148,12 +148,37 @@ export async function updateApartment(id: string, updates: Partial<Apartment>): 
 }
 
 // ==============================================================================
+// ERRORI DATABASE
+// Quando Supabase è configurato NON si ripiega mai in silenzio su localStorage:
+// una scrittura fallita deve essere visibile, altrimenti l'interfaccia mostra
+// "salvato" mentre il database non è stato modificato.
+// ==============================================================================
+interface DbErrorLike {
+  message: string;
+  code?: string;
+  hint?: string | null;
+  details?: string | null;
+}
+
+function dbError(action: string, error: DbErrorLike): Error {
+  console.error(`Supabase ${action}:`, error);
+  let reason = error.message;
+  if (error.code === '42501' || /row-level security|permission denied/i.test(error.message)) {
+    reason = 'permesso negato dal database (RLS). Esci e rientra nell’area admin; se persiste controlla le policy.';
+  } else if (error.code === '23503') {
+    reason = 'l’alloggio non esiste nel database (chiave esterna). Controlla che i 3 alloggi siano presenti su Supabase.';
+  } else if (error.code === '42703' || error.code === 'PGRST204' || /column .* does not exist|schema cache/i.test(error.message)) {
+    reason = 'colonna mancante nel database. Esegui la migrazione supabase/migrations/20261023_stay_rules.sql.';
+  } else if (error.code === '42P10') {
+    reason = 'manca il vincolo UNIQUE richiesto (apartment_id + data). Riesegui la migrazione iniziale.';
+  }
+  return new Error(`${action}: ${reason}`);
+}
+
+// ==============================================================================
 // DAILY RATES & AVAILABILITY API
 // ==============================================================================
 export async function getCalendarData(apartmentId: string, startDate: string, endDate: string) {
-  let rates: DailyRate[] = [];
-  let availability: Availability[] = [];
-
   if (isSupabaseConfigured()) {
     const [ratesRes, availRes] = await Promise.all([
       supabase
@@ -169,26 +194,24 @@ export async function getCalendarData(apartmentId: string, startDate: string, en
         .gte('avail_date', startDate)
         .lte('avail_date', endDate),
     ]);
-
-    if (!ratesRes.error && ratesRes.data) rates = ratesRes.data as DailyRate[];
-    if (!availRes.error && availRes.data) availability = availRes.data as Availability[];
-
-    if (!ratesRes.error && !availRes.error) {
-      return { rates, availability };
-    }
+    if (ratesRes.error) throw dbError('Lettura tariffe', ratesRes.error);
+    if (availRes.error) throw dbError('Lettura disponibilità', availRes.error);
+    return {
+      rates: (ratesRes.data ?? []) as DailyRate[],
+      availability: (availRes.data ?? []) as Availability[],
+    };
   }
 
   const allRates = getLocal<DailyRate[]>(LS_RATES, []);
   const allAvail = getLocal<Availability[]>(LS_AVAIL, []);
-
-  rates = allRates.filter(
-    (r) => r.apartment_id === apartmentId && r.rate_date >= startDate && r.rate_date <= endDate
-  );
-  availability = allAvail.filter(
-    (a) => a.apartment_id === apartmentId && a.avail_date >= startDate && a.avail_date <= endDate
-  );
-
-  return { rates, availability };
+  return {
+    rates: allRates.filter(
+      (r) => r.apartment_id === apartmentId && r.rate_date >= startDate && r.rate_date <= endDate
+    ),
+    availability: allAvail.filter(
+      (a) => a.apartment_id === apartmentId && a.avail_date >= startDate && a.avail_date <= endDate
+    ),
+  };
 }
 
 export async function setDailyRate(
@@ -197,72 +220,8 @@ export async function setDailyRate(
   price: number,
   source: 'manual' | 'bulk' = 'manual'
 ) {
-  if (isSupabaseConfigured()) {
-    const { data, error } = await supabase
-      .from('daily_rates')
-      .upsert(
-        {
-          apartment_id: apartmentId,
-          rate_date: date,
-          price_per_night: price,
-          is_manual_override: true,
-          source,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'apartment_id, rate_date' }
-      )
-      .select()
-      .single();
-    if (!error && data) return data as DailyRate;
-    if (error) console.error('Supabase setDailyRate error:', error);
-  }
-
-  const allRates = getLocal<DailyRate[]>(LS_RATES, []);
-  const history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
-  const existingIdx = allRates.findIndex(
-    (r) => r.apartment_id === apartmentId && r.rate_date === date
-  );
-
-  let updatedRate: DailyRate;
-  if (existingIdx !== -1) {
-    const oldPrice = allRates[existingIdx].price_per_night;
-    updatedRate = {
-      ...allRates[existingIdx],
-      price_per_night: price,
-      is_manual_override: true,
-      source,
-      updated_at: new Date().toISOString(),
-    };
-    allRates[existingIdx] = updatedRate;
-    if (oldPrice !== price) {
-      history.unshift({
-        id: generateUUID(),
-        apartment_id: apartmentId,
-        daily_rate_id: updatedRate.id,
-        rate_date: date,
-        old_price: oldPrice,
-        new_price: price,
-        change_reason: 'Modifica manuale admin',
-        changed_at: new Date().toISOString(),
-      });
-    }
-  } else {
-    updatedRate = {
-      id: generateUUID(),
-      apartment_id: apartmentId,
-      rate_date: date,
-      price_per_night: price,
-      is_manual_override: true,
-      source,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    allRates.push(updatedRate);
-  }
-
-  setLocal(LS_RATES, allRates);
-  setLocal(LS_RATE_HISTORY, history);
-  return updatedRate;
+  const res = await bulkUpdateCalendar(apartmentId, [date], { price }, source);
+  return res.rates[0];
 }
 
 export async function setAvailability(
@@ -272,57 +231,12 @@ export async function setAvailability(
   isHighDemand: boolean = false,
   notes: string = ''
 ) {
-  if (isSupabaseConfigured()) {
-    const { data, error } = await supabase
-      .from('availability')
-      .upsert(
-        {
-          apartment_id: apartmentId,
-          avail_date: date,
-          is_available: isAvailable,
-          is_high_demand: isHighDemand,
-          notes: notes || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'apartment_id, avail_date' }
-      )
-      .select()
-      .single();
-    if (!error && data) return data as Availability;
-    if (error) console.error('Supabase setAvailability error:', error);
-  }
-
-  const allAvail = getLocal<Availability[]>(LS_AVAIL, []);
-  const existingIdx = allAvail.findIndex(
-    (a) => a.apartment_id === apartmentId && a.avail_date === date
-  );
-
-  let updatedAvail: Availability;
-  if (existingIdx !== -1) {
-    updatedAvail = {
-      ...allAvail[existingIdx],
-      is_available: isAvailable,
-      is_high_demand: isHighDemand,
-      notes: notes || null,
-      updated_at: new Date().toISOString(),
-    };
-    allAvail[existingIdx] = updatedAvail;
-  } else {
-    updatedAvail = {
-      id: generateUUID(),
-      apartment_id: apartmentId,
-      avail_date: date,
-      is_available: isAvailable,
-      is_high_demand: isHighDemand,
-      notes: notes || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    allAvail.push(updatedAvail);
-  }
-
-  setLocal(LS_AVAIL, allAvail);
-  return updatedAvail;
+  const res = await bulkUpdateCalendar(apartmentId, [date], {
+    is_available: isAvailable,
+    is_high_demand: isHighDemand,
+    notes,
+  });
+  return res.availability[0];
 }
 
 export async function bulkUpdateCalendar(
@@ -333,82 +247,261 @@ export async function bulkUpdateCalendar(
     is_available?: boolean;
     is_high_demand?: boolean;
     notes?: string;
+  },
+  source: 'manual' | 'bulk' = 'bulk'
+): Promise<{ rates: DailyRate[]; availability: Availability[] }> {
+  const uniqueDates = [...new Set(dates)];
+  const touchAvail =
+    updates.is_available !== undefined || updates.is_high_demand !== undefined || updates.notes !== undefined;
+  const nowIso = new Date().toISOString();
+
+  if (updates.price !== undefined && (!Number.isFinite(updates.price) || updates.price < 0)) {
+    throw new Error('Prezzo non valido.');
   }
-) {
-  for (const date of dates) {
+
+  // ---------------------------- Supabase ----------------------------
+  if (isSupabaseConfigured()) {
+    let savedRates: DailyRate[] = [];
+    let savedAvail: Availability[] = [];
+
     if (updates.price !== undefined) {
-      await setDailyRate(apartmentId, date, updates.price, 'bulk');
+      const rows = uniqueDates.map((date) => ({
+        apartment_id: apartmentId,
+        rate_date: date,
+        price_per_night: updates.price as number,
+        is_manual_override: true,
+        source,
+        updated_at: nowIso,
+      }));
+      // NB: onConflict senza spazi, altrimenti PostgREST cerca la colonna " rate_date"
+      const { data, error } = await supabase
+        .from('daily_rates')
+        .upsert(rows, { onConflict: 'apartment_id,rate_date' })
+        .select();
+      if (error) throw dbError('Salvataggio tariffe', error);
+      savedRates = (data ?? []) as DailyRate[];
+
+      const wrong = savedRates.filter((r) => Number(r.price_per_night) !== Number(updates.price));
+      if (savedRates.length !== uniqueDates.length || wrong.length > 0) {
+        throw new Error(
+          `Salvataggio tariffe: il database ha confermato ${savedRates.length - wrong.length} giorni su ${uniqueDates.length}. Modifica NON applicata completamente.`
+        );
+      }
     }
-    if (updates.is_available !== undefined || updates.is_high_demand !== undefined) {
-      const currentAvails = getLocal<Availability[]>(LS_AVAIL, []);
-      const existing = currentAvails.find(
-        (a) => a.apartment_id === apartmentId && a.avail_date === date
-      );
-      await setAvailability(
-        apartmentId,
-        date,
-        updates.is_available ?? existing?.is_available ?? true,
-        updates.is_high_demand ?? existing?.is_high_demand ?? false,
-        updates.notes ?? existing?.notes ?? ''
-      );
+
+    if (touchAvail) {
+      // Recupera le righe esistenti per non perdere note / flag non toccati
+      const { data: existing, error: exErr } = await supabase
+        .from('availability')
+        .select('*')
+        .eq('apartment_id', apartmentId)
+        .in('avail_date', uniqueDates);
+      if (exErr) throw dbError('Lettura disponibilità', exErr);
+      const byDate = new Map((existing ?? []).map((a) => [a.avail_date as string, a as Availability]));
+
+      const rows = uniqueDates.map((date) => {
+        const cur = byDate.get(date);
+        return {
+          apartment_id: apartmentId,
+          avail_date: date,
+          is_available: updates.is_available ?? cur?.is_available ?? true,
+          is_high_demand: updates.is_high_demand ?? cur?.is_high_demand ?? false,
+          notes: (updates.notes ?? cur?.notes ?? '') || null,
+          updated_at: nowIso,
+        };
+      });
+      const { data, error } = await supabase
+        .from('availability')
+        .upsert(rows, { onConflict: 'apartment_id,avail_date' })
+        .select();
+      if (error) throw dbError('Salvataggio disponibilità', error);
+      savedAvail = (data ?? []) as Availability[];
+      if (savedAvail.length !== uniqueDates.length) {
+        throw new Error(
+          `Salvataggio disponibilità: confermati ${savedAvail.length} giorni su ${uniqueDates.length}.`
+        );
+      }
+    }
+
+    return { rates: savedRates, availability: savedAvail };
+  }
+
+  // ------------------- Modalità locale (senza Supabase) -------------------
+  const allRates = getLocal<DailyRate[]>(LS_RATES, []);
+  const history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
+  const allAvail = getLocal<Availability[]>(LS_AVAIL, []);
+  const savedRates: DailyRate[] = [];
+  const savedAvail: Availability[] = [];
+
+  for (const date of uniqueDates) {
+    if (updates.price !== undefined) {
+      const idx = allRates.findIndex((r) => r.apartment_id === apartmentId && r.rate_date === date);
+      if (idx !== -1) {
+        const oldPrice = allRates[idx].price_per_night;
+        allRates[idx] = {
+          ...allRates[idx],
+          price_per_night: updates.price,
+          is_manual_override: true,
+          source,
+          updated_at: nowIso,
+        };
+        if (oldPrice !== updates.price) {
+          history.unshift({
+            id: generateUUID(),
+            apartment_id: apartmentId,
+            daily_rate_id: allRates[idx].id,
+            rate_date: date,
+            old_price: oldPrice,
+            new_price: updates.price,
+            change_reason: 'Modifica manuale admin',
+            changed_at: nowIso,
+          });
+        }
+        savedRates.push(allRates[idx]);
+      } else {
+        const created: DailyRate = {
+          id: generateUUID(),
+          apartment_id: apartmentId,
+          rate_date: date,
+          price_per_night: updates.price,
+          is_manual_override: true,
+          source,
+          created_at: nowIso,
+          updated_at: nowIso,
+        };
+        allRates.push(created);
+        savedRates.push(created);
+      }
+    }
+
+    if (touchAvail) {
+      const idx = allAvail.findIndex((a) => a.apartment_id === apartmentId && a.avail_date === date);
+      const cur = idx !== -1 ? allAvail[idx] : undefined;
+      const next: Availability = {
+        id: cur?.id ?? generateUUID(),
+        apartment_id: apartmentId,
+        avail_date: date,
+        is_available: updates.is_available ?? cur?.is_available ?? true,
+        is_high_demand: updates.is_high_demand ?? cur?.is_high_demand ?? false,
+        notes: (updates.notes ?? cur?.notes ?? '') || null,
+        created_at: cur?.created_at ?? nowIso,
+        updated_at: nowIso,
+      };
+      if (idx !== -1) allAvail[idx] = next;
+      else allAvail.push(next);
+      savedAvail.push(next);
     }
   }
-  return true;
+
+  setLocal(LS_RATES, allRates);
+  setLocal(LS_RATE_HISTORY, history);
+  setLocal(LS_AVAIL, allAvail);
+  return { rates: savedRates, availability: savedAvail };
 }
 
 // ==============================================================================
-// MIN STAY RULES API
+// REGOLE DI SOGGIORNO (soggiorno minimo, costi extra, sconti)
 // ==============================================================================
-export async function getMinStayRules(): Promise<MinStayRule[]> {
+export type StayRuleInput = Omit<MinStayRule, 'id' | 'created_at' | 'updated_at'>;
+
+function normalizeRule(r: MinStayRule): MinStayRule {
+  return { ...r, rule_type: r.rule_type ?? 'min_stay', is_active: r.is_active ?? true };
+}
+
+/**
+ * Colonne da inviare al database. Per i soggiorni minimi attivi si inviano solo
+ * le colonne storiche, così funzionano anche prima di eseguire la migrazione.
+ */
+function ruleToRow(rule: Partial<StayRuleInput>): Record<string, unknown> {
+  const row: Record<string, unknown> = {};
+  const legacy = ['apartment_id', 'min_nights', 'start_date', 'end_date', 'priority', 'description'] as const;
+  for (const k of legacy) if (rule[k] !== undefined) row[k] = rule[k];
+
+  const type = rule.rule_type ?? 'min_stay';
+  if (type !== 'min_stay') {
+    row.rule_type = type;
+    row.amount = rule.amount ?? null;
+    row.amount_type = rule.amount_type ?? null;
+    row.charge_basis = rule.charge_basis ?? null;
+    row.threshold_nights = rule.threshold_nights ?? null;
+    row.min_nights = null;
+  }
+  if (rule.is_active !== undefined) row.is_active = rule.is_active;
+  return row;
+}
+
+export async function getStayRules(): Promise<MinStayRule[]> {
   if (isSupabaseConfigured()) {
     const { data, error } = await supabase
       .from('min_stay_rules')
       .select('*')
       .order('priority', { ascending: false });
-    if (!error && data) return data as MinStayRule[];
+    if (error) throw dbError('Lettura regole soggiorno', error);
+    return (data as MinStayRule[]).map(normalizeRule);
   }
-  return getLocal<MinStayRule[]>(LS_MIN_STAY, INITIAL_MIN_STAY_RULES);
+  return getLocal<MinStayRule[]>(LS_MIN_STAY, INITIAL_MIN_STAY_RULES)
+    .map(normalizeRule)
+    .sort((a, b) => b.priority - a.priority);
 }
 
-export async function createMinStayRule(rule: Omit<MinStayRule, 'id' | 'created_at' | 'updated_at'>): Promise<MinStayRule> {
+export async function createStayRule(rule: StayRuleInput): Promise<MinStayRule> {
   if (isSupabaseConfigured()) {
-    const { data, error } = await supabase
-      .from('min_stay_rules')
-      .insert({
-        apartment_id: rule.apartment_id,
-        min_nights: rule.min_nights,
-        start_date: rule.start_date,
-        end_date: rule.end_date,
-        priority: rule.priority,
-        description: rule.description,
-      })
-      .select()
-      .single();
-    if (!error && data) return data as MinStayRule;
-    if (error) console.error('Supabase createMinStayRule error:', error);
+    const { data, error } = await supabase.from('min_stay_rules').insert(ruleToRow(rule)).select().single();
+    if (error) throw dbError('Creazione regola', error);
+    return normalizeRule(data as MinStayRule);
   }
-
-  const newRule: MinStayRule = {
+  const newRule: MinStayRule = normalizeRule({
     ...rule,
     id: generateUUID(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  };
-
+  } as MinStayRule);
   const list = getLocal<MinStayRule[]>(LS_MIN_STAY, INITIAL_MIN_STAY_RULES);
   list.unshift(newRule);
   setLocal(LS_MIN_STAY, list);
   return newRule;
 }
 
-export async function deleteMinStayRule(id: string): Promise<boolean> {
+export async function updateStayRule(id: string, updates: Partial<StayRuleInput>): Promise<MinStayRule> {
   if (isSupabaseConfigured()) {
-    await supabase.from('min_stay_rules').delete().eq('id', id);
+    const { data, error } = await supabase
+      .from('min_stay_rules')
+      .update(ruleToRow(updates))
+      .eq('id', id)
+      .select();
+    if (error) throw dbError('Modifica regola', error);
+    // Con RLS un UPDATE non consentito non dà errore: restituisce 0 righe
+    if (!data || data.length === 0) {
+      throw new Error('Modifica regola: nessuna riga aggiornata (regola inesistente o permesso negato).');
+    }
+    return normalizeRule(data[0] as MinStayRule);
+  }
+  const list = getLocal<MinStayRule[]>(LS_MIN_STAY, INITIAL_MIN_STAY_RULES);
+  const idx = list.findIndex((r) => r.id === id);
+  if (idx === -1) throw new Error('Regola non trovata');
+  list[idx] = normalizeRule({ ...list[idx], ...updates, updated_at: new Date().toISOString() });
+  setLocal(LS_MIN_STAY, list);
+  return list[idx];
+}
+
+export async function deleteStayRule(id: string): Promise<boolean> {
+  if (isSupabaseConfigured()) {
+    const { data, error } = await supabase.from('min_stay_rules').delete().eq('id', id).select();
+    if (error) throw dbError('Eliminazione regola', error);
+    if (!data || data.length === 0) {
+      throw new Error('Eliminazione regola: nessuna riga eliminata (regola inesistente o permesso negato).');
+    }
+    return true;
   }
   const list = getLocal<MinStayRule[]>(LS_MIN_STAY, INITIAL_MIN_STAY_RULES);
   setLocal(LS_MIN_STAY, list.filter((r) => r.id !== id));
   return true;
 }
+
+// Alias per compatibilità con il codice esistente
+export const getMinStayRules = getStayRules;
+export const createMinStayRule = createStayRule;
+export const deleteMinStayRule = deleteStayRule;
 
 // ==============================================================================
 // MONTHLY DATA API (Occupazione & Prezzo Medio)

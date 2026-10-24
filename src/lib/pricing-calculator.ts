@@ -1,4 +1,5 @@
 import { Apartment, DailyRate, Availability, MinStayRule } from '@/types/database';
+import { computeStayExtras, FeeLine, DiscountLine, getMinNightsForStay } from './stay-rules';
 
 export interface QuoteInput {
   apartment: Apartment;
@@ -29,6 +30,12 @@ export interface QuoteResult {
   nightsTotal: number;
   extraGuestsFee: number;
   cleaningFee: number;
+  /** Costi aggiuntivi da regole di soggiorno (es. pulizie), con eventuale omaggio. */
+  extraFees: FeeLine[];
+  extraFeesTotal: number;
+  /** Sconto applicato (il più vantaggioso tra quelli validi). */
+  discount: DiscountLine | null;
+  discountTotal: number;
   grandTotal: number;
   formattedMessageSummary: string;
 }
@@ -44,7 +51,7 @@ export function getStayDates(checkIn: string, checkOut: string): string[] {
   const current = new Date(start);
   while (current < end) {
     dates.push(current.toISOString().split('T')[0]);
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1); // UTC: immune dal cambio ora legale
   }
   return dates;
 }
@@ -69,17 +76,8 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
     validationErrors.push(`L'alloggio ${apartment.name} può ospitare al massimo ${apartment.max_guests} persone.`);
   }
 
-  // Verifica soggiorno minimo
-  let requiredMinNights = 2; // Default generale
-  const relevantRule = minStayRules.find((rule) => {
-    if (rule.apartment_id && rule.apartment_id !== apartment.id) return false;
-    if (!rule.start_date || !rule.end_date) return true;
-    return stayDates.some((d) => d >= (rule.start_date as string) && d <= (rule.end_date as string));
-  });
-
-  if (relevantRule) {
-    requiredMinNights = relevantRule.min_nights;
-  }
+  // Verifica soggiorno minimo (regola attiva con priorità più alta valida per le date)
+  const requiredMinNights = getMinNightsForStay(minStayRules, apartment.id, stayDates);
 
   if (totalNights > 0 && totalNights < requiredMinNights) {
     validationErrors.push(
@@ -139,7 +137,19 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
     cleaningFee = 0;
   }
 
-  const grandTotal = nightsTotal + extraGuestsFee + cleaningFee;
+  // Costi extra e sconti definiti nelle regole di soggiorno
+  const extras = computeStayExtras({
+    rules: minStayRules,
+    apartmentId: apartment.id,
+    dates: stayDates,
+    guests,
+    nightsTotal,
+  });
+
+  const grandTotal = Math.max(
+    0,
+    Math.round((nightsTotal + extraGuestsFee + cleaningFee + extras.feesTotal - extras.discountTotal) * 100) / 100
+  );
 
   // Testo riepilogativo formattato pronto per il campo 'message' del modulo Netlify Contatti
   const formattedMessageSummary = [
@@ -150,6 +160,10 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
     `Ospiti: ${guests}`,
     `Totale stimato: € ${grandTotal.toFixed(2)}`,
     cleaningFee > 0 ? `(Include pulizia: € ${cleaningFee.toFixed(2)})` : `(Pulizia inclusa/gratuita)`,
+    ...extras.fees.map((f) =>
+      f.waived ? `${f.label}: omaggio (valore € ${f.fullAmount.toFixed(2)})` : `${f.label}: € ${f.amount.toFixed(2)}`
+    ),
+    ...(extras.discount ? [`${extras.discount.label}: -€ ${extras.discount.amount.toFixed(2)}`] : []),
     `--------------------------------------`,
   ].join('\n');
 
@@ -165,6 +179,10 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
     nightsTotal,
     extraGuestsFee,
     cleaningFee,
+    extraFees: extras.fees,
+    extraFeesTotal: extras.feesTotal,
+    discount: extras.discount,
+    discountTotal: extras.discountTotal,
     grandTotal,
     formattedMessageSummary,
   };

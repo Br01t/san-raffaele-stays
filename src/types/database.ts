@@ -49,17 +49,34 @@ export interface Availability {
   updated_at: string;
 }
 
+export type StayRuleType = 'min_stay' | 'fee' | 'discount';
+export type StayRuleAmountType = 'fixed' | 'percent';
+export type StayRuleChargeBasis = 'per_stay' | 'per_night' | 'per_guest';
+
+/**
+ * Regola di soggiorno. La tabella si chiama ancora min_stay_rules per compatibilità:
+ *  - min_stay: soggiorno minimo (min_nights)
+ *  - fee:      costo aggiuntivo (es. pulizie) – amount, charge_basis, gratis da threshold_nights
+ *  - discount: sconto fisso (€) o percentuale – amount, amount_type, valido da threshold_nights
+ */
 export interface MinStayRule {
   id: string;
   apartment_id: string | null;
-  min_nights: number;
+  min_nights: number | null;
   start_date: string | null;
   end_date: string | null;
   priority: number;
   description: string | null;
+  rule_type?: StayRuleType;
+  amount?: number | null;
+  amount_type?: StayRuleAmountType | null;
+  charge_basis?: StayRuleChargeBasis | null;
+  threshold_nights?: number | null;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
 }
+export type StayRule = MinStayRule;
 
 export interface MonthlyData {
   id: string;
