@@ -1,3 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # La chiave "anon" e l'URL di Supabase sono pubblici per progetto (finiscono per forza nel sito).
+  # Senza questa riga lo "secrets scanning" di Netlify li scambia per segreti e blocca il deploy.
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

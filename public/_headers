@@ -1,0 +1,14 @@
+# Intestazioni di sicurezza e cache.
+# Letto da Netlify (copiato nella cartella pubblicata dal build di Vite).
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=15552000
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-src https://www.google.com https://datastudio.google.com https://lookerstudio.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# File con hash nel nome: si possono tenere in cache per sempre
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

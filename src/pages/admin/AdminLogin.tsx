@@ -72,11 +72,21 @@ export const AdminLogin: React.FC = () => {
           </CardHeader>
 
           <CardContent>
-            {!hasSupabase && (
+            {!hasSupabase && import.meta.env.DEV && (
               <Alert className="mb-5 bg-amber-50 border-amber-200 text-amber-900 text-xs">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertDescription>
-                  <strong>Modalità Locale Attiva:</strong> Puoi effettuare l'accesso con la tua email (es. <em>admin@sanraffaele.it</em>) per esplorare l'area amministrativa. Quando configurerai Supabase in <code>.env</code>, il login utilizzerà Supabase Auth.
+                  <strong>Solo sviluppo locale:</strong> senza chiavi Supabase in <code>.env</code> il login è simulato.
+                  Questa modalità è disattivata nel sito pubblicato.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {!hasSupabase && !import.meta.env.DEV && (
+              <Alert variant="destructive" className="mb-5 text-xs">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Area amministrativa non configurata: mancano le chiavi del database nella pubblicazione del sito.
                 </AlertDescription>
               </Alert>
             )}
@@ -98,7 +108,7 @@ export const AdminLogin: React.FC = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="tua-email@esempio.it"
+                    placeholder="tua-email@esempio.it" autoComplete="username"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured, supabaseUrl, supabaseAnonKey } from './supabase';
+import { isSupabaseConfigured, supabaseUrl, supabaseAnonKey } from './supabase-config';
 import { SiteEvent } from '@/types/database';
 
 const LS_SITE_EVENTS = 'srs_site_events';
@@ -105,57 +105,41 @@ export function trackEvent(
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Lettura per la dashboard admin                                            */
+/*  Riepilogo per la dashboard admin (nessuna dipendenza da supabase-js)       */
 /* -------------------------------------------------------------------------- */
 
-export interface SiteEventsResult {
-  events: SiteEvent[];
-  /** true = dati reali da Supabase; false = solo localStorage di questo browser */
-  fromDatabase: boolean;
-  /** true = raggiunto il limite di sicurezza di righe lette */
-  truncated: boolean;
+/** Una riga di riepilogo: stesso formato della funzione SQL admin_site_event_summary. */
+export interface SiteEventSummaryRow {
+  event_type: string;
+  page_path: string;
+  label: string | null;
+  apartment: string | null;
+  cnt: number;
 }
 
-const PAGE_SIZE = 1000; // limite massimo di righe per richiesta di PostgREST
-const MAX_ROWS = 50000;
-
-/** Legge TUTTI gli eventi dal periodo richiesto (paginando), non solo gli ultimi 100. */
-export async function getSiteEvents(sinceIso?: string): Promise<SiteEventsResult> {
-  try {
-    if (isSupabaseConfigured()) {
-      const all: SiteEvent[] = [];
-      let from = 0;
-      let truncated = false;
-      for (;;) {
-        let q = supabase
-          .from('site_events')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .range(from, from + PAGE_SIZE - 1);
-        if (sinceIso) q = q.gte('created_at', sinceIso);
-        const { data, error } = await q;
-        if (error) throw error;
-        const rows = (data ?? []) as SiteEvent[];
-        all.push(...rows);
-        if (rows.length < PAGE_SIZE) break;
-        from += PAGE_SIZE;
-        if (from >= MAX_ROWS) {
-          truncated = true;
-          break;
-        }
-      }
-      return { events: all, fromDatabase: true, truncated };
-    }
-  } catch (err) {
-    console.error('Lettura site_events fallita:', err);
-  }
-
+/** Eventi salvati nel browser (solo modalità locale, senza Supabase). */
+export function getLocalSiteEvents(sinceIso?: string): SiteEvent[] {
   try {
     const raw = localStorage.getItem(LS_SITE_EVENTS);
     let events = raw ? (JSON.parse(raw) as SiteEvent[]) : [];
     if (sinceIso) events = events.filter((e) => e.created_at >= sinceIso);
-    return { events, fromDatabase: false, truncated: false };
+    return events;
   } catch {
-    return { events: [], fromDatabase: false, truncated: false };
+    return [];
   }
+}
+
+/** Raggruppa gli eventi come fa il database (tipo, pagina, pulsante, alloggio). */
+export function summarizeEvents(events: SiteEvent[]): SiteEventSummaryRow[] {
+  const map = new Map<string, SiteEventSummaryRow>();
+  for (const e of events) {
+    const md = (e.metadata || {}) as Record<string, unknown>;
+    const label = md.label != null ? String(md.label) : md.form != null ? String(md.form) : null;
+    const apartment = md.apartment != null ? String(md.apartment) : null;
+    const key = `${e.event_type}|${e.page_path}|${label}|${apartment}`;
+    const row = map.get(key) ?? { event_type: e.event_type, page_path: e.page_path, label, apartment, cnt: 0 };
+    row.cnt += 1;
+    map.set(key, row);
+  }
+  return [...map.values()];
 }

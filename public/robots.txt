@@ -1,32 +1,42 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /admin
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /admin
 
 # GEO / AI Crawlers
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
 
 User-agent: Anthropic-ai
 Allow: /
+Disallow: /admin
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
 
 User-agent: *
 Allow: /
+Disallow: /admin
 
 Sitemap: https://amicidelsanraffaele.com/sitemap.xml

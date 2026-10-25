@@ -20,7 +20,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getSiteEvents } from '@/lib/tracking';
+import { getSiteEventSummary, getRecentContactEvents } from '@/lib/admin-api';
+import { SiteEventSummaryRow } from '@/lib/tracking';
+import { toast } from 'sonner';
 import { SiteEvent } from '@/types/database';
 import { ColumnHeader, TableToolbar } from '@/components/admin/ColumnHeader';
 import { ColumnDef, useTableControls } from '@/lib/table-controls';
@@ -49,24 +51,30 @@ const EVENT_LABELS: Record<string, string> = {
 const CONTACT_TYPES = ['phone_click', 'whatsapp_click', 'email_click', 'form_submit'];
 
 export const AdminAnalytics: React.FC = () => {
+  const [summary, setSummary] = useState<SiteEventSummaryRow[]>([]);
   const [events, setEvents] = useState<SiteEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<(typeof PERIODS)[number]['key']>('30');
   const [fromDatabase, setFromDatabase] = useState(true);
-  const [truncated, setTruncated] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       setLoading(true);
-      const days = PERIODS.find((p) => p.key === period)!.days;
-      const since = days ? new Date(Date.now() - days * 86400000).toISOString() : undefined;
-      const res = await getSiteEvents(since);
-      if (cancelled) return;
-      setEvents(res.events);
-      setFromDatabase(res.fromDatabase);
-      setTruncated(res.truncated);
-      setLoading(false);
+      try {
+        const days = PERIODS.find((p) => p.key === period)!.days;
+        const since = days ? new Date(Date.now() - days * 86400000).toISOString() : undefined;
+        // Il database restituisce i totali già raggruppati (pochi KB) + gli ultimi 300 contatti per il registro
+        const [sum, recent] = await Promise.all([getSiteEventSummary(since), getRecentContactEvents(since, 300)]);
+        if (cancelled) return;
+        setSummary(sum.rows);
+        setFromDatabase(sum.fromDatabase);
+        setEvents(recent);
+      } catch (err) {
+        if (!cancelled) toast.error(err instanceof Error ? err.message : 'Caricamento statistiche non riuscito.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
     return () => {
@@ -74,12 +82,12 @@ export const AdminAnalytics: React.FC = () => {
     };
   }, [period]);
 
-  // Conteggi aggregati su TUTTI gli eventi del periodo (non solo gli ultimi 100)
+  // Totali esatti su TUTTI gli eventi del periodo (calcolati dal database)
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
-    for (const e of events) c[e.event_type] = (c[e.event_type] || 0) + 1;
+    for (const r of summary) c[r.event_type] = (c[r.event_type] || 0) + r.cnt;
     return c;
-  }, [events]);
+  }, [summary]);
 
   const phoneClicks = counts['phone_click'] || 0;
   const whatsappClicks = counts['whatsapp_click'] || 0;
@@ -93,24 +101,20 @@ export const AdminAnalytics: React.FC = () => {
   // Dettaglio per singolo pulsante / link
   const byButton = useMemo(() => {
     const map = new Map<string, { type: string; label: string; page: string; apartment: string; count: number }>();
-    for (const e of events) {
-      if (!CONTACT_TYPES.includes(e.event_type)) continue;
-      const md = (e.metadata || {}) as Record<string, unknown>;
-      const label = String(md.label ?? md.form ?? e.event_type);
-      const apartment = md.apartment ? String(md.apartment) : '';
-      const key = `${e.event_type}|${label}|${apartment}|${e.page_path}`;
-      const row = map.get(key) ?? { type: e.event_type, label, page: e.page_path, apartment, count: 0 };
-      row.count += 1;
+    for (const r of summary) {
+      if (!CONTACT_TYPES.includes(r.event_type)) continue;
+      const label = r.label ?? r.event_type;
+      const apartment = r.apartment ?? '';
+      const key = `${r.event_type}|${label}|${apartment}|${r.page_path}`;
+      const row = map.get(key) ?? { type: r.event_type, label, page: r.page_path, apartment, count: 0 };
+      row.count += r.cnt;
       map.set(key, row);
     }
     return [...map.values()].sort((a, b) => b.count - a.count);
-  }, [events]);
+  }, [summary]);
 
   // Registro: tutti i contatti del periodo (non solo gli ultimi), con "mostra altri"
-  const recentEvents = useMemo(
-    () => events.filter((e) => CONTACT_TYPES.includes(e.event_type) || e.event_type === 'form_error'),
-    [events]
-  );
+  const recentEvents = events;
   const [visibleLog, setVisibleLog] = useState(50);
 
   const buttonColumns = useMemo<ColumnDef<(typeof byButton)[number]>[]>(
@@ -189,12 +193,6 @@ export const AdminAnalytics: React.FC = () => {
               </p>
             </div>
           )}
-          {truncated && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-              Periodo molto ampio: sono stati letti solo gli eventi più recenti. Restringi il periodo per conteggi esatti.
-            </div>
-          )}
-
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-xs text-slate-500">
               Contatti totali nel periodo:{' '}
@@ -302,7 +300,7 @@ export const AdminAnalytics: React.FC = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-bold text-slate-900">Registro Interazioni</CardTitle>
               <CardDescription className="text-xs">
-                Tutti i contatti del periodo selezionato (clic su telefono, WhatsApp, email e invii del modulo).
+                Gli ultimi 300 contatti del periodo selezionato (clic su telefono, WhatsApp, email e invii del modulo). I totali qui sopra sono invece calcolati su tutti gli eventi.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">

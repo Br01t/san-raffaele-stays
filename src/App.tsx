@@ -4,9 +4,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "./contexts/AuthContext";
-import { AuthGuard } from "./components/admin/AuthGuard";
-import { AdminLayout } from "./components/admin/AdminLayout";
 import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -20,7 +17,9 @@ const PrivacyPolicy = React.lazy(() => import("./pages/PrivacyPolicy"));
 const CookiePolicy = React.lazy(() => import("./pages/CookiePolicy"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
-// Admin pages
+// Admin (tutto caricato solo entrando in /admin: il sito pubblico non scarica Supabase)
+const AdminShell = React.lazy(() => import("./components/admin/AdminShell"));
+const AdminArea = React.lazy(() => import("./components/admin/AdminArea"));
 const AdminLogin = React.lazy(() =>
   import("./pages/admin/AdminLogin").then((m) => ({ default: m.AdminLogin }))
 );
@@ -50,8 +49,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
+    <TooltipProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
@@ -75,25 +73,18 @@ const App = () => (
                 <Route path="/cookie-policy" element={<CookiePolicy />} />
               </Route>
 
-              {/* Admin Login */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-
-              {/* Protected Admin Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <AuthGuard>
-                    <AdminLayout />
-                  </AuthGuard>
-                }
-              >
-                <Route index element={<AdminDashboard />} />
-                <Route path="appartamenti" element={<AdminApartments />} />
-                <Route path="calendario" element={<AdminCalendar />} />
-                <Route path="dati-mensili" element={<AdminMonthlyData />} />
-                <Route path="eventi" element={<AdminEventsNotes />} />
-                <Route path="analytics" element={<AdminAnalytics />} />
-                <Route path="impostazioni" element={<AdminSettings />} />
+              {/* Area admin: login + rotte protette, dentro il provider di autenticazione */}
+              <Route element={<AdminShell />}>
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin" element={<AdminArea />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="appartamenti" element={<AdminApartments />} />
+                  <Route path="calendario" element={<AdminCalendar />} />
+                  <Route path="dati-mensili" element={<AdminMonthlyData />} />
+                  <Route path="eventi" element={<AdminEventsNotes />} />
+                  <Route path="analytics" element={<AdminAnalytics />} />
+                  <Route path="impostazioni" element={<AdminSettings />} />
+                </Route>
               </Route>
 
               {/* 404 */}
@@ -101,8 +92,7 @@ const App = () => (
             </Routes>
           </React.Suspense>
         </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

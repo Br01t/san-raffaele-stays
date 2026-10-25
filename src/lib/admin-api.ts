@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { getLocalSiteEvents, summarizeEvents, SiteEventSummaryRow } from './tracking';
 import {
   Apartment,
   DailyRate,
@@ -9,6 +10,7 @@ import {
   InternalNote,
   RateHistory,
   MonthlyDataHistory,
+  SiteEvent,
 } from '@/types/database';
 import {
   INITIAL_APARTMENTS,
@@ -718,31 +720,110 @@ export async function deleteNote(id: string): Promise<boolean> {
   return true;
 }
 
-export async function getRateHistory(apartmentId?: string): Promise<RateHistory[]> {
+export async function getRateHistory(apartmentId?: string, limit = 300): Promise<RateHistory[]> {
   if (isSupabaseConfigured()) {
-    let query = supabase.from('rate_history').select('*').order('changed_at', { ascending: false });
+    // Limite: lo storico cresce a ogni modifica e va scaricato a pezzi (traffico del piano free)
+    let query = supabase
+      .from('rate_history')
+      .select('*')
+      .order('changed_at', { ascending: false })
+      .limit(limit);
     if (apartmentId) query = query.eq('apartment_id', apartmentId);
-    const { data } = await query;
-    if (data) return data as RateHistory[];
+    const { data, error } = await query;
+    if (error) throw dbError('Lettura storico tariffe', error);
+    return (data ?? []) as RateHistory[];
   }
   const history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
-  if (apartmentId) return history.filter((h) => h.apartment_id === apartmentId);
-  return history;
+  const list = apartmentId ? history.filter((h) => h.apartment_id === apartmentId) : history;
+  return list.slice(0, limit);
+}
+
+// ==============================================================================
+// STATISTICHE SITO (riepilogo calcolato dal database: pochi KB, non migliaia di righe)
+// ==============================================================================
+const CONTACT_EVENT_TYPES = ['phone_click', 'whatsapp_click', 'email_click', 'form_submit', 'form_error'];
+
+export async function getSiteEventSummary(
+  sinceIso?: string
+): Promise<{ rows: SiteEventSummaryRow[]; fromDatabase: boolean }> {
+  if (isSupabaseConfigured()) {
+    const { data, error } = await supabase.rpc('admin_site_event_summary', { p_since: sinceIso ?? null });
+    if (error) {
+      if (error.code === 'PGRST202' || error.code === '42883') {
+        throw new Error('Statistiche: funzione mancante. Esegui la migrazione supabase/migrations/20261024_security_hardening.sql.');
+      }
+      throw dbError('Lettura statistiche', error);
+    }
+    const rows = ((data ?? []) as SiteEventSummaryRow[]).map((r) => ({ ...r, cnt: Number(r.cnt) }));
+    return { rows, fromDatabase: true };
+  }
+  return { rows: summarizeEvents(getLocalSiteEvents(sinceIso)), fromDatabase: false };
+}
+
+export async function getRecentContactEvents(sinceIso?: string, limit = 300): Promise<SiteEvent[]> {
+  if (isSupabaseConfigured()) {
+    let q = supabase
+      .from('site_events')
+      .select('id,event_type,page_path,metadata,session_id,created_at')
+      .in('event_type', CONTACT_EVENT_TYPES)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (sinceIso) q = q.gte('created_at', sinceIso);
+    const { data, error } = await q;
+    if (error) throw dbError('Lettura registro contatti', error);
+    return (data ?? []) as SiteEvent[];
+  }
+  return getLocalSiteEvents(sinceIso)
+    .filter((e) => CONTACT_EVENT_TYPES.includes(e.event_type))
+    .slice(0, limit);
 }
 
 // ==============================================================================
 // EXPORT DATA (CSV & JSON)
 // ==============================================================================
+/** Legge un'intera tabella a blocchi da 1000 righe (limite di PostgREST). */
+async function fetchAllRows<T>(table: string, orderBy: string): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from(table)
+      .select('*')
+      .order(orderBy, { ascending: true })
+      .range(from, from + 999);
+    if (error) throw dbError(`Backup ${table}`, error);
+    out.push(...((data ?? []) as T[]));
+    if (!data || data.length < 1000) break;
+  }
+  return out;
+}
+
+/**
+ * Backup completo. Il piano free di Supabase NON include backup automatici:
+ * conviene scaricare questo file periodicamente (es. una volta al mese).
+ */
 export async function exportAllDataJSON(): Promise<string> {
-  const [apartments, events, monthly, rules, notes, rates, history] = await Promise.all([
+  const [apartments, events, monthly, rules, notes] = await Promise.all([
     getApartments(),
     getEvents(),
     getMonthlyData(),
-    getMinStayRules(),
+    getStayRules(),
     getNotes(),
-    getLocal<DailyRate[]>(LS_RATES, []),
-    getRateHistory(),
   ]);
+
+  let rates: DailyRate[];
+  let availability: Availability[];
+  let history: RateHistory[];
+  if (isSupabaseConfigured()) {
+    [rates, availability, history] = await Promise.all([
+      fetchAllRows<DailyRate>('daily_rates', 'rate_date'),
+      fetchAllRows<Availability>('availability', 'avail_date'),
+      fetchAllRows<RateHistory>('rate_history', 'changed_at'),
+    ]);
+  } else {
+    rates = getLocal<DailyRate[]>(LS_RATES, []);
+    availability = getLocal<Availability[]>(LS_AVAIL, []);
+    history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
+  }
 
   const payload = {
     exportDate: new Date().toISOString(),
@@ -751,14 +832,25 @@ export async function exportAllDataJSON(): Promise<string> {
       apartments,
       events,
       monthlyData: monthly,
-      minStayRules: rules,
+      stayRules: rules,
       notes,
       dailyRates: rates,
+      availability,
       rateHistory: history,
     },
   };
 
   return JSON.stringify(payload, null, 2);
+}
+
+/**
+ * Cella CSV sicura: neutralizza le "formule" (= + - @) che Excel/Sheets eseguirebbero
+ * all'apertura (CSV injection) e raddoppia le virgolette.
+ */
+export function csvCell(value: string | number | null | undefined): string {
+  let v = String(value ?? '');
+  if (/^[=+\-@\t\r]/.test(v)) v = `'${v}`;
+  return `"${v.replace(/"/g, '""')}"`;
 }
 
 export async function exportMonthlyDataCSV(): Promise<string> {
@@ -769,11 +861,11 @@ export async function exportMonthlyDataCSV(): Promise<string> {
   const rows = monthly.map((m) => [
     m.year,
     m.month,
-    `"${aptMap.get(m.apartment_id) || m.apartment_id}"`,
+    csvCell(aptMap.get(m.apartment_id) || m.apartment_id),
     m.occupancy_percentage,
     m.average_price,
     m.price_definition,
-    `"${(m.notes || '').replace(/"/g, '""')}"`,
+    csvCell(m.notes),
   ]);
 
   return [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\n');
