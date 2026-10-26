@@ -96,7 +96,7 @@ export const AdminApartments: React.FC = () => {
       </div>
 
       {/* Grid of 3 Apartments */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {apartments.map((apt) => (
           <Card key={apt.id} className="border-slate-200 shadow-sm flex flex-col justify-between overflow-hidden">
             <div>

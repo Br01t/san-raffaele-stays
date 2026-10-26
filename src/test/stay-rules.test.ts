@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStayExtras, getMinNightsForStay, getMinStayRuleFor, describeRule } from "@/lib/stay-rules";
+import { computeStayExtras, getMinNightsForStay, getMinStayRuleFor, getAlwaysMinStayRule, describeRule } from "@/lib/stay-rules";
 import { calculateStayQuote } from "@/lib/pricing-calculator";
 import { MinStayRule, Apartment } from "@/types/database";
 
@@ -108,5 +108,23 @@ describe("preventivo completo", () => {
     expect(q.dailyBreakdown.map((d) => d.date)).toEqual([
       "2027-03-26", "2027-03-27", "2027-03-28", "2027-03-29", "2027-03-30", "2027-03-31", "2027-04-01",
     ]);
+  });
+});
+
+describe("regola notti minime sempre valida (testo accanto al calendario)", () => {
+  const general = rule({ rule_type: "min_stay", min_nights: 2, priority: 1 });
+  const seasonal = rule({ rule_type: "min_stay", min_nights: 4, priority: 10, start_date: "2027-05-10", end_date: "2027-05-15" });
+  const own = rule({ rule_type: "min_stay", min_nights: 3, priority: 1, apartment_id: APT });
+  const off = rule({ rule_type: "min_stay", min_nights: 9, priority: 1, apartment_id: APT, is_active: false });
+
+  it("ignora le regole a periodo e quelle disattivate", () => {
+    expect(getAlwaysMinStayRule([seasonal, off, general], APT)?.min_nights).toBe(2);
+  });
+  it("la regola dell'alloggio ha la precedenza sulla generale, che vale per gli altri", () => {
+    expect(getAlwaysMinStayRule([general, own], APT)?.min_nights).toBe(3);
+    expect(getAlwaysMinStayRule([general, own], "altro")?.min_nights).toBe(2);
+  });
+  it("senza regole restituisce null", () => {
+    expect(getAlwaysMinStayRule([seasonal], APT)).toBeNull();
   });
 });

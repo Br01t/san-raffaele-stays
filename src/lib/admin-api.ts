@@ -531,6 +531,7 @@ export async function upsertMonthlyData(entry: Omit<MonthlyData, 'id' | 'created
           month: entry.month,
           occupancy_percentage: entry.occupancy_percentage,
           average_price: entry.average_price,
+          revenue: entry.revenue,
           price_definition: entry.price_definition,
           notes: entry.notes,
           is_manual: entry.is_manual,
@@ -559,7 +560,7 @@ export async function upsertMonthlyData(entry: Omit<MonthlyData, 'id' | 'created
       updated_at: new Date().toISOString(),
     };
     list[index] = result;
-    if (old.occupancy_percentage !== entry.occupancy_percentage || old.average_price !== entry.average_price) {
+    if (old.occupancy_percentage !== entry.occupancy_percentage || old.average_price !== entry.average_price || (old.revenue ?? null) !== (entry.revenue ?? null)) {
       history.unshift({
         id: generateUUID(),
         monthly_data_id: old.id,
@@ -567,6 +568,8 @@ export async function upsertMonthlyData(entry: Omit<MonthlyData, 'id' | 'created
         new_occupancy: entry.occupancy_percentage,
         old_avg_price: old.average_price,
         new_avg_price: entry.average_price,
+        old_revenue: old.revenue ?? null,
+        new_revenue: entry.revenue ?? null,
         change_reason: 'Rettifica manuale admin',
         changed_at: new Date().toISOString(),
       });
@@ -827,7 +830,7 @@ export async function exportAllDataJSON(): Promise<string> {
 
   const payload = {
     exportDate: new Date().toISOString(),
-    source: 'San Raffaele Stays Admin Backup',
+    source: 'Amici del San Raffaele Admin Backup',
     data: {
       apartments,
       events,
@@ -857,13 +860,14 @@ export async function exportMonthlyDataCSV(): Promise<string> {
   const [apartments, monthly] = await Promise.all([getApartments(), getMonthlyData()]);
   const aptMap = new Map(apartments.map((a) => [a.id, a.name]));
 
-  const headers = ['Anno', 'Mese', 'Alloggio', 'Tasso Occupazione (%)', 'Prezzo Medio (EUR)', 'Tipo Prezzo', 'Note'];
+  const headers = ['Anno', 'Mese', 'Alloggio', 'Tasso Occupazione (%)', 'Prezzo Medio (EUR)', 'Fatturato (EUR)', 'Tipo Prezzo', 'Note'];
   const rows = monthly.map((m) => [
     m.year,
     m.month,
     csvCell(aptMap.get(m.apartment_id) || m.apartment_id),
     m.occupancy_percentage,
     m.average_price,
+    m.revenue ?? '',
     m.price_definition,
     csvCell(m.notes),
   ]);

@@ -85,6 +85,8 @@ export interface MonthlyData {
   month: number;
   occupancy_percentage: number;
   average_price: number;
+  /** Fatturato del mese in euro; null = non ancora inserito */
+  revenue: number | null;
   price_definition: 'per_night' | 'per_stay';
   notes: string | null;
   is_manual: boolean;
@@ -99,6 +101,8 @@ export interface MonthlyDataHistory {
   new_occupancy: number | null;
   old_avg_price: number | null;
   new_avg_price: number | null;
+  old_revenue?: number | null;
+  new_revenue?: number | null;
   change_reason: string | null;
   changed_at: string;
 }

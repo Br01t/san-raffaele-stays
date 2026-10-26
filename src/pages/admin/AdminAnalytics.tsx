@@ -168,7 +168,7 @@ export const AdminAnalytics: React.FC = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="site" className="space-y-4">
-        <TabsList className="bg-slate-100 p-1">
+        <TabsList className="bg-slate-100 p-1 h-auto w-full sm:w-auto flex-wrap justify-start">
           <TabsTrigger value="site" className="text-xs font-semibold">
             Metriche Sito Web
           </TabsTrigger>
@@ -215,7 +215,7 @@ export const AdminAnalytics: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {[
               { title: 'Telefonate Cliccate', value: phoneClicks, hint: 'Clic su qualsiasi numero di telefono', Icon: PhoneCall, tone: 'bg-emerald-50 text-emerald-600' },
               { title: 'Contatti WhatsApp', value: whatsappClicks, hint: 'Clic su Contattaci, Richiedi informazioni/disponibilità, chat…', Icon: MessageCircle, tone: 'bg-green-50 text-green-600' },
@@ -257,7 +257,7 @@ export const AdminAnalytics: React.FC = () => {
             <CardContent className="p-0">
               <TableToolbar controls={buttonTable} />
               <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
+                <table className="stack-table w-full text-xs text-left">
                   <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                     <tr>
                       <ColumnHeader label="Pulsante / link" columnKey="label" controls={buttonTable} className="py-2.5 px-4" />
@@ -279,13 +279,13 @@ export const AdminAnalytics: React.FC = () => {
                     ) : (
                       buttonTable.rows.map((r) => (
                         <tr key={`${r.type}|${r.label}|${r.apartment}|${r.page}`} className="hover:bg-slate-50/80">
-                          <td className="py-2.5 px-4 font-semibold text-slate-800">{r.label}</td>
-                          <td className="py-2.5 px-4 text-slate-600">{r.apartment || '—'}</td>
-                          <td className="py-2.5 px-4">
+                          <td data-label="Pulsante / link" className="py-2.5 px-4 font-semibold text-slate-800">{r.label}</td>
+                          <td data-label="Alloggio" className="py-2.5 px-4 text-slate-600">{r.apartment || '—'}</td>
+                          <td data-label="Tipo" className="py-2.5 px-4">
                             <Badge variant="outline" className="text-[10px]">{EVENT_LABELS[r.type] ?? r.type}</Badge>
                           </td>
-                          <td className="py-2.5 px-4 text-slate-600">{r.page}</td>
-                          <td className="py-2.5 px-4 text-right font-bold text-slate-900">{r.count}</td>
+                          <td data-label="Pagina" className="py-2.5 px-4 text-slate-600">{r.page}</td>
+                          <td data-label="Clic" className="py-2.5 px-4 text-right font-bold text-slate-900">{r.count}</td>
                         </tr>
                       ))
                     )}
@@ -306,7 +306,7 @@ export const AdminAnalytics: React.FC = () => {
             <CardContent className="p-0">
               <TableToolbar controls={logTable} />
               <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
+                <table className="stack-table w-full text-xs text-left">
                   <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
                     <tr>
                       <ColumnHeader label="Data e Ora" columnKey="date" controls={logTable} className="py-2.5 px-4" />
@@ -329,12 +329,12 @@ export const AdminAnalytics: React.FC = () => {
                         const md = (evt.metadata || {}) as Record<string, unknown>;
                         return (
                           <tr key={evt.id} className="hover:bg-slate-50/80">
-                            <td className="py-2.5 px-4 text-slate-500">{new Date(evt.created_at).toLocaleString('it-IT')}</td>
-                            <td className="py-2.5 px-4">
+                            <td data-label="Data e Ora" className="py-2.5 px-4 text-slate-500">{new Date(evt.created_at).toLocaleString('it-IT')}</td>
+                            <td data-label="Tipo Evento" className="py-2.5 px-4">
                               <Badge variant="outline" className="text-[10px]">{EVENT_LABELS[evt.event_type] ?? evt.event_type}</Badge>
                             </td>
-                            <td className="py-2.5 px-4 text-slate-600">{evt.page_path}</td>
-                            <td className="py-2.5 px-4 text-slate-500">
+                            <td data-label="Pagina" className="py-2.5 px-4 text-slate-600">{evt.page_path}</td>
+                            <td data-label="Pulsante" className="py-2.5 px-4 text-slate-500">
                               {String(md.label ?? md.form ?? '—')}
                               {md.apartment ? ` (${String(md.apartment)})` : ''}
                             </td>
@@ -454,7 +454,7 @@ export const AdminAnalytics: React.FC = () => {
                   L'API di Google Business Profile (<em>Performance API</em>) richiede l'autenticazione OAuth 2.0 con l'account proprietario della scheda Google Business. Le metriche consultabili includono: visualizzazioni della scheda su Google Maps e Ricerca, chiamate telefoniche avviate, richieste di indicazioni stradali e visite al sito web.
                 </p>
                 <p className="text-slate-600 leading-relaxed">
-                  <strong>Raccomandazione:</strong> Il sistema San Raffaele Stays è strutturato per archiviare queste metriche nella tabella <code>analytics_cache</code> non appena il cliente collegherà il proprio account Google con autorizzazione OAuth. Nel frattempo, tutte le conversioni dirette dal sito (telefonate e chat WhatsApp) vengono già conteggiate nel tab <em>Metriche Sito Web</em> in tempo reale.
+                  <strong>Raccomandazione:</strong> Il sistema Amici del San Raffaele è strutturato per archiviare queste metriche nella tabella <code>analytics_cache</code> non appena il cliente collegherà il proprio account Google con autorizzazione OAuth. Nel frattempo, tutte le conversioni dirette dal sito (telefonate e chat WhatsApp) vengono già conteggiate nel tab <em>Metriche Sito Web</em> in tempo reale.
                 </p>
               </div>
             </CardContent>

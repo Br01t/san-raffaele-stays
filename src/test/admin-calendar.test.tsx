@@ -69,4 +69,40 @@ describe("AdminCalendar", () => {
 
     await waitFor(() => expect(screen.getAllByText("177 €").length).toBe(lastDay));
   });
+
+  it("mostra le notti minime come testo accanto al calendario (non su ogni giorno) e si modificano da lì", async () => {
+    render(
+      <MemoryRouter>
+        <AdminCalendar />
+      </MemoryRouter>
+    );
+    const notice = await screen.findByTestId("min-stay-notice");
+    expect(notice.textContent).toMatch(/prenotazione minima di 2 notti/);
+    // niente più "min 2n" dentro le celle del calendario
+    expect(screen.queryAllByText(/^min \d+n$/).length).toBe(0);
+
+    fireEvent.click(within(notice).getByText("Modifica"));
+    fireEvent.change(screen.getByLabelText(/prenotazione minima di/), { target: { value: "3" } });
+    fireEvent.click(screen.getByText("Salva"));
+
+    await waitFor(() => expect(screen.getByTestId("min-stay-notice").textContent).toMatch(/prenotazione minima di 3 notti/));
+    // è solo una regola per questo alloggio: la generale resta a 2
+    const rules = JSON.parse(localStorage.getItem("srs_min_stay_rules") || "[]");
+    expect(rules.some((r: { apartment_id: string | null; min_nights: number }) => r.apartment_id === APT && r.min_nights === 3)).toBe(true);
+    expect(rules.some((r: { apartment_id: string | null; min_nights: number }) => r.apartment_id === null && r.min_nights === 2)).toBe(true);
+  });
+
+  it("i giorni disponibili sono verdi e quelli occupati sono etichettati 'Occupato'", async () => {
+    render(
+      <MemoryRouter>
+        <AdminCalendar />
+      </MemoryRouter>
+    );
+    await screen.findByTestId("min-stay-notice");
+    expect(screen.getAllByText("Occupato").length).toBe(1); // solo la legenda: nessun giorno occupato
+    expect(screen.queryByText(/Chiuso/)).toBeNull();
+    const firstDay = screen.getAllByText("1").find((el) => el.className.includes("rounded-full"));
+    expect(firstDay?.className).toMatch(/emerald/);
+    expect(firstDay?.closest("div[class*='bg-emerald-100']")).toBeTruthy();
+  });
 });

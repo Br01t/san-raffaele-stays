@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -37,21 +37,34 @@ export const AdminLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const connectedToSupabase = isSupabaseConfigured();
 
+  // Esc chiude il menu; con il menu aperto la pagina sotto non scorre
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMobileMenuOpen(false);
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [mobileMenuOpen]);
+
   const handleLogout = async () => {
     await signOut();
     navigate('/admin/login');
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-900 font-sans">
       {/* Mobile Header */}
-      <header className="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+      <header className="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm">
-            SRS
+            ASR
           </div>
           <div>
-            <h1 className="text-sm font-bold text-slate-800 leading-tight">San Raffaele Stays</h1>
+            <h1 className="text-sm font-bold text-slate-800 leading-tight">Amici del San Raffaele</h1>
             <p className="text-[11px] text-muted-foreground">Area Amministrativa</p>
           </div>
         </div>
@@ -59,15 +72,25 @@ export const AdminLayout: React.FC = () => {
           variant="ghost"
           size="icon"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Menu"
+          aria-label={mobileMenuOpen ? 'Chiudi menu' : 'Apri menu'}
+          aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </header>
 
-      {/* Sidebar for Desktop & Mobile Overlay */}
+      {/* Sfondo scuro dietro al menu (solo sotto 1024px): un tocco fuori lo chiude */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-[45] bg-slate-900/50 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar: fissa da 1024px in su, menu a scomparsa sotto */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-30 h-screen w-64 bg-slate-900 text-slate-100 flex flex-col transition-transform duration-200 ease-in-out md:translate-x-0 ${
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen h-dvh w-72 max-w-[85vw] lg:w-64 lg:max-w-none shrink-0 bg-slate-900 text-slate-100 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -75,23 +98,24 @@ export const AdminLayout: React.FC = () => {
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-black text-base shadow-md">
-              SRS
+              ASR
             </div>
             <div>
-              <h2 className="font-bold text-sm tracking-wide text-white">San Raffaele Stays</h2>
+              <h2 className="font-bold text-sm tracking-wide text-white">Amici del San Raffaele</h2>
               <p className="text-xs text-slate-400">Pannello Proprietario</p>
             </div>
           </div>
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="md:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-slate-400 hover:text-white p-1"
+            aria-label="Chiudi menu"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation links */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 min-h-0 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (

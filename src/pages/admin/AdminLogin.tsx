@@ -61,10 +61,10 @@ export const AdminLogin: React.FC = () => {
         <Card className="border-slate-800/80 shadow-2xl bg-white/95 backdrop-blur-sm">
           <CardHeader className="space-y-2 text-center pb-6">
             <div className="mx-auto w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow-lg mb-2">
-              SRS
+              ASR
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">
-              San Raffaele Stays
+              Amici del San Raffaele
             </CardTitle>
             <CardDescription className="text-slate-500">
               Accesso riservato al proprietario per la gestione di calendari, tariffe e statistiche.

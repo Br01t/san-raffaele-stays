@@ -177,7 +177,7 @@ export const AdminEventsNotes: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Left Column: Eventi & Festività */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">

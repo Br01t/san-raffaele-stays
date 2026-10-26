@@ -33,13 +33,12 @@ import {
   getEvents,
   getNotes,
   getStayRules,
-  createStayRule,
 } from '@/lib/admin-api';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { groupContiguousDates, monthRange, toDateStr } from '@/lib/date-utils';
-import { getMinStayRuleFor } from '@/lib/stay-rules';
+import { monthRange, toDateStr } from '@/lib/date-utils';
 import { CalendarSidePanel } from '@/components/admin/CalendarSidePanel';
 import { StayRulesDialog } from '@/components/admin/StayRulesDialog';
+import { MinStayNotice } from '@/components/admin/MinStayNotice';
 import {
   Apartment,
   DailyRate,
@@ -83,7 +82,6 @@ export const AdminCalendar: React.FC = () => {
   const [editHighDemand, setEditHighDemand] = useState<boolean>(false);
   const [demandTouched, setDemandTouched] = useState(false);
   const [demandMixed, setDemandMixed] = useState(false);
-  const [editMinStay, setEditMinStay] = useState<string>('');
   const [isApplying, setIsApplying] = useState(false);
 
   const reloadRules = useCallback(async () => {
@@ -206,7 +204,6 @@ export const AdminCalendar: React.FC = () => {
     setDemandMixed(demand.size > 1);
     setDemandTouched(false);
 
-    setEditMinStay('');
     setEditDialogOpen(true);
   };
 
@@ -214,16 +211,11 @@ export const AdminCalendar: React.FC = () => {
     if (!selectedAptId || selectedDates.length === 0) return;
 
     const priceChanged = editPrice.trim() !== '' && editPrice !== initialPrice;
-    const minStayValue = editMinStay.trim() === '' ? null : Number(editMinStay);
     if (priceChanged && (!Number.isFinite(Number(editPrice)) || Number(editPrice) < 0)) {
       toast.error('Inserisci un prezzo valido.');
       return;
     }
-    if (minStayValue !== null && (!Number.isInteger(minStayValue) || minStayValue < 1 || minStayValue > 60)) {
-      toast.error('Il soggiorno minimo deve essere un numero intero di notti (1-60).');
-      return;
-    }
-    if (!priceChanged && !availTouched && !demandTouched && minStayValue === null) {
+    if (!priceChanged && !availTouched && !demandTouched) {
       toast.info('Nessuna modifica da applicare.');
       return;
     }
@@ -236,22 +228,6 @@ export const AdminCalendar: React.FC = () => {
           ...(availTouched ? { is_available: editAvailable } : {}),
           ...(demandTouched ? { is_high_demand: editHighDemand } : {}),
         });
-      }
-
-      // Una regola di soggiorno minimo per ogni gruppo di giorni consecutivi selezionati
-      if (minStayValue !== null) {
-        for (const range of groupContiguousDates(selectedDates)) {
-          await createStayRule({
-            rule_type: 'min_stay',
-            apartment_id: selectedAptId,
-            min_nights: minStayValue,
-            start_date: range.start,
-            end_date: range.end,
-            priority: 5,
-            description: `Minimo ${minStayValue} notti (${range.start} → ${range.end})`,
-          });
-        }
-        await reloadRules();
       }
 
       toast.success(`Aggiornati ${selectedDates.length} giorni: modifica confermata dal database.`);
@@ -320,8 +296,8 @@ export const AdminCalendar: React.FC = () => {
       </div>
 
       {/* Calendar Control Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      <div className="bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" onClick={prevMonth} className="h-9 w-9" aria-label="Mese precedente">
               <ChevronLeft className="h-4 w-4" />
@@ -338,7 +314,7 @@ export const AdminCalendar: React.FC = () => {
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:justify-end">
           <Button variant="ghost" size="sm" onClick={selectAllMonth} className="text-xs text-slate-600">
             Seleziona tutto il mese
           </Button>
@@ -360,20 +336,28 @@ export const AdminCalendar: React.FC = () => {
       </div>
 
       {/* Calendario + pannello eventi/note */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-4 items-start">
         <div className="space-y-3 min-w-0">
+          {/* Notti minime: solo testo informativo, valido sempre */}
+          <MinStayNotice
+            apartmentId={selectedAptId}
+            apartmentName={selectedApt?.name}
+            rules={stayRules}
+            onChanged={reloadRules}
+          />
+
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 px-1">
             <div className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 rounded bg-emerald-50 border border-emerald-300 inline-block" />
+              <span className="w-3.5 h-3.5 rounded bg-emerald-100 border border-emerald-400 inline-block" />
               <span>Disponibile</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 rounded bg-rose-50 border border-rose-300 inline-block" />
-              <span>Non disponibile / Chiuso</span>
+              <span className="w-3.5 h-3.5 rounded bg-rose-100 border border-rose-400 inline-block" />
+              <span>Occupato</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3.5 h-3.5 rounded bg-amber-50 border border-amber-300 inline-block" />
+              <Flame className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
               <span>Alta Richiesta / Evento</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -417,8 +401,6 @@ export const AdminCalendar: React.FC = () => {
                 const matchingEvent = dayEvents[0];
                 const dayNotes = notesByDate.get(dateStr) ?? [];
 
-                const minStayRule = getMinStayRuleFor(stayRules, selectedAptId, [dateStr]);
-
                 return (
                   <div
                     key={dateStr}
@@ -427,10 +409,8 @@ export const AdminCalendar: React.FC = () => {
                       isSelected
                         ? 'bg-primary/10 ring-2 ring-inset ring-primary z-10'
                         : isAvailable
-                        ? isHighDemand || matchingEvent
-                          ? 'bg-amber-50/70 hover:bg-amber-100/60'
-                          : 'bg-white hover:bg-slate-50'
-                        : 'bg-rose-50/80 hover:bg-rose-100/70'
+                        ? 'bg-emerald-100 hover:bg-emerald-200/80'
+                        : 'bg-rose-100 hover:bg-rose-200/80'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -439,8 +419,8 @@ export const AdminCalendar: React.FC = () => {
                           isSelected
                             ? 'bg-primary text-white shadow-sm'
                             : isAvailable
-                            ? 'text-slate-800'
-                            : 'text-rose-700 line-through'
+                            ? 'text-emerald-900'
+                            : 'text-rose-700'
                         }`}
                       >
                         {dayNum}
@@ -457,8 +437,8 @@ export const AdminCalendar: React.FC = () => {
                           </span>
                         )}
                         {!isAvailable && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 bg-rose-100 px-1 py-0.5 rounded">
-                            Chiuso
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-rose-700 bg-rose-200 px-1 py-0.5 rounded">
+                            Occupato
                           </span>
                         )}
                       </div>
@@ -484,13 +464,10 @@ export const AdminCalendar: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="mt-2 pt-1 border-t border-slate-100 flex items-center justify-between">
-                      <span className={`text-xs font-extrabold ${isAvailable ? 'text-slate-900' : 'text-slate-400'}`}>
+                    <div className={`mt-2 pt-1 border-t flex items-center justify-between ${isAvailable ? 'border-emerald-200' : 'border-rose-200'}`}>
+                      <span className={`text-xs font-extrabold ${isAvailable ? 'text-emerald-950' : 'text-rose-400'}`}>
                         {price} €
                       </span>
-                      {minStayRule && (minStayRule.min_nights ?? 0) > 1 && (
-                        <span className="text-[9px] text-slate-500 font-medium">min {minStayRule.min_nights}n</span>
-                      )}
                     </div>
                   </div>
                 );
@@ -552,7 +529,7 @@ export const AdminCalendar: React.FC = () => {
                 <div className="text-[11px] text-muted-foreground">
                   {availMixed && !availTouched
                     ? 'Valori diversi nella selezione: invariato finché non lo cambi'
-                    : 'Se disattivato, le date appariranno occupate o bloccate'}
+                    : 'Se disattivato, le date risulteranno occupate'}
                 </div>
               </div>
               <Switch
@@ -583,25 +560,6 @@ export const AdminCalendar: React.FC = () => {
                   setDemandTouched(true);
                 }}
               />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="bulkMinStay" className="text-xs font-semibold">
-                Soggiorno minimo per questo periodo (notti)
-              </Label>
-              <Input
-                id="bulkMinStay"
-                type="number"
-                min={1}
-                max={60}
-                value={editMinStay}
-                onChange={(e) => setEditMinStay(e.target.value)}
-                placeholder="Vuoto = non creare nessuna regola"
-                className="h-9"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Crea una regola con questo periodo. Costi e sconti si gestiscono da "Regole di Soggiorno".
-              </p>
             </div>
           </div>
 

@@ -55,6 +55,22 @@ export function getMinStayRuleFor(
   return candidates[0] ?? null;
 }
 
+/**
+ * Regola "sempre valida" di soggiorno minimo, quella mostrata come testo accanto al calendario:
+ * senza periodo, attiva, dell'alloggio (o in mancanza quella generale).
+ */
+export function getAlwaysMinStayRule(rules: MinStayRule[], apartmentId: string): MinStayRule | null {
+  const candidates = rules
+    .filter((r) => getRuleType(r) === 'min_stay' && isRuleActive(r))
+    .filter((r) => !r.start_date && !r.end_date && appliesToApartment(r, apartmentId))
+    .sort((a, b) => {
+      const as = a.apartment_id ? 1 : 0;
+      const bs = b.apartment_id ? 1 : 0;
+      return bs - as || b.priority - a.priority;
+    });
+  return candidates[0] ?? null;
+}
+
 export function getMinNightsForStay(rules: MinStayRule[], apartmentId: string, dates: string[]): number {
   const rule = getMinStayRuleFor(rules, apartmentId, dates);
   return rule?.min_nights ?? DEFAULT_MIN_NIGHTS;

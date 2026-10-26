@@ -88,3 +88,71 @@
     font-family: 'Fredoka One', cursive;
   }
 }
+
+/*
+ * Tabelle admin (.stack-table): sotto i 640px ogni riga diventa una scheda
+ * con "etichetta: valore", così nessuna colonna viene tagliata e non serve scorrere di lato.
+ * Le intestazioni restano cliccabili (ordina/filtra) e vanno a capo come pulsanti.
+ */
+@media (max-width: 639px) {
+  .stack-table,
+  .stack-table thead,
+  .stack-table tbody,
+  .stack-table tr,
+  .stack-table th,
+  .stack-table td {
+    display: block;
+  }
+  .stack-table thead tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  .stack-table thead th {
+    padding: 0.25rem 0.625rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+  }
+  .stack-table .stack-hide {
+    display: none;
+  }
+  .stack-table thead th[class*="text-right"] {
+    text-align: left;
+  }
+  .stack-table tbody tr {
+    padding: 0.75rem 1rem;
+  }
+  .stack-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.25rem 0;
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .stack-table td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    max-width: 45%;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+  .stack-table td:not([data-label]) {
+    justify-content: flex-end;
+  }
+  .stack-table td[colspan] {
+    display: block;
+    text-align: center;
+  }
+}
