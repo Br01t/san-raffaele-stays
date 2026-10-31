@@ -10,7 +10,6 @@ import {
   Scale,
   User,
   Building2,
-  CreditCard,
   CalendarClock,
   ArrowRight,
   Clock,
@@ -72,11 +71,6 @@ export const AdminDashboard: React.FC = () => {
     setMovDefaults(defaults);
     setMovDialogOpen(true);
   };
-
-  const revolutCategoryId = useMemo(
-    () => (finance?.categories ?? []).find((c) => c.scope === 'personal' && c.cat_group === 'revolut' && c.is_active)?.id,
-    [finance?.categories]
-  );
 
   // Impegni dell'Agenda di oggi + prossimi 7 giorni
   const todayAgendaItems = useMemo(() => {
@@ -147,33 +141,24 @@ export const AdminDashboard: React.FC = () => {
                   Apri sezione →
                 </Link>
               </div>
-              <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 sm:h-9 px-2 text-[11px] sm:text-xs font-semibold bg-white hover:bg-rose-50 border-rose-200 text-rose-700 gap-1"
+                  className="h-8 sm:h-9 px-2.5 text-[11px] sm:text-xs font-semibold bg-white hover:bg-rose-50 border-rose-200 text-rose-700 gap-1.5"
                   onClick={() => openQuickMovement('personal', { direction: 'expense' })}
                 >
                   <PlusCircle className="h-3.5 w-3.5 shrink-0 text-rose-600" />
-                  <span className="truncate">Spesa Pers.</span>
+                  <span className="truncate">Spesa Personale</span>
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 sm:h-9 px-2 text-[11px] sm:text-xs font-semibold bg-white hover:bg-sky-50 border-sky-200 text-sky-700 gap-1"
-                  onClick={() => openQuickMovement('personal', { direction: 'expense', categoryId: revolutCategoryId })}
-                >
-                  <CreditCard className="h-3.5 w-3.5 shrink-0 text-sky-600" />
-                  <span className="truncate">Revolut</span>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 sm:h-9 px-2 text-[11px] sm:text-xs font-semibold bg-white hover:bg-emerald-50 border-emerald-200 text-emerald-700 gap-1"
+                  className="h-8 sm:h-9 px-2.5 text-[11px] sm:text-xs font-semibold bg-white hover:bg-emerald-50 border-emerald-200 text-emerald-700 gap-1.5"
                   onClick={() => openQuickMovement('personal', { direction: 'income' })}
                 >
                   <PlusCircle className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                  <span className="truncate">Entrata</span>
+                  <span className="truncate">Entrata Personale</span>
                 </Button>
               </div>
             </div>
