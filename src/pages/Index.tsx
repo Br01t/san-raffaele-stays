@@ -144,7 +144,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {vantaggi.map((v) => (
               <div key={v.title} className="flex flex-col items-center text-center">
-                <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted flex flex-col items-center justify-center p-8 shadow-lg">
+                <div className="w-56 h-56 md:w-64 md:h-64 rounded-full bg-muted/95 flex flex-col items-center justify-center p-8 border border-teal-500/45 ring-1 ring-cyan-400/30 shadow-[0_0_32px_-2px_rgba(20,184,166,0.28)]">
                   <h2 className="font-display text-primary text-lg md:text-xl mb-3">{v.title}</h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
                 </div>
@@ -162,10 +162,10 @@ const Index = () => {
           <p className="text-muted-foreground text-center max-w-xl mx-auto mb-8 sm:mb-12 text-sm sm:text-base">
             Spazi luminosi, arredati con cura e pronti per accoglierti. Tutti i nostri appartamenti si trovano a circa <span className="text-primary font-bold">150 metri a piedi</span> dall'ingresso dell'Ospedale San Raffaele.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch">
             {apartments.map((apt) => (
-              <article key={apt.name} className="bg-card rounded-2xl overflow-hidden card-shadow hover:card-shadow-hover transition-shadow group">
-                <div className="overflow-hidden h-48 sm:h-56">
+              <article key={apt.name} className="bg-card rounded-2xl overflow-hidden flex flex-col justify-between border border-teal-500/40 ring-1 ring-cyan-500/20 shadow-[0_0_28px_-4px_rgba(20,184,166,0.22)] hover:shadow-[0_0_36px_-2px_rgba(20,184,166,0.32)] transition-shadow group">
+                <div className="overflow-hidden h-48 sm:h-56 shrink-0">
                   <img
                     src={apt.img}
                     alt={`Appartamento ${apt.name} - Anteprima`}
@@ -173,15 +173,19 @@ const Index = () => {
                     loading="lazy"
                   />
                 </div>
-                <div className="p-4 sm:p-6">
-                  <h3 className="font-display text-primary text-base sm:text-lg mb-2">{apt.name}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-3 leading-relaxed">{apt.desc}</p>
-                  <p className="text-primary font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
-                    {apt.price} <span className="text-xs sm:text-sm text-muted-foreground font-normal ml-2">— {apt.distance}</span>
-                  </p>
-                  <Button variant="outline" size="sm" asChild className="w-full rounded-full">
-                    <Link to={apt.link} aria-label={`Scopri di più su ${apt.name}`}>Scopri di più <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
-                  </Button>
+                <div className="p-4 sm:p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    <h3 className="font-display text-primary text-base sm:text-lg mb-2">{apt.name}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3 leading-relaxed">{apt.desc}</p>
+                  </div>
+                  <div>
+                    <p className="text-primary font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
+                      {apt.price} <span className="text-xs sm:text-sm text-muted-foreground font-normal ml-2">— {apt.distance}</span>
+                    </p>
+                    <Button variant="outline" size="sm" asChild className="w-full rounded-full">
+                      <Link to={apt.link} aria-label={`Scopri di più su ${apt.name}`}>Scopri di più <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" /></Link>
+                    </Button>
+                  </div>
                 </div>
               </article>
             ))}
