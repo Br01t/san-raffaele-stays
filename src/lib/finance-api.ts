@@ -114,6 +114,7 @@ const DEFAULT_CATEGORIES: Omit<CategoryInput, 'is_active'>[] = [
   { scope: 'personal', kind: 'expense', cat_group: 'fixed', name: 'Affitto', system_key: 'per_rent', sort_order: 10 },
   { scope: 'personal', kind: 'expense', cat_group: 'fixed', name: 'Utenze e bollette', system_key: 'per_utilities', sort_order: 20 },
   { scope: 'personal', kind: 'expense', cat_group: 'fixed', name: 'Asilo nido', system_key: 'per_nursery', sort_order: 30 },
+  { scope: 'personal', kind: 'expense', cat_group: 'variable', name: 'Carta di credito', system_key: 'per_credit_card', sort_order: 45 },
   { scope: 'personal', kind: 'expense', cat_group: 'variable', name: 'Assicurazioni', system_key: 'per_insurance', sort_order: 50 },
   { scope: 'personal', kind: 'expense', cat_group: 'variable', name: 'Viaggi', system_key: 'per_travel', sort_order: 60 },
   { scope: 'personal', kind: 'expense', cat_group: 'variable', name: 'Amazon e acquisti', system_key: 'per_shopping', sort_order: 70 },
@@ -127,7 +128,22 @@ const DEFAULT_CATEGORIES: Omit<CategoryInput, 'is_active'>[] = [
 
 function localCategories(): FinanceCategory[] {
   const existing = getLocal<FinanceCategory[] | null>(LS_CATEGORIES, null);
-  if (existing) return existing;
+  if (existing) {
+    const knownKeys = new Set(existing.map((c) => c.system_key).filter(Boolean));
+    const missing = DEFAULT_CATEGORIES.filter((c) => c.system_key && !knownKeys.has(c.system_key)).map((c) => ({
+      ...c,
+      is_active: true,
+      id: generateUUID(),
+      created_at: nowIso(),
+      updated_at: nowIso(),
+    }));
+    if (missing.length > 0) {
+      const merged = [...existing, ...missing];
+      setLocal(LS_CATEGORIES, merged);
+      return merged;
+    }
+    return existing;
+  }
   const seeded = DEFAULT_CATEGORIES.map((c) => ({
     ...c,
     is_active: true,
@@ -148,7 +164,21 @@ const sortCategories = (list: FinanceCategory[]) =>
 export async function getCategories(): Promise<FinanceCategory[]> {
   if (useFinanceDb()) {
     const rows = await fetchAll<FinanceCategory>('finance_categories', 'sort_order');
-    if (rows !== null) return sortCategories(rows);
+    if (rows !== null) {
+      const knownKeys = new Set(rows.map((c) => c.system_key).filter(Boolean));
+      const missing = DEFAULT_CATEGORIES.filter((c) => c.system_key && !knownKeys.has(c.system_key)).map((c) => ({
+        ...c,
+        is_active: true,
+      }));
+      if (missing.length > 0) {
+        const { data } = await supabase
+          .from('finance_categories')
+          .upsert(missing, { onConflict: 'system_key', ignoreDuplicates: true })
+          .select();
+        if (data?.length) return sortCategories([...rows, ...(data as FinanceCategory[])]);
+      }
+      return sortCategories(rows);
+    }
   }
   return sortCategories(localCategories());
 }
