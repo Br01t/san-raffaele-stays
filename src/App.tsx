@@ -35,6 +35,15 @@ const AdminCalendar = React.lazy(() =>
 const AdminMonthlyData = React.lazy(() =>
   import("./pages/admin/AdminMonthlyData").then((m) => ({ default: m.AdminMonthlyData }))
 );
+const AdminApartmentAccounting = React.lazy(() =>
+  import("./pages/admin/AdminApartmentAccounting").then((m) => ({ default: m.AdminApartmentAccounting }))
+);
+const AdminPersonalFinance = React.lazy(() =>
+  import("./pages/admin/AdminPersonalFinance").then((m) => ({ default: m.AdminPersonalFinance }))
+);
+const AdminPersonalBalance = React.lazy(() =>
+  import("./pages/admin/AdminPersonalBalance").then((m) => ({ default: m.AdminPersonalBalance }))
+);
 const AdminEventsNotes = React.lazy(() =>
   import("./pages/admin/AdminEventsNotes").then((m) => ({ default: m.AdminEventsNotes }))
 );
@@ -81,6 +90,9 @@ const App = () => (
                   <Route path="appartamenti" element={<AdminApartments />} />
                   <Route path="calendario" element={<AdminCalendar />} />
                   <Route path="dati-mensili" element={<AdminMonthlyData />} />
+                  <Route path="contabilita" element={<AdminApartmentAccounting />} />
+                  <Route path="finanze-personali" element={<AdminPersonalFinance />} />
+                  <Route path="bilancio" element={<AdminPersonalBalance />} />
                   <Route path="eventi" element={<AdminEventsNotes />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
                   <Route path="impostazioni" element={<AdminSettings />} />

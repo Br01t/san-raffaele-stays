@@ -828,6 +828,23 @@ export async function exportAllDataJSON(): Promise<string> {
     history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
   }
 
+  // Gestione finanziaria (import dinamico: finance-api dipende da questo file).
+  // Se la migrazione non è ancora stata eseguita il backup prosegue senza questi dati.
+  let finance: Record<string, unknown> | null = null;
+  try {
+    const fin = await import('./finance-api');
+    const [categories, movements, recurring, budgets, settings] = await Promise.all([
+      fin.getCategories(),
+      fin.getMovements(),
+      fin.getRecurring(),
+      fin.getBudgets(),
+      fin.getSettings(),
+    ]);
+    finance = { categories, movements, recurring, budgets, settings };
+  } catch (e) {
+    console.warn('Backup: dati finanziari non disponibili', e);
+  }
+
   const payload = {
     exportDate: new Date().toISOString(),
     source: 'Amici del San Raffaele Admin Backup',
@@ -840,6 +857,7 @@ export async function exportAllDataJSON(): Promise<string> {
       dailyRates: rates,
       availability,
       rateHistory: history,
+      ...(finance ? { finance } : {}),
     },
   };
 

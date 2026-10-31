@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   Database,
   CloudOff,
+  Calculator,
+  Wallet,
+  PieChart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +29,9 @@ const navItems = [
   { to: '/admin/appartamenti', label: 'Appartamenti', icon: Building2 },
   { to: '/admin/calendario', label: 'Calendario & Tariffe', icon: CalendarDays },
   { to: '/admin/dati-mensili', label: 'Dati Mensili & Storico', icon: TrendingUp },
+  { to: '/admin/contabilita', label: 'Contabilità Appartamenti', icon: Calculator },
+  { to: '/admin/finanze-personali', label: 'Finanze Personali', icon: Wallet },
+  { to: '/admin/bilancio', label: 'Bilancio Personale', icon: PieChart },
   { to: '/admin/eventi', label: 'Eventi & Note', icon: CalendarCheck2 },
   { to: '/admin/analytics', label: 'Analytics & Ricerche', icon: BarChart3 },
   { to: '/admin/impostazioni', label: 'Impostazioni & Export', icon: Settings },
