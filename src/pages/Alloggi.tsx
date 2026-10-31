@@ -325,10 +325,10 @@ const Alloggi = () => {
                       </ul>
                     </div>
 
-                    {/* Card 2: Servizi & Posti Letto compatta + Box Sconto Calcolatore */}
+                    {/* Card 2: Servizi & Posti Letto compatta */}
                     <div className="bg-muted/35 rounded-xl p-3.5 sm:p-4 border border-border/60 flex flex-col justify-between gap-2.5 h-full">
-                      <div className="space-y-2.5">
-                        <div className="flex items-center gap-2">
+                      <div className="space-y-2.5 h-full flex flex-col justify-between">
+                        <div className="flex items-center gap-2 shrink-0">
                           <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shrink-0">
                             <Sparkles className="w-3.5 h-3.5 text-primary" />
                           </div>
@@ -338,7 +338,7 @@ const Alloggi = () => {
                         </div>
 
                         {/* Box Posti Letto compatto */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 bg-background rounded-lg px-3 py-2 border border-primary/20">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 bg-background rounded-lg px-3 py-2 border border-primary/20 shrink-0">
                           <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-primary">
                             <Bed className="w-4 h-4 shrink-0 text-primary" />
                             <span>{meta.bedsSummary.split("·")[0]?.trim()}</span>
@@ -351,13 +351,13 @@ const Alloggi = () => {
                         </div>
 
                         {/* Griglia Servizi compatta su 3 colonne */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1">
                           {servicesList.map((srv) => {
                             const IconComp = getServiceIcon(srv);
                             return (
                               <div
                                 key={srv}
-                                className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium bg-background text-foreground/90 px-2.5 py-1.5 rounded-lg border border-border/60"
+                                className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium bg-background text-foreground/90 px-2.5 py-2 rounded-lg border border-border/60"
                               >
                                 <IconComp className="w-3.5 h-3.5 text-primary shrink-0" />
                                 <span className="truncate">{formatServiceLabel(srv)}</span>
@@ -366,23 +366,6 @@ const Alloggi = () => {
                           })}
                         </div>
                       </div>
-
-                      {/* Invito cliccabile: Scopri nel calcolatore se hai diritto a uno sconto */}
-                      <button
-                        type="button"
-                        onClick={() => openCalculatorFor(meta.slug)}
-                        className="w-full flex items-center justify-between gap-2 bg-emerald-50/90 hover:bg-emerald-100/90 border border-emerald-300/80 text-emerald-950 rounded-lg px-3 py-2 text-left transition-colors group cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-6 h-6 rounded-md bg-emerald-500/15 flex items-center justify-center shrink-0">
-                            <Tag className="w-3.5 h-3.5 text-emerald-700" />
-                          </div>
-                          <span className="text-xs font-semibold text-emerald-900 leading-snug">
-                            Scopri nel calcolatore se hai diritto a uno <strong>sconto sul preventivo</strong>
-                          </span>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-emerald-700 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
                     </div>
                   </div>
                 </article>

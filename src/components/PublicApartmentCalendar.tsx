@@ -10,6 +10,8 @@ import {
   Flame,
   Moon,
   Calculator,
+  Tag,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Apartment, Availability, DailyRate, MinStayRule, RateTier } from '@/types/database';
@@ -488,25 +490,10 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
         )}
       </div>
 
-      {/* Sotto il calendario: Pulsanti Richiedi disponibilità e Calcola preventivo */}
-      <div className="pt-4 mt-4 border-t border-border/60 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Button asChild className="rounded-full px-7 w-full sm:w-auto shadow-sm">
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-track-label="alloggi_richiedi_disponibilita"
-            data-track-apartment={apartment.name}
-          >
-            {checkIn && checkOut && quote
-              ? `Richiedi disponibilità (${formatIt(checkIn)} - ${formatIt(checkOut)})`
-              : 'Richiedi disponibilità'}
-          </a>
-        </Button>
-
-        <Button
+      {/* Sotto la legenda e sopra i tasti: Invito cliccabile al calcolatore sconti + Pulsanti azione */}
+      <div className="pt-3 mt-3 space-y-3">
+        <button
           type="button"
-          variant="outline"
           onClick={() => {
             if (onOpenCalculator) {
               onOpenCalculator({
@@ -520,13 +507,58 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                 ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
           }}
-          className="rounded-full px-7 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold gap-2 shadow-sm cursor-pointer"
-          data-track-label="alloggi_calcola_preventivo"
-          data-track-apartment={apartment.name}
+          className="w-full flex items-center justify-between gap-2 bg-emerald-50/90 hover:bg-emerald-100/90 border border-emerald-300/80 text-emerald-950 rounded-xl px-3.5 py-2.5 text-left transition-colors group cursor-pointer"
         >
-          <Calculator className="w-4 h-4" />
-          Calcola preventivo
-        </Button>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-md bg-emerald-500/15 flex items-center justify-center shrink-0">
+              <Tag className="w-3.5 h-3.5 text-emerald-700" />
+            </div>
+            <span className="text-xs sm:text-[13px] font-semibold text-emerald-900 leading-snug">
+              Scopri nel calcolatore se hai diritto a uno <strong>sconto sul preventivo</strong>
+            </span>
+          </div>
+          <ArrowRight className="w-3.5 h-3.5 text-emerald-700 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+
+        <div className="pt-3 border-t border-border/60 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button asChild className="rounded-full px-7 w-full sm:w-auto shadow-sm">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track-label="alloggi_richiedi_disponibilita"
+              data-track-apartment={apartment.name}
+            >
+              {checkIn && checkOut && quote
+                ? `Richiedi disponibilità (${formatIt(checkIn)} - ${formatIt(checkOut)})`
+                : 'Richiedi disponibilità'}
+            </a>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              if (onOpenCalculator) {
+                onOpenCalculator({
+                  checkIn,
+                  checkOut,
+                  guests: (guests >= 4 ? 4 : guests === 3 ? 3 : 2) as 2 | 3 | 4,
+                });
+              } else {
+                document
+                  .getElementById('calcolatore-preventivo')
+                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+            className="rounded-full px-7 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold gap-2 shadow-sm cursor-pointer"
+            data-track-label="alloggi_calcola_preventivo"
+            data-track-apartment={apartment.name}
+          >
+            <Calculator className="w-4 h-4" />
+            Calcola preventivo
+          </Button>
+        </div>
       </div>
     </div>
   );
