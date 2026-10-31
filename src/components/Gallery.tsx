@@ -19,10 +19,10 @@ const Gallery = ({ images, name }: GalleryProps) => {
 
   return (
     <>
-    <div className="flex flex-col gap-2 h-full">
-      {/* Immagine principale grande */}
+    <div className="flex flex-col gap-2.5 h-full">
+      {/* Immagine principale grande: si adatta in altezza per pareggiare la colonna destra su PC */}
       <div 
-        className="relative cursor-pointer group overflow-hidden rounded-xl h-64 sm:h-80 md:h-96"
+        className="relative cursor-pointer group overflow-hidden rounded-xl h-64 sm:h-80 lg:h-auto lg:flex-1 lg:min-h-[320px]"
         onClick={() => handleOpen(0)}
       >
         <img
@@ -35,7 +35,7 @@ const Gallery = ({ images, name }: GalleryProps) => {
       </div>
 
       {/* Griglia miniature sotto */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2 shrink-0">
         {images.slice(1, 5).map((img, i) => (
           <button 
             key={i + 1} 

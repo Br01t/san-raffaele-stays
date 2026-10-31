@@ -183,21 +183,22 @@ const Alloggi = () => {
                   key={meta.name}
                   className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-teal-500/35 ring-1 ring-cyan-500/20 shadow-[0_0_32px_-4px_rgba(20,184,166,0.22)] transition-shadow"
                 >
-                  {/* Riga Superiore: Sinistra (Titolo + Foto + 2 Mini-card) | Destra (Calendario leggermente più in basso + 2 tasti) */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-                    {/* Colonna Sinistra: Titolo + Galleria + 2 Mini Card sotto le foto */}
-                    <div className="flex flex-col gap-3 min-w-0">
-                      <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight">
-                        {aptObj.name || meta.name}
-                      </h2>
+                  {/* Titolo Appartamento */}
+                  <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight mb-3.5">
+                    {aptObj.name || meta.name}
+                  </h2>
 
-                      <div>
+                  {/* Riga Superiore: Sinistra (Foto + 2 Mini-card) | Destra (Calendario + 2 tasti) — stessa identica altezza su PC */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+                    {/* Colonna Sinistra: Galleria (si estende in altezza) + 2 Mini Card allineate al bordo inferiore */}
+                    <div className="flex flex-col justify-between gap-3 min-w-0 h-full">
+                      <div className="flex-1 min-h-0 flex flex-col">
                         <Gallery images={meta.images} name={meta.name} />
                       </div>
 
-                      {/* 2 Mini Card visibili sotto le immagini */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5">
+                      {/* 2 Mini Card visibili sotto le immagini, allineate al fondo della card destra */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 shrink-0">
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-3 h-full">
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                             <Sparkles className="w-4 h-4 text-primary" />
                           </div>
@@ -206,7 +207,7 @@ const Alloggi = () => {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5">
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-3 h-full">
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                             <Gift className="w-4 h-4 text-primary" />
                           </div>
@@ -217,8 +218,8 @@ const Alloggi = () => {
                       </div>
                     </div>
 
-                    {/* Colonna Destra: Calendario portato leggermente più in basso per allinearsi con foto e mini-card */}
-                    <div className="w-full min-w-0 lg:mt-10">
+                    {/* Colonna Destra: Calendario allineato in alto e in basso con foto + mini-card */}
+                    <div className="w-full min-w-0 h-full flex flex-col">
                       <PublicApartmentCalendar
                         apartment={aptObj}
                         dailyRates={dailyRates}

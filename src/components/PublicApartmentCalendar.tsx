@@ -221,16 +221,16 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   }, [apartment.name, checkIn, checkOut, quote, guests]);
 
   return (
-    <div className="flex flex-col justify-between h-full w-full min-w-0 overflow-hidden bg-muted/30 rounded-2xl p-3.5 sm:p-6 border border-primary/15 shadow-sm">
-      <div className="space-y-4 min-w-0">
-        {/* Intestazione più ariosa: Titolo + Selettore Ospiti responsive su mobile */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-border/60 min-w-0">
-          <div className="min-w-0 space-y-1">
-            <h3 className="font-display text-primary text-sm sm:text-lg font-bold flex items-center gap-2 leading-snug">
-              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
+    <div className="flex flex-col justify-between flex-1 h-full w-full min-w-0 overflow-hidden bg-muted/30 rounded-2xl p-3.5 sm:p-5 md:p-6 border border-primary/15 shadow-sm">
+      <div className="space-y-3.5 min-w-0">
+        {/* Intestazione più ariosa: Titolo + Selettore Ospiti responsive su mobile e su riga singola su PC */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-border/60 min-w-0">
+          <div className="min-w-0 space-y-0.5">
+            <h3 className="font-display text-primary text-sm sm:text-base xl:text-[17px] font-bold flex items-center gap-2 leading-snug sm:whitespace-nowrap">
+              <CalendarIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-primary shrink-0" />
               <span>Calendario Disponibilità & Prezzi</span>
             </h3>
-            <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
+            <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
               Scegli gli ospiti e clicca Check-in e Check-out
             </p>
           </div>
@@ -248,7 +248,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   key={g}
                   type="button"
                   onClick={() => setGuests(g)}
-                  className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                     active
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
