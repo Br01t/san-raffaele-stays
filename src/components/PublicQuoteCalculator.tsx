@@ -212,209 +212,192 @@ export const PublicQuoteCalculator: React.FC<PublicQuoteCalculatorProps> = ({
   return (
     <div
       id="calcolatore-preventivo"
-      className="scroll-mt-24 bg-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-teal-500/40 ring-1 ring-cyan-500/25 shadow-[0_0_40px_-6px_rgba(20,184,166,0.26)]"
+      className="scroll-mt-24 bg-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-7 border border-teal-500/40 ring-1 ring-cyan-500/25 shadow-[0_0_40px_-6px_rgba(20,184,166,0.26)]"
     >
-      {/* Intestazione Calcolatore */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 mb-6 border-b border-border/70">
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            <Calculator className="w-3.5 h-3.5" />
-            Preventivatore Automatico & Sconti
-          </div>
-          <h2 className="font-display text-primary text-2xl sm:text-3xl leading-tight">
-            Calcola il tuo Preventivo Personalizzato
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm max-w-2xl">
-            Seleziona l'alloggio, le date e il numero di persone: il sistema analizza in tempo reale il calendario dei prezzi e applica automaticamente gli <strong>sconti per soggiorni prolungati</strong>.
-          </p>
-        </div>
-
-        {/* Fasce di Sconto Attive */}
-        {activeDiscountTiers.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 bg-emerald-50/90 border border-emerald-200 rounded-2xl p-3 sm:px-4">
-            <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-xs sm:text-sm">
-              <Tag className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Sconti attivi:</span>
+      {/* Griglia Principale compatta: Sinistra (Titolo compatto + Parametri + Sconti attivi) | Destra (Riepilogo Preventivo alzato allo stesso livello) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-stretch">
+        {/* Colonna Sinistra (7 col): Intestazione compatta + Scelta Alloggio, Date, Ospiti + Sconti attivi sotto il numero di persone */}
+        <div className="lg:col-span-7 flex flex-col justify-between gap-4 min-w-0 h-full">
+          {/* Intestazione compatta nella parte sinistra */}
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+              <Calculator className="w-3 h-3" />
+              Preventivatore Automatico
             </div>
-            {activeDiscountTiers.map((tier) => {
-              const val =
-                tier.amount_type === 'fixed'
-                  ? `-${Number(tier.amount)}€`
-                  : `-${Number(tier.amount)}%`;
-              return (
-                <button
-                  key={tier.id}
-                  type="button"
-                  onClick={() => tier.threshold_nights && applyQuickDuration(tier.threshold_nights)}
-                  className="inline-flex items-center gap-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs transition-colors cursor-pointer"
-                  title="Clicca per simulare subito questo soggiorno"
-                >
-                  <Percent className="w-3 h-3 text-emerald-600" />
-                  {tier.threshold_nights ? `Da ${tier.threshold_nights} notti: ` : ''}
-                  <span className="text-emerald-700">{val}</span>
-                </button>
-              );
-            })}
+            <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight">
+              Calcola il tuo Preventivo Personalizzato
+            </h2>
+            <p className="text-muted-foreground text-xs sm:text-[13px] leading-snug">
+              Seleziona alloggio, date e ospiti per calcolare il preventivo reale e verificare eventuali sconti.
+            </p>
           </div>
-        )}
-      </div>
 
-      {/* Griglia Principale: Sinistra (Parametri scelta) | Destra (Risultato Preventivo e Sconto) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-        {/* Colonna Sinistra (7 col): Scelta Alloggio, Date, Ospiti */}
-        <div className="lg:col-span-7 flex flex-col justify-between space-y-5 bg-muted/30 rounded-2xl p-4 sm:p-6 border border-border/60">
-          <div className="space-y-5">
-            {/* 1. Scelta Alloggio */}
-            <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1.5">
-                <Building2 className="w-4 h-4" />
-                1. Scegli l'Appartamento
-              </Label>
-              <div className="grid grid-cols-3 gap-2.5">
-                {apartments.map((apt) => {
-                  const slug = apt.slug || apt.name.toLowerCase().replace(/\s+/g, '-');
-                  const isSelected = selectedApartment.id === apt.id;
-                  return (
-                    <button
-                      key={apt.id}
-                      type="button"
-                      onClick={() => onSelectApartmentSlug(slug)}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20'
-                          : 'bg-background hover:bg-accent/60 text-foreground border-border/80'
-                      }`}
-                    >
-                      <div className="font-display font-bold text-sm sm:text-base leading-tight">
-                        {apt.name}
-                      </div>
-                      <div
-                        className={`text-[11px] mt-0.5 ${
-                          isSelected ? 'text-primary-foreground/85' : 'text-muted-foreground'
+          <div className="flex-1 flex flex-col justify-between space-y-4 bg-muted/30 rounded-2xl p-4 sm:p-5 border border-border/60">
+            <div className="space-y-4">
+              {/* 1. Scelta Alloggio */}
+              <div className="space-y-1.5">
+                <Label className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4" />
+                  1. Scegli l'Appartamento
+                </Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {apartments.map((apt) => {
+                    const slug = apt.slug || apt.name.toLowerCase().replace(/\s+/g, '-');
+                    const isSelected = selectedApartment.id === apt.id;
+                    return (
+                      <button
+                        key={apt.id}
+                        type="button"
+                        onClick={() => onSelectApartmentSlug(slug)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-primary text-primary-foreground border-primary shadow-sm ring-2 ring-primary/20'
+                            : 'bg-background hover:bg-accent/60 text-foreground border-border/80'
                         }`}
                       >
-                        Max {apt.max_guests} ospiti
-                      </div>
-                    </button>
-                  );
-                })}
+                        <div className="font-display font-bold text-xs sm:text-sm leading-tight">
+                          {apt.name}
+                        </div>
+                        <div
+                          className={`text-[10px] sm:text-[11px] mt-0.5 ${
+                            isSelected ? 'text-primary-foreground/85' : 'text-muted-foreground'
+                          }`}
+                        >
+                          Max {apt.max_guests} ospiti
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
 
-            {/* 2. Scelta Date Check-in e Check-out */}
-            <div className="space-y-2.5">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              {/* 2. Scelta Date Check-in e Check-out */}
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Label className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1.5">
+                    <CalendarIcon className="w-4 h-4" />
+                    2. Inserisci le Date del Soggiorno
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground">
+                    Soggiorno minimo: <strong>{minNightsDefault} notti</strong>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <Label htmlFor="calc-checkin" className="text-xs text-muted-foreground">
+                      Data Check-in (Arrivo)
+                    </Label>
+                    <Input
+                      id="calc-checkin"
+                      type="date"
+                      min={todayIso}
+                      value={checkIn}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCheckIn(val);
+                        if (checkOut && val >= checkOut) {
+                          setCheckOut(addDaysIso(val, Math.max(minNightsDefault, 2)));
+                        }
+                      }}
+                      className="bg-background h-10 font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="calc-checkout" className="text-xs text-muted-foreground">
+                      Data Check-out (Partenza)
+                    </Label>
+                    <Input
+                      id="calc-checkout"
+                      type="date"
+                      min={checkIn ? addDaysIso(checkIn, 1) : todayIso}
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      className="bg-background h-10 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Bottoni rapidi per durata soggiorno */}
+                <div className="pt-0.5 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-muted-foreground mr-1">Durata rapida:</span>
+                  {[
+                    { nights: 5, label: '5 notti' },
+                    { nights: 7, label: '7 notti' },
+                    { nights: 10, label: '10 notti' },
+                    { nights: 14, label: '14 notti' },
+                  ].map((preset) => {
+                    const isCurrent = quote?.totalNights === preset.nights;
+                    return (
+                      <button
+                        key={preset.nights}
+                        type="button"
+                        onClick={() => applyQuickDuration(preset.nights)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                          isCurrent
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background hover:bg-accent text-foreground border-border'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Scelta Numero Ospiti */}
+              <div className="space-y-1.5">
                 <Label className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1.5">
-                  <CalendarIcon className="w-4 h-4" />
-                  2. Inserisci le Date del Soggiorno
+                  <Users className="w-4 h-4" />
+                  3. Numero di Persone che alloggeranno
                 </Label>
-                <span className="text-[11px] text-muted-foreground">
-                  Soggiorno minimo: <strong>{minNightsDefault} notti</strong>
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="calc-checkin" className="text-xs text-muted-foreground">
-                    Data Check-in (Arrivo)
-                  </Label>
-                  <Input
-                    id="calc-checkin"
-                    type="date"
-                    min={todayIso}
-                    value={checkIn}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setCheckIn(val);
-                      if (checkOut && val >= checkOut) {
-                        setCheckOut(addDaysIso(val, Math.max(minNightsDefault, 2)));
-                      }
-                    }}
-                    className="bg-background h-11 font-medium"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label htmlFor="calc-checkout" className="text-xs text-muted-foreground">
-                    Data Check-out (Partenza)
-                  </Label>
-                  <Input
-                    id="calc-checkout"
-                    type="date"
-                    min={checkIn ? addDaysIso(checkIn, 1) : todayIso}
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="bg-background h-11 font-medium"
-                  />
+                <div
+                  className={`grid ${
+                    guestOptions.length === 3 ? 'grid-cols-3' : 'grid-cols-2'
+                  } gap-2`}
+                >
+                  {guestOptions.map((g) => {
+                    const active = guests === g;
+                    return (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => setGuests(g)}
+                        className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                            : 'bg-background hover:bg-accent/60 text-foreground border-border/80'
+                        }`}
+                      >
+                        <Users className="w-4 h-4 shrink-0" />
+                        {g} Persone
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Bottoni rapidi per durata soggiorno */}
-              <div className="pt-1 flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] text-muted-foreground mr-1">Durata rapida:</span>
-                {[
-                  { nights: 5, label: '5 notti' },
-                  { nights: 7, label: '7 notti' },
-                  { nights: 10, label: '10 notti (Con Sconto)' },
-                  { nights: 14, label: '14 notti' },
-                ].map((preset) => {
-                  const isCurrent = quote?.totalNights === preset.nights;
-                  return (
-                    <button
-                      key={preset.nights}
-                      type="button"
-                      onClick={() => applyQuickDuration(preset.nights)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
-                        isCurrent
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-background hover:bg-accent text-foreground border-border'
-                      }`}
-                    >
-                      {preset.label}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Box Sconti Attivi sotto il numero di persone (senza percentuale) */}
+              {activeDiscountTiers.length > 0 && (
+                <div className="flex items-center gap-2.5 bg-emerald-50/90 border border-emerald-200 rounded-xl px-3.5 py-2.5 text-emerald-900">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0">
+                    <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                  </div>
+                  <div className="text-xs leading-snug">
+                    <strong className="text-emerald-950">Sconti attivi presenti:</strong> inserendo le date del tuo soggiorno il sistema verifica in automatico se hai diritto a uno sconto sul preventivo.
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* 3. Scelta Numero Ospiti */}
-            <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-bold text-primary flex items-center gap-1.5">
-                <Users className="w-4 h-4" />
-                3. Numero di Persone che alloggeranno
-              </Label>
-              <div
-                className={`grid ${
-                  guestOptions.length === 3 ? 'grid-cols-3' : 'grid-cols-2'
-                } gap-2.5`}
-              >
-                {guestOptions.map((g) => {
-                  const active = guests === g;
-                  return (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => setGuests(g)}
-                      className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                        active
-                          ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                          : 'bg-background hover:bg-accent/60 text-foreground border-border/80'
-                      }`}
-                    >
-                      <Users className="w-4 h-4 shrink-0" />
-                      {g} Persone
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5 font-medium text-primary">
+                <Sparkles className="w-3.5 h-3.5" /> Nessun costo di pulizia finale
+              </span>
+              <span>Prezzi reali dal calendario di {selectedApartment.name}</span>
             </div>
-          </div>
-
-          <div className="pt-4 mt-4 border-t border-border/60 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 font-medium text-primary">
-              <Sparkles className="w-3.5 h-3.5" /> Nessun costo di pulizia finale
-            </span>
-            <span>Prezzi reali dal calendario di {selectedApartment.name}</span>
           </div>
         </div>
 
