@@ -4,10 +4,11 @@ import {
   ChevronRight,
   Users,
   Calendar as CalendarIcon,
-  Sparkles,
   CheckCircle2,
   AlertCircle,
   RotateCcw,
+  Flame,
+  Moon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Apartment, Availability, DailyRate, MinStayRule, RateTier } from '@/types/database';
@@ -80,7 +81,6 @@ interface PublicApartmentCalendarProps {
   availability: Availability[];
   stayRules: MinStayRule[];
   rateTiers: RateTier[];
-  extras?: string[];
 }
 
 export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = ({
@@ -89,7 +89,6 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   availability,
   stayRules,
   rateTiers,
-  extras = ['Nessun costo pulizie', 'Notte regalo per chi si ospedalizza'],
 }) => {
   const now = useMemo(() => new Date(), []);
   const todayIso = useMemo(() => toIso(now.getFullYear(), now.getMonth(), now.getDate()), [now]);
@@ -101,10 +100,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   const [checkOut, setCheckOut] = useState<string | null>(null);
 
   const maxGuests = Math.max(3, Math.min(4, apartment.max_guests || 4));
-  const guestOptions = useMemo(
-    () => [2, 3, ...(maxGuests >= 4 ? [4] : [])],
-    [maxGuests]
-  );
+  const guestOptions = useMemo(() => [2, 3, ...(maxGuests >= 4 ? [4] : [])], [maxGuests]);
 
   const ratesByDate = useMemo(
     () => new Map(dailyRates.filter((r) => r.apartment_id === apartment.id).map((r) => [r.rate_date, r])),
@@ -224,22 +220,22 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   }, [apartment.name, checkIn, checkOut, quote, guests]);
 
   return (
-    <div className="flex flex-col justify-between h-full bg-muted/30 rounded-2xl p-4 sm:p-5 border border-border/70">
-      <div className="space-y-4">
-        {/* Intestazione: Titolo + Selettore Ospiti */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
-          <div>
-            <h3 className="font-display text-primary text-base sm:text-lg flex items-center gap-2">
+    <div className="flex flex-col justify-between h-full bg-muted/30 rounded-2xl p-3.5 sm:p-4 border border-border/70">
+      <div className="space-y-2.5">
+        {/* Intestazione compatta: Titolo su una riga + Selettore Ospiti */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-border/60">
+          <div className="min-w-0">
+            <h3 className="font-display text-primary text-sm sm:text-base font-bold flex items-center gap-1.5 whitespace-nowrap">
               <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
               Calendario Disponibilità & Prezzi
             </h3>
-            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
-              Seleziona il numero di ospiti e clicca le date di Check-in e Check-out
+            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+              Scegli gli ospiti e clicca Check-in e Check-out
             </p>
           </div>
 
           {/* Selettore 2 / 3 / 4 persone */}
-          <div className="inline-flex items-center bg-background rounded-full p-1 border border-border shadow-sm self-start sm:self-auto">
+          <div className="inline-flex items-center bg-background rounded-full p-0.5 border border-border shadow-sm shrink-0">
             {guestOptions.map((g) => {
               const active = guests === g;
               return (
@@ -247,7 +243,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   key={g}
                   type="button"
                   onClick={() => setGuests(g)}
-                  className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                     active
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
@@ -261,29 +257,13 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
           </div>
         </div>
 
-        {/* Pillole vantaggi (Nessun costo pulizie / Notte regalo / Prezzi base) */}
-        <div className="flex flex-wrap items-center gap-2">
-          {extras.map((e) => (
-            <span
-              key={e}
-              className="inline-flex items-center gap-1.5 text-[11px] font-medium bg-accent/70 text-primary px-2.5 py-1 rounded-full border border-primary/15"
-            >
-              <Sparkles className="w-3 h-3 shrink-0" />
-              {e}
-            </span>
-          ))}
-          <span className="inline-flex items-center text-[11px] text-muted-foreground bg-background px-2.5 py-1 rounded-full border border-border/60">
-            Soggiorno min. {minNightsDefault} notti
-          </span>
-        </div>
-
         {/* Controlli Mese */}
-        <div className="flex items-center justify-between bg-background rounded-xl px-3 py-2 border border-border/60">
+        <div className="flex items-center justify-between bg-background rounded-xl px-3 py-1.5 border border-border/60">
           <button
             type="button"
             onClick={prevMonth}
             aria-label="Mese precedente"
-            className="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors"
+            className="p-1 rounded-lg hover:bg-muted text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -308,7 +288,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
             type="button"
             onClick={nextMonth}
             aria-label="Mese successivo"
-            className="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors"
+            className="p-1 rounded-lg hover:bg-muted text-foreground transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -320,7 +300,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
             {WEEKDAYS.map((day, idx) => (
               <div
                 key={day}
-                className={`py-1.5 text-center text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${
+                className={`py-1 text-center text-[10px] font-bold uppercase tracking-wider ${
                   idx >= 5 ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
@@ -332,7 +312,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
           <div className="grid grid-cols-7 gap-px bg-border/40">
             {calendarCells.map((cell, idx) => {
               if (!cell) {
-                return <div key={`empty-${idx}`} className="bg-muted/20 min-h-[48px] sm:min-h-[54px]" />;
+                return <div key={`empty-${idx}`} className="bg-muted/20 min-h-[42px] sm:min-h-[46px]" />;
               }
 
               const isStart = checkIn === cell.dateIso;
@@ -360,18 +340,20 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   type="button"
                   disabled={cell.isPast || (!cell.isAvailable && !checkIn)}
                   onClick={() => handleDayClick(cell.dateIso, cell.isPast, cell.isAvailable)}
-                  className={`relative min-h-[48px] sm:min-h-[54px] p-1 flex flex-col items-center justify-between transition-colors ${cellStyle}`}
+                  className={`relative min-h-[42px] sm:min-h-[46px] p-1 flex flex-col items-center justify-between transition-colors ${cellStyle}`}
                   title={
                     cell.isPast
                       ? 'Data passata'
                       : !cell.isAvailable
                       ? 'Occupato'
-                      : `${formatIt(cell.dateIso)}: ${cell.price}€ a notte (${guests} pers.)`
+                      : `${formatIt(cell.dateIso)}: ${cell.price}€ a notte (${guests} pers.)${
+                          cell.isHighDemand ? ' · Periodo ad alta richiesta' : ''
+                        }`
                   }
                 >
                   <div className="w-full flex items-center justify-between px-0.5">
                     <span
-                      className={`text-[11px] sm:text-xs leading-none ${
+                      className={`text-[11px] leading-none ${
                         cell.dateIso === todayIso && !isSelected
                           ? 'font-extrabold text-primary underline'
                           : 'font-medium'
@@ -379,19 +361,28 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                     >
                       {cell.day}
                     </span>
-                    {cell.tier && cell.isAvailable && !cell.isPast && !isSelected && (
-                      <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: cell.tier.color }}
-                        title={`Fascia ${cell.tier.name}`}
-                      />
-                    )}
+                    <span className="inline-flex items-center gap-0.5">
+                      {cell.isHighDemand && !cell.isPast && (
+                        <Flame
+                          className={`w-3 h-3 shrink-0 ${
+                            isSelected ? 'text-amber-200' : 'text-amber-500 fill-amber-400'
+                          }`}
+                        />
+                      )}
+                      {cell.tier && cell.isAvailable && !cell.isPast && !isSelected && (
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: cell.tier.color }}
+                          title={`Fascia ${cell.tier.name}`}
+                        />
+                      )}
+                    </span>
                   </div>
 
                   {cell.isPast ? (
                     <span className="text-[9px] text-muted-foreground/40">—</span>
                   ) : !cell.isAvailable ? (
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-rose-500 leading-tight">
+                    <span className="text-[9px] font-semibold text-rose-500 leading-tight">
                       Occupato
                     </span>
                   ) : (
@@ -409,16 +400,24 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
           </div>
         </div>
 
-        {/* Legenda rapida */}
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground px-1">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-400" />
-              Disponibile (prezzo per {guests} pers.)
+        {/* Legenda completa: Disponibile | Occupato | Alta richiesta (fuoco) | Soggiorno minimo */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground px-0.5 pt-0.5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="inline-flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-400 shrink-0" />
+              Disponibile ({guests} pers.)
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-rose-100 border border-rose-300" />
+            <span className="inline-flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-sm bg-rose-100 border border-rose-300 shrink-0" />
               Occupato
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Flame className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
+              Alta richiesta
+            </span>
+            <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
+              <Moon className="w-3 h-3 text-primary shrink-0" />
+              Soggiorno min. {minNightsDefault} notti
             </span>
           </div>
           {(checkIn || checkOut) && (
@@ -430,24 +429,23 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
               }}
               className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
-              <RotateCcw className="w-3 h-3" /> Azzera date
+              <RotateCcw className="w-3 h-3" /> Azzera
             </button>
           )}
         </div>
 
         {/* Box Preventivo se l'utente ha selezionato date */}
         {checkIn && !checkOut && (
-          <div className="rounded-xl bg-accent/60 border border-primary/20 px-3.5 py-2.5 text-xs text-primary flex items-center justify-between">
+          <div className="rounded-xl bg-accent/60 border border-primary/20 px-3 py-2 text-xs text-primary flex items-center justify-between">
             <span>
-              Check-in selezionato: <strong>{formatIt(checkIn)}</strong> — clicca ora la data di{' '}
-              <strong>Check-out</strong>
+              Check-in: <strong>{formatIt(checkIn)}</strong> — clicca ora la data di <strong>Check-out</strong>
             </span>
           </div>
         )}
 
         {checkIn && checkOut && quote && (
           <div
-            className={`rounded-xl px-3.5 py-3 border text-xs space-y-1.5 ${
+            className={`rounded-xl px-3 py-2.5 border text-xs space-y-1 ${
               quote.isValid
                 ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
                 : 'bg-amber-50/80 border-amber-200 text-amber-950'
@@ -463,7 +461,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                 {formatIt(checkIn)} → {formatIt(checkOut)} ({quote.totalNights}{' '}
                 {quote.totalNights === 1 ? 'notte' : 'notti'}, {guests} pers.)
               </span>
-              <span className="text-sm sm:text-base font-extrabold text-primary">
+              <span className="text-sm font-extrabold text-primary">
                 Totale: {quote.grandTotal.toFixed(0)}€
               </span>
             </div>
@@ -480,7 +478,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
       </div>
 
       {/* Sotto il calendario: Pulsante Richiedi disponibilità */}
-      <div className="pt-4 mt-4 border-t border-border/60 flex justify-center">
+      <div className="pt-3 mt-3 border-t border-border/60 flex justify-center">
         <Button asChild className="rounded-full px-8 w-full sm:w-auto shadow-sm">
           <a
             href={whatsappHref}

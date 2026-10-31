@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bed, Car, MapPin, Check, Sparkles, Wind } from "lucide-react";
+import { Bed, Car, MapPin, Check, Sparkles, Wind, Gift } from "lucide-react";
 import AmenityStrip from "@/components/AmenityStrip";
 import Gallery from "@/components/Gallery";
 import SEO from "@/components/SEO";
@@ -181,26 +181,50 @@ const Alloggi = () => {
               return (
                 <article
                   key={meta.name}
-                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 card-shadow"
+                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 card-shadow"
                 >
-                  <h2 className="font-display text-primary text-xl sm:text-2xl mb-4 sm:mb-6">
-                    {aptObj.name || meta.name}
-                  </h2>
+                  {/* Riga Superiore: Sinistra (Titolo + Foto + 2 Mini-card) | Destra (Calendario collegato + Richiedi disponibilità) */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
+                    {/* Colonna Sinistra: Titolo allineato col calendario + Galleria + 2 Mini Card sotto le foto */}
+                    <div className="flex flex-col gap-3">
+                      <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight">
+                        {aptObj.name || meta.name}
+                      </h2>
 
-                  {/* Riga Superiore: Sinistra Foto | Destra Calendario collegato + Richiedi disponibilità */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-stretch">
-                    <div className="h-full">
-                      <Gallery images={meta.images} name={meta.name} />
+                      <div>
+                        <Gallery images={meta.images} name={meta.name} />
+                      </div>
+
+                      {/* 2 Mini Card visibili sotto le immagini */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <Sparkles className="w-4 h-4 text-primary" />
+                          </div>
+                          <span className="font-display text-primary text-xs sm:text-sm font-semibold leading-snug">
+                            Nessun costo pulizie
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <Gift className="w-4 h-4 text-primary" />
+                          </div>
+                          <span className="font-display text-primary text-xs sm:text-sm font-semibold leading-snug">
+                            Notte regalo per chi si ospedalizza
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="h-full">
+                    {/* Colonna Destra: Calendario e Disponibilità sulla stessa linea del titolo */}
+                    <div className="w-full">
                       <PublicApartmentCalendar
                         apartment={aptObj}
                         dailyRates={dailyRates}
                         availability={availability}
                         stayRules={stayRules}
                         rateTiers={rateTiers}
-                        extras={meta.extras}
                       />
                     </div>
                   </div>
