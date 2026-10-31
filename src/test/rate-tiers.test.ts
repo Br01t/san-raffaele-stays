@@ -8,6 +8,7 @@ import {
   updateRateTier,
 } from '@/lib/admin-api';
 import { calculateStayQuote } from '@/lib/pricing-calculator';
+import { getPublicDayPrice } from '@/components/PublicApartmentCalendar';
 import { INITIAL_APARTMENTS } from '@/lib/mock-data';
 
 const APT = INITIAL_APARTMENTS[0];
@@ -78,5 +79,28 @@ describe('preventivo con scaglioni', () => {
     });
     expect(q.dailyBreakdown.map((d) => d.basePrice)).toEqual([135, 100]);
     expect(q.extraGuestsFee).toBe(15); // solo la notte senza scaglione
+  });
+
+  it('calendario pubblico calcola 2p/3p/4p da scaglione, prezzo manuale o base', () => {
+    const ratesMap = new Map([
+      ['2026-11-10', rate('2026-11-10', 't1', 120)],
+      ['2026-11-11', rate('2026-11-11', null, 100)],
+    ]);
+    const tiersMap = new Map([['t1', tier]]);
+
+    // Giorno con scaglione Alta (120 / 135 / 150)
+    expect(getPublicDayPrice(APT, '2026-11-10', 2, ratesMap, tiersMap).price).toBe(120);
+    expect(getPublicDayPrice(APT, '2026-11-10', 3, ratesMap, tiersMap).price).toBe(135);
+    expect(getPublicDayPrice(APT, '2026-11-10', 4, ratesMap, tiersMap).price).toBe(150);
+
+    // Giorno manuale (100€ base 2p -> +5€ per 3p, +20€ per 4p come da tariffa standard 90/95/110)
+    expect(getPublicDayPrice(APT, '2026-11-11', 2, ratesMap, tiersMap).price).toBe(100);
+    expect(getPublicDayPrice(APT, '2026-11-11', 3, ratesMap, tiersMap).price).toBe(105);
+    expect(getPublicDayPrice(APT, '2026-11-11', 4, ratesMap, tiersMap).price).toBe(120);
+
+    // Giorno standard senza override (90 / 95 / 110)
+    expect(getPublicDayPrice(APT, '2026-11-12', 2, ratesMap, tiersMap).price).toBe(90);
+    expect(getPublicDayPrice(APT, '2026-11-12', 3, ratesMap, tiersMap).price).toBe(95);
+    expect(getPublicDayPrice(APT, '2026-11-12', 4, ratesMap, tiersMap).price).toBe(110);
   });
 });

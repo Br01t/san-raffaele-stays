@@ -217,6 +217,26 @@ export async function getCalendarData(apartmentId: string, startDate: string, en
   };
 }
 
+export async function getAllPublicCalendarData(startDate: string, endDate: string) {
+  if (isSupabaseConfigured()) {
+    const [ratesRes, availRes] = await Promise.all([
+      supabase.from('daily_rates').select('*').gte('rate_date', startDate).lte('rate_date', endDate),
+      supabase.from('availability').select('*').gte('avail_date', startDate).lte('avail_date', endDate),
+    ]);
+    return {
+      rates: (ratesRes.data ?? []) as DailyRate[],
+      availability: (availRes.data ?? []) as Availability[],
+    };
+  }
+  ensureLocalInitialized();
+  const allRates = getLocal<DailyRate[]>(LS_RATES, []);
+  const allAvail = getLocal<Availability[]>(LS_AVAIL, []);
+  return {
+    rates: allRates.filter((r) => r.rate_date >= startDate && r.rate_date <= endDate),
+    availability: allAvail.filter((a) => a.avail_date >= startDate && a.avail_date <= endDate),
+  };
+}
+
 export async function setDailyRate(
   apartmentId: string,
   date: string,
