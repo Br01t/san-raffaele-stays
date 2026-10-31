@@ -22,7 +22,7 @@ const Footer = () => (
           <h3 className="font-display text-sm uppercase tracking-wider opacity-60">Navigazione</h3>
           <ul className="space-y-2 text-sm opacity-80">
             <li><Link to="/" className="hover:opacity-100 transition-opacity">Home</Link></li>
-            <li><Link to="/alloggi" className="hover:opacity-100 transition-opacity">Alloggi</Link></li>
+            <li><Link to="/alloggi" className="hover:opacity-100 transition-opacity">Alloggi e disponibilità</Link></li>
             <li><Link to="/come-raggiungerci" className="hover:opacity-100 transition-opacity">Come raggiungerci</Link></li>
             <li><Link to="/guida-zona" className="hover:opacity-100 transition-opacity">Guida alla zona</Link></li>
             <li><Link to="/contatti" className="hover:opacity-100 transition-opacity">Contatti</Link></li>
