@@ -115,6 +115,22 @@ const Index = () => {
           <Button size="lg" asChild className="rounded-full px-8">
             <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp" data-track-label="home_hero_contattaci">Contattaci</a>
           </Button>
+
+          <div className="mt-5 max-w-xl mx-auto">
+            <Link
+              to="/alloggi"
+              data-track-label="home_hero_alloggi_disponibilita"
+              className="inline-flex items-center justify-center gap-2 bg-card/90 hover:bg-accent/60 px-4 py-2 rounded-full border border-teal-500/40 ring-1 ring-cyan-500/20 shadow-[0_0_20px_-4px_rgba(20,184,166,0.22)] text-xs sm:text-sm text-muted-foreground transition-all group"
+            >
+              <span>
+                Puoi guardare gli alloggi, verificare le disponibilità e calcolare il tuo preventivo nella pagina{" "}
+                <strong className="text-primary underline decoration-primary/40 underline-offset-2 group-hover:decoration-primary">
+                  Alloggi e disponibilità
+                </strong>
+              </span>
+              <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
         </div>
         {/* Full-width panoramic image */}
         <div className="w-full h-56 sm:h-72 md:h-[420px] overflow-hidden">
