@@ -228,59 +228,55 @@ export const AdminPersonalBalance: React.FC = () => {
       </div>
 
       {/* 3.1 Riepilogo generale */}
-      <section className="space-y-3">
+      <section className="space-y-2.5">
         <SectionTitle icon={TrendingUp} title="Entrate" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <KpiCard title="Incassi appartamenti" value={apt.income} icon={Building2} tone="blue" hint="Da Contabilità Appartamenti" />
-          <KpiCard title="Entrate personali" value={per.income} icon={User} tone="emerald" hint="Da Finanze Personali" />
-          <KpiCard title="Entrate complessive" value={totalIncome} icon={Wallet} tone="emerald" highlight />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <KpiCard title="Appartamenti" value={apt.income} icon={Building2} tone="blue" hint="Da Contabilità Appartamenti" />
+          <KpiCard title="Personali" value={per.income} icon={User} tone="emerald" hint="Da Finanze Personali" />
+          <KpiCard title="Totale entrate" value={totalIncome} icon={Wallet} tone="emerald" highlight />
         </div>
         <SectionTitle icon={TrendingDown} title="Uscite" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <KpiCard title="Spese appartamenti" value={apt.expenses} icon={Building2} tone="slate" hint="Da Contabilità Appartamenti" />
-          <KpiCard title="Spese personali" value={per.expenses} icon={User} tone="violet" hint="Da Finanze Personali" />
-          <KpiCard title="Uscite complessive" value={totalExpenses} icon={Receipt} tone="rose" highlight />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <KpiCard title="Appartamenti" value={apt.expenses} icon={Building2} tone="slate" hint="Da Contabilità Appartamenti" />
+          <KpiCard title="Personali" value={per.expenses} icon={User} tone="violet" hint="Da Finanze Personali" />
+          <KpiCard title="Totale uscite" value={totalExpenses} icon={Receipt} tone="rose" highlight />
         </div>
       </section>
 
       <Card className="border-primary/30 bg-primary/[0.03] shadow-sm">
-        <CardContent className="p-5 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-4 text-center">
+        <CardContent className="p-3.5 sm:p-5 grid grid-cols-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 sm:gap-4 text-center">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Risultato appartamenti</div>
-            <div className={`text-xl font-bold ${apt.net < 0 ? 'text-rose-600' : 'text-slate-900'}`}>{eur.format(apt.net)}</div>
-            <div className="text-[11px] text-slate-500">quanto produce l’attività</div>
+            <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500">Utile alloggi</div>
+            <div className={`text-base sm:text-xl font-bold ${apt.net < 0 ? 'text-rose-600' : 'text-slate-900'}`}>{eur.format(apt.net)}</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:block">quanto produce l’attività</div>
           </div>
-          <div className="text-xl text-slate-400 font-bold">+</div>
+          <div className="text-lg sm:text-xl text-slate-400 font-bold hidden md:block">+</div>
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Saldo personale</div>
-            <div className={`text-xl font-bold ${per.balance < 0 ? 'text-rose-600' : 'text-slate-900'}`}>{eur.format(per.balance)}</div>
-            <div className="text-[11px] text-slate-500">entrate − spese personali</div>
+            <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500">Saldo pers.</div>
+            <div className={`text-base sm:text-xl font-bold ${per.balance < 0 ? 'text-rose-600' : 'text-slate-900'}`}>{eur.format(per.balance)}</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:block">entrate − spese personali</div>
           </div>
-          <div className="text-xl text-slate-400 font-bold">=</div>
+          <div className="text-lg sm:text-xl text-slate-400 font-bold hidden md:block">=</div>
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">Saldo netto complessivo</div>
-            <div className={`text-3xl font-black ${totalNet < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{eur.format(totalNet)}</div>
-            <div className="text-[11px] text-slate-500">quanto rimane dopo tutte le uscite</div>
+            <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-primary">Saldo netto</div>
+            <div className={`text-lg sm:text-3xl font-black ${totalNet < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{eur.format(totalNet)}</div>
+            <div className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:block">quanto rimane dopo tutte le uscite</div>
           </div>
         </CardContent>
-        <p className="px-5 pb-4 -mt-1 text-[11px] text-slate-500 flex gap-1.5 justify-center">
-          <Info className="h-3.5 w-3.5 shrink-0" />
-          Il risultato degli appartamenti è già al netto delle loro spese: non viene sommato di nuovo agli incassi lordi.
-        </p>
       </Card>
 
       {/* Sotto-schede vista: Andamento & Rendimento | Previsione Liquidità | Confronto fra Anni */}
-      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-5 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-          <TabsList className="h-auto p-1 bg-slate-100/90 border border-slate-200/80">
-            <TabsTrigger value="overview" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              📊 Andamento & Rendimento
+      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-4 pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+          <TabsList className="grid grid-cols-3 w-full sm:w-auto h-auto p-1 bg-slate-100/90 border border-slate-200/80">
+            <TabsTrigger value="overview" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              📊 Andamento
             </TabsTrigger>
-            <TabsTrigger value="forecast" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              🔮 Previsione Liquidità & Scadenze
+            <TabsTrigger value="forecast" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              🔮 Previsioni
             </TabsTrigger>
-            <TabsTrigger value="compare" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              📅 Confronto fra Anni
+            <TabsTrigger value="compare" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              📅 Confronto
             </TabsTrigger>
           </TabsList>
         </div>

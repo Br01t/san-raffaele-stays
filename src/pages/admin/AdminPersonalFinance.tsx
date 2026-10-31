@@ -266,24 +266,24 @@ export const AdminPersonalFinance: React.FC = () => {
       </Card>
 
       {/* Sotto-schede vista: Categorie & Grafico | Movimenti | Spese Fisse & Annuali */}
-      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-5 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-          <TabsList className="h-auto p-1 bg-slate-100/90 border border-slate-200/80">
-            <TabsTrigger value="overview" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              📊 Categorie & Grafico
+      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-4 pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+          <TabsList className="grid grid-cols-3 w-full sm:w-auto h-auto p-1 bg-slate-100/90 border border-slate-200/80">
+            <TabsTrigger value="overview" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              📊 Categorie
             </TabsTrigger>
-            <TabsTrigger value="movements" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              🧾 Elenco Movimenti ({periodMovements.length})
+            <TabsTrigger value="movements" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              🧾 Movimenti ({periodMovements.length})
             </TabsTrigger>
-            <TabsTrigger value="recurring" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              🔄 Spese Fisse & Annuali ({recurring.length})
+            <TabsTrigger value="recurring" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              🔄 Ricorrenti ({recurring.length})
             </TabsTrigger>
           </TabsList>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'income' })}>
+          <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1 w-full sm:w-auto" onClick={() => openNew({ direction: 'income' })}>
               <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> + Entrata
             </Button>
-            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'expense' })}>
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1 w-full sm:w-auto" onClick={() => openNew({ direction: 'expense' })}>
               <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> + Spesa
             </Button>
           </div>

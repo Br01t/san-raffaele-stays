@@ -206,21 +206,21 @@ export const KpiCard: React.FC<{
   highlight?: boolean;
 }> = ({ title, value, hint, icon: Icon, tone = 'slate', signed, highlight }) => (
   <Card className={`shadow-sm h-full ${highlight ? 'border-primary/30 bg-primary/[0.03]' : 'border-slate-200'}`}>
-    <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0 p-4">
-      <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 leading-tight">{title}</CardTitle>
-      <div className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center ${TONES[tone]}`}>
-        <Icon className="h-4 w-4" />
+    <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 p-2.5 sm:p-4">
+      <CardTitle className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500 leading-tight">{title}</CardTitle>
+      <div className={`w-6 h-6 sm:w-8 sm:h-8 shrink-0 rounded-md sm:rounded-lg flex items-center justify-center ${TONES[tone]}`}>
+        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
       </div>
     </CardHeader>
-    <CardContent className="px-4 pb-4 pt-0">
+    <CardContent className="px-2.5 pb-2.5 sm:px-4 sm:pb-4 pt-0">
       <div
-        className={`text-xl sm:text-2xl font-bold ${
+        className={`text-base sm:text-2xl font-bold leading-tight ${
           signed ? (value < 0 ? 'text-rose-600' : value > 0 ? 'text-emerald-600' : 'text-slate-900') : 'text-slate-900'
         }`}
       >
         {eur.format(value)}
       </div>
-      {hint && <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{hint}</p>}
+      {hint && <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 sm:mt-1 leading-snug hidden sm:block">{hint}</p>}
     </CardContent>
   </Card>
 );

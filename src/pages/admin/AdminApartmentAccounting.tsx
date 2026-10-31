@@ -201,23 +201,23 @@ export const AdminApartmentAccounting: React.FC = () => {
       </p>
 
       {/* 1.1 Incassi */}
-      <section className="space-y-3">
+      <section className="space-y-2">
         <SectionTitle icon={Wallet} title="Incassi" description="Incassi fatturati e incassi diretti sono tenuti distinti." />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <KpiCard title="Incassi fatturati" value={summary.invoiced} icon={FileCheck2} tone="emerald" />
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <KpiCard title="Fatturati" value={summary.invoiced} icon={FileCheck2} tone="emerald" />
           <KpiCard
-            title="Incassi diretti"
+            title="Diretti"
             value={summary.toInvoice}
             icon={FileClock}
             tone="amber"
             hint={summary.toInvoice > 0 ? 'Incassi senza fattura: apri il movimento per cambiare la parte fatturata' : undefined}
           />
-          <KpiCard title="Incassi totali" value={summary.income} icon={Wallet} tone="blue" highlight />
+          <KpiCard title="Totale incassi" value={summary.income} icon={Wallet} tone="blue" highlight />
         </div>
       </section>
 
       {/* 1.2 Spese */}
-      <section className="space-y-3">
+      <section className="space-y-2">
         <SectionTitle
           icon={Receipt}
           title="Spese"
@@ -227,19 +227,19 @@ export const AdminApartmentAccounting: React.FC = () => {
               : `Comprende la quota (1/${aptCount}) delle spese condivise.`
           }
         />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <KpiCard title="Spese fisse" value={summary.fixed} icon={Lock} tone="slate" hint="Mutuo, condominio, utenze" />
-          <KpiCard title="Spese variabili" value={summary.variable} icon={Shuffle} tone="violet" hint="Tasse, pulizie, manutenzione, varie" />
-          <KpiCard title="Spese totali" value={summary.expenses} icon={Receipt} tone="rose" highlight />
+          <KpiCard title="Variabili" value={summary.variable} icon={Shuffle} tone="violet" hint="Tasse, pulizie, manutenzione, varie" />
+          <KpiCard title="Totale spese" value={summary.expenses} icon={Receipt} tone="rose" highlight />
         </div>
       </section>
 
       {/* 1.3 Risultato */}
-      <section className="space-y-3">
+      <section className="space-y-2">
         <SectionTitle icon={Scale} title="Risultato economico" description="Incassi totali − Spese totali" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <KpiCard
-            title="Risultato netto (cassa)"
+            title="Netto cassa"
             value={summary.net}
             icon={Scale}
             tone="primary"
@@ -248,7 +248,7 @@ export const AdminApartmentAccounting: React.FC = () => {
             hint="Soldi entrati meno soldi usciti, rata del mutuo intera"
           />
           <KpiCard
-            title="Redditività economica"
+            title="Redditività"
             value={summary.economicNet}
             icon={LineChartIcon}
             tone="emerald"
@@ -256,7 +256,7 @@ export const AdminApartmentAccounting: React.FC = () => {
             hint="Come sopra, ma del mutuo conta solo la quota interessi"
           />
           <KpiCard
-            title="Capitale mutuo rimborsato"
+            title="Cap. mutuo"
             value={summary.mortgageCapital}
             icon={Landmark}
             tone="slate"
@@ -266,24 +266,24 @@ export const AdminApartmentAccounting: React.FC = () => {
       </section>
 
       {/* Sotto-schede vista: Panoramica | Movimenti | Spese Fisse */}
-      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-5 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-          <TabsList className="h-auto p-1 bg-slate-100/90 border border-slate-200/80">
-            <TabsTrigger value="overview" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              📊 Panoramica & Grafici
+      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-4 pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+          <TabsList className="grid grid-cols-3 w-full sm:w-auto h-auto p-1 bg-slate-100/90 border border-slate-200/80">
+            <TabsTrigger value="overview" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              📊 Panoramica
             </TabsTrigger>
-            <TabsTrigger value="movements" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              🧾 Elenco Movimenti ({tabMovements.length})
+            <TabsTrigger value="movements" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              🧾 Movimenti ({tabMovements.length})
             </TabsTrigger>
-            <TabsTrigger value="recurring" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
-              🔄 Spese Fisse & Ricorrenti ({tabRecurring.length})
+            <TabsTrigger value="recurring" className="text-[11px] sm:text-xs font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2">
+              🔄 Ricorrenti ({tabRecurring.length})
             </TabsTrigger>
           </TabsList>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'income' })}>
+          <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1 w-full sm:w-auto" onClick={() => openNew({ direction: 'income' })}>
               <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> + Incasso
             </Button>
-            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'expense' })}>
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1 w-full sm:w-auto" onClick={() => openNew({ direction: 'expense' })}>
               <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> + Spesa
             </Button>
           </div>
