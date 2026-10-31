@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Home, Trees, Clock, ArrowRight, ShoppingBag, Coffee, Pill, Bus, Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, Home, Trees, Clock, ArrowRight, ShoppingBag, Coffee, Pill, Bus, Star, Quote, ChevronLeft, ChevronRight, Tag, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-apartment.jpg";
 import milano2Img from "@/assets/foto milano 2 .webp";
@@ -190,6 +190,31 @@ const Index = () => {
             Comfort degli appartamenti
           </h3>
           <AmenityStrip />
+
+          {/* Banner Disclaimer Sconti Attivi -> aggancio a Alloggi e disponibilità */}
+          <div className="mt-10 sm:mt-12 max-w-4xl mx-auto">
+            <div className="bg-card rounded-2xl p-5 sm:p-6 md:px-8 border border-teal-500/40 ring-1 ring-cyan-500/20 shadow-[0_0_28px_-4px_rgba(20,184,166,0.22)] flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+              <div className="flex flex-col sm:flex-row items-center gap-3.5 min-w-0">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                  <Tag className="w-6 h-6 text-emerald-700" />
+                </div>
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wider">
+                    <Percent className="w-3 h-3 text-emerald-700" /> Sconti Attivi
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground font-medium leading-relaxed">
+                    Vai alla pagina <strong className="text-primary">Alloggi e disponibilità</strong> per verificare se hai diritto a <strong>sconti per il tuo soggiorno</strong> e calcolare subito il preventivo.
+                  </p>
+                </div>
+              </div>
+
+              <Button asChild size="lg" className="rounded-full px-6 shrink-0 w-full sm:w-auto font-semibold shadow-sm">
+                <Link to="/alloggi" data-track-label="home_banner_sconti_alloggi">
+                  Alloggi e disponibilità <ArrowRight className="w-4 h-4 ml-1.5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
