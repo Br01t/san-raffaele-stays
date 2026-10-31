@@ -112,24 +112,16 @@ const Index = () => {
             Appartamenti a <b>150 metri dall Ospedale San Raffaele</b> ideali per pazienti e familiari.
           </p>
 
-          <Button size="lg" asChild className="rounded-full px-8">
-            <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp" data-track-label="home_hero_contattaci">Contattaci</a>
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <Button size="lg" asChild className="rounded-full px-8 w-full sm:w-auto">
+              <a href="https://wa.me/393457956159" target="_blank" rel="noopener noreferrer" aria-label="Contattaci su WhatsApp" data-track-label="home_hero_contattaci">Contattaci</a>
+            </Button>
 
-          <div className="mt-5 max-w-xl mx-auto">
-            <Link
-              to="/alloggi"
-              data-track-label="home_hero_alloggi_disponibilita"
-              className="inline-flex items-center justify-center gap-2 bg-card/90 hover:bg-accent/60 px-4 py-2 rounded-full border border-teal-500/40 ring-1 ring-cyan-500/20 shadow-[0_0_20px_-4px_rgba(20,184,166,0.22)] text-xs sm:text-sm text-muted-foreground transition-all group"
-            >
-              <span>
-                Puoi guardare gli alloggi, verificare le disponibilità e calcolare il tuo preventivo nella pagina{" "}
-                <strong className="text-primary underline decoration-primary/40 underline-offset-2 group-hover:decoration-primary">
-                  Alloggi e disponibilità
-                </strong>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            <Button size="lg" variant="outline" asChild className="rounded-full px-8 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold">
+              <Link to="/alloggi" data-track-label="home_hero_alloggi_disponibilita">
+                Alloggi e disponibilità <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
+              </Link>
+            </Button>
           </div>
         </div>
         {/* Full-width panoramic image */}
