@@ -247,24 +247,25 @@ const Alloggi = () => {
               return (
                 <article
                   key={meta.name}
-                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-teal-500/35 ring-1 ring-cyan-500/20 shadow-[0_0_32px_-4px_rgba(20,184,166,0.22)] transition-shadow"
+                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-teal-500/35 ring-1 ring-cyan-500/20 shadow-[0_0_32px_-4px_rgba(20,184,166,0.22)] transition-shadow"
                 >
-                  {/* Titolo Appartamento */}
-                  <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight mb-3.5">
-                    {aptObj.name || meta.name}
-                  </h2>
+                  {/* Riga Superiore: Sinistra (Titolo AMICI 1 + Foto + 2 Mini-card) | Destra (Calendario + 2 tasti) — stessa identica altezza su PC */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7 items-stretch">
+                    {/* Colonna Sinistra: Titolo allineato a Calendario Disponibilità & Prezzi + Galleria + 2 Mini Card */}
+                    <div className="flex flex-col justify-between gap-2.5 min-w-0 h-full">
+                      <div className="pt-1 sm:pt-1.5 shrink-0">
+                        <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight">
+                          {aptObj.name || meta.name}
+                        </h2>
+                      </div>
 
-                  {/* Riga Superiore: Sinistra (Foto + 2 Mini-card) | Destra (Calendario + 2 tasti) — stessa identica altezza su PC */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
-                    {/* Colonna Sinistra: Galleria (si estende in altezza) + 2 Mini Card allineate al bordo inferiore */}
-                    <div className="flex flex-col justify-between gap-3 min-w-0 h-full">
                       <div className="flex-1 min-h-0 flex flex-col">
                         <Gallery images={meta.images} name={meta.name} />
                       </div>
 
                       {/* 2 Mini Card visibili sotto le immagini, allineate al fondo della card destra */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 shrink-0">
-                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-3 h-full">
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5 h-full">
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                             <Sparkles className="w-4 h-4 text-primary" />
                           </div>
@@ -273,7 +274,7 @@ const Alloggi = () => {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-3 h-full">
+                        <div className="flex items-center gap-2.5 bg-accent/60 border border-primary/15 rounded-xl px-3.5 py-2.5 h-full">
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                             <Gift className="w-4 h-4 text-primary" />
                           </div>
@@ -284,7 +285,7 @@ const Alloggi = () => {
                       </div>
                     </div>
 
-                    {/* Colonna Destra: Calendario allineato in alto e in basso con foto + mini-card */}
+                    {/* Colonna Destra: Calendario allineato in alto con il titolo AMICI 1 e in basso con le mini-card */}
                     <div className="w-full min-w-0 h-full flex flex-col">
                       <PublicApartmentCalendar
                         apartment={aptObj}
@@ -299,68 +300,64 @@ const Alloggi = () => {
                     </div>
                   </div>
 
-                  {/* Riga Inferiore (sotto le immagini): 2 Card Orizzontali affiancate (Ubicazione | Servizi & Posti Letto) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 pt-6 border-t border-border/70 items-stretch">
-                    {/* Card 1: Ubicazione schematica */}
-                    <div className="bg-muted/35 rounded-xl p-4 sm:p-5 border border-border/60 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2.5 mb-3.5">
-                          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                            <MapPin className="w-4 h-4 text-primary" />
-                          </div>
-                          <h3 className="font-display text-primary text-base sm:text-lg">
-                            Ubicazione
-                          </h3>
+                  {/* Riga Inferiore compatta: 2 Card Orizzontali affiancate (Ubicazione | Servizi & Posti Letto) senza spazi vuoti */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 mt-4 pt-4 border-t border-border/70 items-stretch">
+                    {/* Card 1: Ubicazione schematica distribuita uniformemente senza buchi sotto */}
+                    <div className="bg-muted/35 rounded-xl p-3.5 sm:p-4 border border-border/60 flex flex-col justify-between h-full">
+                      <div className="flex items-center gap-2 mb-2.5 shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <ul className="space-y-2.5">
-                          {meta.locationPoints.map((pt) => (
-                            <li
-                              key={pt}
-                              className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground/90 leading-snug bg-background/70 rounded-lg px-3 py-2 border border-border/50"
-                            >
-                              <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                              <span>{pt}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        <h3 className="font-display text-primary text-sm sm:text-base">
+                          Ubicazione
+                        </h3>
                       </div>
+                      <ul className="flex-1 flex flex-col justify-between gap-2">
+                        {meta.locationPoints.map((pt) => (
+                          <li
+                            key={pt}
+                            className="flex items-center gap-2.5 text-xs sm:text-sm text-foreground/90 leading-snug bg-background/80 rounded-lg px-3 py-2.5 border border-border/50 flex-1"
+                          >
+                            <Check className="w-4 h-4 text-primary shrink-0" />
+                            <span>{pt}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
-                    {/* Card 2: Servizi & Posti Letto migliorata + Box Sconto Calcolatore */}
-                    <div className="bg-muted/35 rounded-xl p-4 sm:p-5 border border-border/60 flex flex-col justify-between gap-3.5">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                              <Sparkles className="w-4 h-4 text-primary" />
-                            </div>
-                            <h3 className="font-display text-primary text-base sm:text-lg">
-                              Servizi & Posti Letto
-                            </h3>
+                    {/* Card 2: Servizi & Posti Letto compatta + Box Sconto Calcolatore */}
+                    <div className="bg-muted/35 rounded-xl p-3.5 sm:p-4 border border-border/60 flex flex-col justify-between gap-2.5 h-full">
+                      <div className="space-y-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shrink-0">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
                           </div>
+                          <h3 className="font-display text-primary text-sm sm:text-base">
+                            Servizi & Posti Letto
+                          </h3>
                         </div>
 
-                        {/* Box Posti Letto ben strutturato */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-background rounded-xl px-3.5 py-2.5 border border-primary/20 shadow-2xs">
+                        {/* Box Posti Letto compatto */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 bg-background rounded-lg px-3 py-2 border border-primary/20">
                           <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-primary">
                             <Bed className="w-4 h-4 shrink-0 text-primary" />
                             <span>{meta.bedsSummary.split("·")[0]?.trim()}</span>
                           </div>
                           {meta.bedsSummary.split("·")[1] && (
-                            <span className="text-[11px] sm:text-xs font-medium text-muted-foreground bg-muted/60 px-2.5 py-0.5 rounded-full">
+                            <span className="text-[11px] font-medium text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">
                               {meta.bedsSummary.split("·")[1]?.trim()}
                             </span>
                           )}
                         </div>
 
-                        {/* Griglia Servizi ordinata */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {/* Griglia Servizi compatta su 3 colonne */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                           {servicesList.map((srv) => {
                             const IconComp = getServiceIcon(srv);
                             return (
                               <div
                                 key={srv}
-                                className="flex items-center gap-2 text-xs font-medium bg-background text-foreground/90 px-2.5 py-2 rounded-lg border border-border/60 shadow-2xs"
+                                className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium bg-background text-foreground/90 px-2.5 py-1.5 rounded-lg border border-border/60"
                               >
                                 <IconComp className="w-3.5 h-3.5 text-primary shrink-0" />
                                 <span className="truncate">{formatServiceLabel(srv)}</span>
@@ -374,17 +371,17 @@ const Alloggi = () => {
                       <button
                         type="button"
                         onClick={() => openCalculatorFor(meta.slug)}
-                        className="w-full flex items-center justify-between gap-2 bg-emerald-50/90 hover:bg-emerald-100/90 border border-emerald-300/80 text-emerald-950 rounded-xl px-3.5 py-2.5 text-left transition-colors group cursor-pointer"
+                        className="w-full flex items-center justify-between gap-2 bg-emerald-50/90 hover:bg-emerald-100/90 border border-emerald-300/80 text-emerald-950 rounded-lg px-3 py-2 text-left transition-colors group cursor-pointer"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0">
+                          <div className="w-6 h-6 rounded-md bg-emerald-500/15 flex items-center justify-center shrink-0">
                             <Tag className="w-3.5 h-3.5 text-emerald-700" />
                           </div>
-                          <span className="text-xs sm:text-[13px] font-semibold text-emerald-900 leading-snug">
+                          <span className="text-xs font-semibold text-emerald-900 leading-snug">
                             Scopri nel calcolatore se hai diritto a uno <strong>sconto sul preventivo</strong>
                           </span>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-emerald-700 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 text-emerald-700 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
                   </div>

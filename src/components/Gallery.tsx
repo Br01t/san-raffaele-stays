@@ -19,10 +19,10 @@ const Gallery = ({ images, name }: GalleryProps) => {
 
   return (
     <>
-    <div className="flex flex-col gap-2.5 h-full">
+    <div className="flex flex-col gap-2 h-full">
       {/* Immagine principale grande: si adatta in altezza per pareggiare la colonna destra su PC */}
       <div 
-        className="relative cursor-pointer group overflow-hidden rounded-xl h-64 sm:h-80 lg:h-auto lg:flex-1 lg:min-h-[320px]"
+        className="relative cursor-pointer group overflow-hidden rounded-xl h-64 sm:h-76 lg:h-auto lg:flex-1 lg:min-h-[260px]"
         onClick={() => handleOpen(0)}
       >
         <img
