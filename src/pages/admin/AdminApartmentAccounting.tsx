@@ -201,15 +201,15 @@ export const AdminApartmentAccounting: React.FC = () => {
 
       {/* 1.1 Incassi */}
       <section className="space-y-3">
-        <SectionTitle icon={Wallet} title="Incassi" description="Incasso e fatturazione sono tenuti distinti." />
+        <SectionTitle icon={Wallet} title="Incassi" description="Incassi fatturati e incassi diretti sono tenuti distinti." />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <KpiCard title="Incassi fatturati" value={summary.invoiced} icon={FileCheck2} tone="emerald" />
           <KpiCard
-            title="Incassi da fatturare"
+            title="Incassi diretti"
             value={summary.toInvoice}
             icon={FileClock}
             tone="amber"
-            hint={summary.toInvoice > 0 ? 'Apri il movimento per indicare la parte fatturata' : undefined}
+            hint={summary.toInvoice > 0 ? 'Incassi senza fattura: apri il movimento per cambiare la parte fatturata' : undefined}
           />
           <KpiCard title="Incassi totali" value={summary.income} icon={Wallet} tone="blue" highlight />
         </div>
@@ -288,7 +288,7 @@ export const AdminApartmentAccounting: React.FC = () => {
                 <tr>
                   <th className="py-2.5 px-4">Appartamento</th>
                   <th className="py-2.5 px-4 text-right">Fatturati</th>
-                  <th className="py-2.5 px-4 text-right">Da fatturare</th>
+                  <th className="py-2.5 px-4 text-right">Diretti</th>
                   <th className="py-2.5 px-4 text-right">Incassi</th>
                   <th className="py-2.5 px-4 text-right">Spese</th>
                   <th className="py-2.5 px-4 text-right">Netto</th>
@@ -299,7 +299,7 @@ export const AdminApartmentAccounting: React.FC = () => {
                   <tr key={apt.id} className="hover:bg-slate-50/80 cursor-pointer" onClick={() => setTab(apt.id)}>
                     <td data-label="Appartamento" className="py-2.5 px-4 font-bold text-slate-800">{apt.name}</td>
                     <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(s.invoiced)}</td>
-                    <td data-label="Da fatturare" className="py-2.5 px-4 text-right text-amber-700">{eur.format(s.toInvoice)}</td>
+                    <td data-label="Diretti" className="py-2.5 px-4 text-right text-amber-700">{eur.format(s.toInvoice)}</td>
                     <td data-label="Incassi" className="py-2.5 px-4 text-right font-semibold">{eur.format(s.income)}</td>
                     <td data-label="Spese" className="py-2.5 px-4 text-right text-rose-600">{eur.format(s.expenses)}</td>
                     <td data-label="Netto" className={`py-2.5 px-4 text-right font-bold ${s.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
@@ -310,7 +310,7 @@ export const AdminApartmentAccounting: React.FC = () => {
                 <tr className="bg-slate-50 font-bold">
                   <td data-label="Appartamento" className="py-2.5 px-4">Totale</td>
                   <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(summary.invoiced)}</td>
-                  <td data-label="Da fatturare" className="py-2.5 px-4 text-right">{eur.format(summary.toInvoice)}</td>
+                  <td data-label="Diretti" className="py-2.5 px-4 text-right">{eur.format(summary.toInvoice)}</td>
                   <td data-label="Incassi" className="py-2.5 px-4 text-right">{eur.format(summary.income)}</td>
                   <td data-label="Spese" className="py-2.5 px-4 text-right">{eur.format(summary.expenses)}</td>
                   <td data-label="Netto" className={`py-2.5 px-4 text-right ${summary.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>

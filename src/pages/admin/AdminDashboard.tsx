@@ -3,37 +3,43 @@ import { Link } from 'react-router-dom';
 import {
   CalendarDays,
   CalendarCheck2,
-  TrendingUp,
-  AlertCircle,
   Sparkles,
   FileText,
   PlusCircle,
   Euro,
-  ExternalLink,
-  ArrowRight,
+  Receipt,
+  Scale,
+  Users,
+  Calculator,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getEvents, getMonthlyData, getNotes } from '@/lib/admin-api';
-import { EventItem, MonthlyData, InternalNote } from '@/types/database';
+import { getEvents, getNotes } from '@/lib/admin-api';
+import { EventItem, InternalNote } from '@/types/database';
+import { useFinanceData } from '@/components/admin/finance/useFinanceData';
+import { eur } from '@/components/admin/finance/finance-ui';
+import { addMonths, monthEnd, monthKey, monthLabel, monthStart, summarizeApartments, todayIso } from '@/lib/finance-calc';
+import amici1Cover from '@/assets/Screenshot 2026-03-12 alle 15.28.04.webp';
+import amici2Cover from '@/assets/AMICI 2 - 1.webp';
+import amici3Cover from '@/assets/IMG_2802.webp';
+
+const APARTMENT_COVERS: Record<string, string> = {
+  'amici-1': amici1Cover,
+  'amici-2': amici2Cover,
+  'amici-3': amici3Cover,
+};
 
 export const AdminDashboard: React.FC = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [notes, setNotes] = useState<InternalNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [evts, mData, nts] = await Promise.all([
-          getEvents(),
-          getMonthlyData(),
-          getNotes(),
-        ]);
+        const [evts, nts] = await Promise.all([getEvents(), getNotes()]);
         setEvents(evts);
-        setMonthlyData(mData);
         setNotes(nts);
       } finally {
         setLoading(false);
@@ -42,32 +48,21 @@ export const AdminDashboard: React.FC = () => {
     loadData();
   }, []);
 
-  // Calcola metriche aggregate
-  const latestMonthData = monthlyData.slice(0, 3);
-  const avgOccupancy =
-    latestMonthData.length > 0
-      ? (
-          latestMonthData.reduce((acc, curr) => acc + Number(curr.occupancy_percentage), 0) /
-          latestMonthData.length
-        ).toFixed(1)
-      : '78.5';
-
-  // Fatturato: totale di tutti gli appartamenti nell'ultimo mese con fatturato registrato
-  const monthLabels = [
-    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
-  ];
-  const withRevenue = monthlyData.filter((m) => m.revenue != null);
-  const latestRevenuePeriod = withRevenue.reduce<number>(
-    (max, m) => Math.max(max, m.year * 100 + m.month),
-    0
-  );
-  const latestRevenueRows = withRevenue.filter((m) => m.year * 100 + m.month === latestRevenuePeriod);
-  const totalRevenue = latestRevenueRows.reduce((acc, m) => acc + Number(m.revenue), 0);
-  const revenueLabel =
-    latestRevenuePeriod > 0
-      ? `${monthLabels[(latestRevenuePeriod % 100) - 1]} ${Math.floor(latestRevenuePeriod / 100)}`
-      : null;
+  // Indicatori economici dalla Contabilità Appartamenti (incassi, spese, utile)
+  const { data: finance, error: financeError, categoryMap } = useFinanceData();
+  const today = todayIso();
+  const currentKey = monthKey(today);
+  const previousKey = addMonths(currentKey, -1);
+  const aptCount = finance?.apartments.length ?? 0;
+  const movements = finance?.movements ?? [];
+  const summaryFor = (key: string, aptId: string | 'all') =>
+    summarizeApartments(movements, categoryMap, aptId, aptCount, { from: monthStart(key), to: monthEnd(key) });
+  const currentSummary = summaryFor(currentKey, 'all');
+  const previousSummary = summaryFor(previousKey, 'all');
+  const currentLabel = monthLabel(currentKey, true);
+  const previousLabel = monthLabel(previousKey, true);
+  const todayLabel = today.split('-').reverse().join('/');
+  const apartmentCards = (finance?.apartments ?? []).map((apt) => ({ apt, s: summaryFor(currentKey, apt.id) }));
 
   const upcomingEvents = events
     .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
@@ -82,76 +77,110 @@ export const AdminDashboard: React.FC = () => {
             Pannello di Controllo
           </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link to="/admin/calendario">
-            <Button size="sm" className="gap-1.5 shadow-sm">
-              <CalendarDays className="h-4 w-4" />
-              Gestisci Calendari
-            </Button>
-          </Link>
-          <Link to="/admin/dati-mensili">
-            <Button size="sm" variant="outline" className="gap-1.5">
-              <TrendingUp className="h-4 w-4" />
-              Inserisci Dati
-            </Button>
-          </Link>
+      </div>
+
+      {/* Indicatori economici: mese corrente e mese precedente */}
+      {financeError && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">{financeError}</div>
+      )}
+      {[
+        { key: 'current', title: `Mese corrente · ${currentLabel}`, note: `aggiornato al ${todayLabel}`, s: currentSummary },
+        { key: 'previous', title: `Mese precedente · ${previousLabel}`, note: 'chiuso', s: previousSummary },
+      ].map((block) => (
+        <section key={block.key} className="space-y-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            {block.title} <span className="font-normal normal-case tracking-normal text-slate-400">({block.note})</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { label: 'Fatturato mensile totale', value: block.s.income, icon: Euro, tone: 'bg-emerald-50 text-emerald-600', color: 'text-slate-900' },
+              { label: 'Spese mensili totali', value: block.s.expenses, icon: Receipt, tone: 'bg-rose-50 text-rose-600', color: 'text-slate-900' },
+              {
+                label: 'Utile netto totale',
+                value: block.s.net,
+                icon: Scale,
+                tone: 'bg-primary/10 text-primary',
+                color: block.s.net < 0 ? 'text-rose-600' : 'text-emerald-600',
+              },
+            ].map((k) => (
+              <Link
+                key={k.label}
+                to="/admin/contabilita"
+                className="block group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              >
+                <Card className="h-full shadow-sm border-slate-200 transition-all group-hover:border-primary/40 group-hover:shadow-md">
+                  <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 p-4">
+                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">{k.label}</CardTitle>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${k.tone}`}>
+                      <k.icon className="h-4 w-4" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4 pt-0">
+                    <div className={`text-2xl font-bold ${k.color}`}>{eur.format(k.value)}</div>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Tutti gli appartamenti</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {/* Anteprima appartamenti */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">I tuoi appartamenti · {currentLabel}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {apartmentCards.map(({ apt, s }) => (
+            <Card key={apt.id} className="overflow-hidden shadow-sm border-slate-200 flex flex-col">
+              <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
+                {APARTMENT_COVERS[apt.slug] && (
+                  <img src={APARTMENT_COVERS[apt.slug]} alt={apt.name} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                )}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 to-transparent p-3 flex items-end justify-between">
+                  <span className="text-white font-bold text-lg">{apt.name}</span>
+                  <Badge className={apt.is_active ? 'bg-emerald-600' : 'bg-slate-500'}>{apt.is_active ? 'Attivo' : 'Non attivo'}</Badge>
+                </div>
+              </div>
+              <CardContent className="p-4 flex-1 flex flex-col gap-3">
+                <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <Users className="h-3.5 w-3.5" /> fino a {apt.max_guests} ospiti
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Euro className="h-3.5 w-3.5" /> da {apt.base_price_2p} €/notte
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase">Fatturato</div>
+                    <div className="text-sm font-bold text-slate-900">{eur.format(s.income)}</div>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase">Spese</div>
+                    <div className="text-sm font-bold text-rose-600">{eur.format(s.expenses)}</div>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-100 p-2">
+                    <div className="text-[10px] font-semibold text-slate-500 uppercase">Utile</div>
+                    <div className={`text-sm font-bold ${s.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{eur.format(s.net)}</div>
+                  </div>
+                </div>
+                <div className="mt-auto flex gap-2">
+                  <Link to="/admin/calendario" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full text-xs gap-1">
+                      <CalendarDays className="h-3.5 w-3.5" /> Calendario
+                    </Button>
+                  </Link>
+                  <Link to="/admin/contabilita" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full text-xs gap-1">
+                      <Calculator className="h-3.5 w-3.5" /> Contabilità
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </div>
-
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Occupazione media: porta al grafico dell'occupazione */}
-        <Link to="/admin/dati-mensili#occupazione" className="block group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Occupazione registrata: vai al grafico dell'occupazione">
-        <Card className="h-full shadow-sm border-slate-200 transition-all group-hover:border-primary/40 group-hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Occupazione Registrata
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <TrendingUp className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{avgOccupancy}%</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Media mensile ultimi dati registrati
-            </p>
-            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-              Vai al grafico <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </CardContent>
-        </Card>
-        </Link>
-
-        {/* Fatturato mensile: porta al grafico del fatturato */}
-        <Link to="/admin/dati-mensili#fatturato" className="block group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Fatturato mensile: vai al grafico del fatturato">
-        <Card className="h-full shadow-sm border-slate-200 transition-all group-hover:border-primary/40 group-hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Fatturato Mensile
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Euro className="h-4 w-4" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {revenueLabel
-                ? new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(totalRevenue)
-                : '—'}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {revenueLabel
-                ? `Totale ${revenueLabel}, tutti gli alloggi`
-                : 'Nessun fatturato ancora registrato'}
-            </p>
-            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-              Vai al grafico <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </CardContent>
-        </Card>
-        </Link>
-      </div>
+      </section>
 
       {/* Main Grid: Apartamenti + Prossimi Eventi */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

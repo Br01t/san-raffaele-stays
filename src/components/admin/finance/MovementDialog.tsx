@@ -253,7 +253,7 @@ export const MovementDialog: React.FC<{
           <DialogTitle className="text-base font-bold">{title}</DialogTitle>
           <DialogDescription className="text-xs">
             {fromMonthlyData
-              ? 'Incasso importato automaticamente da “Dati Mensili”: qui puoi indicare quanto è già stato fatturato.'
+              ? 'Incasso importato automaticamente da “Dati Mensili”: qui puoi indicare quanto è fatturato (il resto è incasso diretto).'
               : 'Data, importo e categoria sono obbligatori. I totali si aggiornano subito.'}
           </DialogDescription>
         </DialogHeader>
@@ -401,7 +401,7 @@ export const MovementDialog: React.FC<{
                 </Button>
               </div>
               <p className="text-[11px] text-slate-500">
-                La differenza resta fra gli “incassi da fatturare”.
+                La differenza viene conteggiata fra gli “incassi diretti”.
               </p>
             </div>
           )}

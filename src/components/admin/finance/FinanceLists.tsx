@@ -178,7 +178,7 @@ export const MovementsTable: React.FC<{
                           </Pill>
                         )}
                         {m.status === 'planned' && <Pill className="bg-amber-50 text-amber-700">Previsto</Pill>}
-                        {toInvoice > 0 && <Pill className="bg-orange-50 text-orange-700">Da fatturare {eur2.format(toInvoice)}</Pill>}
+                        {toInvoice > 0 && <Pill className="bg-orange-50 text-orange-700">Diretto {eur2.format(toInvoice)}</Pill>}
                         {m.interest_amount != null && (
                           <Pill className="bg-slate-100 text-slate-600">Interessi {eur2.format(Number(m.interest_amount))}</Pill>
                         )}

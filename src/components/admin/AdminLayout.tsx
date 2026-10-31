@@ -19,6 +19,7 @@ import {
   Calculator,
   Wallet,
   PieChart,
+  CalendarClock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +27,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 
 const navItems = [
   { to: '/admin', label: 'Panoramica', icon: LayoutDashboard, end: true },
+  { to: '/admin/agenda', label: 'Agenda', icon: CalendarClock },
   { to: '/admin/appartamenti', label: 'Appartamenti', icon: Building2 },
   { to: '/admin/calendario', label: 'Calendario & Tariffe', icon: CalendarDays },
   { to: '/admin/dati-mensili', label: 'Dati Mensili & Storico', icon: TrendingUp },
