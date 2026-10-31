@@ -27,7 +27,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   CHART_TOOLTIP_STYLE,
   CategoryBreakdown,
@@ -57,6 +57,7 @@ export const AdminApartmentAccounting: React.FC = () => {
   const { data, error, loading, reload, categoryMap, apartmentNames } = useFinanceData();
   const { state: periodState, setState: setPeriodState, period, label: periodLabel } = usePeriod('month');
   const [tab, setTab] = useState<string>('all');
+  const [viewTab, setViewTab] = useState<'overview' | 'movements' | 'recurring'>('overview');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<EditTarget>(null);
   const [defaults, setDefaults] = useState<MovementDefaults | undefined>();
@@ -226,20 +227,10 @@ export const AdminApartmentAccounting: React.FC = () => {
               : `Comprende la quota (1/${aptCount}) delle spese condivise.`
           }
         />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-            <KpiCard title="Spese fisse" value={summary.fixed} icon={Lock} tone="slate" hint="Mutuo, condominio, utenze" />
-            <KpiCard title="Spese variabili" value={summary.variable} icon={Shuffle} tone="violet" hint="Tasse, pulizie, manutenzione, varie" />
-            <KpiCard title="Spese totali" value={summary.expenses} icon={Receipt} tone="rose" highlight />
-          </div>
-          <Card className="lg:col-span-2 border-slate-200 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold text-slate-900">Spese per categoria</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CategoryBreakdown items={expenseItems} empty="Nessuna spesa registrata nel periodo." />
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <KpiCard title="Spese fisse" value={summary.fixed} icon={Lock} tone="slate" hint="Mutuo, condominio, utenze" />
+          <KpiCard title="Spese variabili" value={summary.variable} icon={Shuffle} tone="violet" hint="Tasse, pulizie, manutenzione, varie" />
+          <KpiCard title="Spese totali" value={summary.expenses} icon={Receipt} tone="rose" highlight />
         </div>
       </section>
 
@@ -274,161 +265,204 @@ export const AdminApartmentAccounting: React.FC = () => {
         </div>
       </section>
 
-      {/* Confronto appartamenti */}
-      {tab === 'all' && perApartment.length > 0 && (
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-primary" /> Confronto fra appartamenti · {periodLabel}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="stack-table w-full text-xs text-left">
-              <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
-                <tr>
-                  <th className="py-2.5 px-4">Appartamento</th>
-                  <th className="py-2.5 px-4 text-right">Fatturati</th>
-                  <th className="py-2.5 px-4 text-right">Diretti</th>
-                  <th className="py-2.5 px-4 text-right">Incassi</th>
-                  <th className="py-2.5 px-4 text-right">Spese</th>
-                  <th className="py-2.5 px-4 text-right">Netto</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {perApartment.map(({ apt, s }) => (
-                  <tr key={apt.id} className="hover:bg-slate-50/80 cursor-pointer" onClick={() => setTab(apt.id)}>
-                    <td data-label="Appartamento" className="py-2.5 px-4 font-bold text-slate-800">{apt.name}</td>
-                    <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(s.invoiced)}</td>
-                    <td data-label="Diretti" className="py-2.5 px-4 text-right text-amber-700">{eur.format(s.toInvoice)}</td>
-                    <td data-label="Incassi" className="py-2.5 px-4 text-right font-semibold">{eur.format(s.income)}</td>
-                    <td data-label="Spese" className="py-2.5 px-4 text-right text-rose-600">{eur.format(s.expenses)}</td>
-                    <td data-label="Netto" className={`py-2.5 px-4 text-right font-bold ${s.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                      {eur.format(s.net)}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-slate-50 font-bold">
-                  <td data-label="Appartamento" className="py-2.5 px-4">Totale</td>
-                  <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(summary.invoiced)}</td>
-                  <td data-label="Diretti" className="py-2.5 px-4 text-right">{eur.format(summary.toInvoice)}</td>
-                  <td data-label="Incassi" className="py-2.5 px-4 text-right">{eur.format(summary.income)}</td>
-                  <td data-label="Spese" className="py-2.5 px-4 text-right">{eur.format(summary.expenses)}</td>
-                  <td data-label="Netto" className={`py-2.5 px-4 text-right ${summary.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                    {eur.format(summary.net)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Grafico andamento */}
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <LineChartIcon className="h-4 w-4 text-primary" /> Andamento entrate, uscite e risultato
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {tabName} · {monthLabel(chartMonths[0], true)} – {monthLabel(chartMonths[chartMonths.length - 1], true)}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => eur.format(v)} />
-                <Tooltip formatter={(v: number) => eur.format(v)} contentStyle={CHART_TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-                <Bar dataKey="income" name="Incassi" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="expenses" name="Spese" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Line type="monotone" dataKey="net" name="Netto" stroke="#0f172a" strokeWidth={2} dot={{ r: 3 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Riepilogo annuale */}
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <CalendarRange className="h-4 w-4 text-primary" /> Riepilogo annuale {summaryYear} · {tabName}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="stack-table w-full text-xs text-left">
-            <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
-              <tr>
-                <th className="py-2.5 px-4">Mese</th>
-                <th className="py-2.5 px-4 text-right">Incassi</th>
-                <th className="py-2.5 px-4 text-right">Spese</th>
-                <th className="py-2.5 px-4 text-right">Netto</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {yearRows.map((r) => (
-                <tr key={r.key} className="hover:bg-slate-50/80">
-                  <td data-label="Mese" className="py-2 px-4 font-semibold text-slate-700">{monthLabel(r.key, true)}</td>
-                  <td data-label="Incassi" className="py-2 px-4 text-right">{eur.format(r.income)}</td>
-                  <td data-label="Spese" className="py-2 px-4 text-right text-rose-600">{eur.format(r.expenses)}</td>
-                  <td data-label="Netto" className={`py-2 px-4 text-right font-bold ${r.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                    {eur.format(r.net)}
-                  </td>
-                </tr>
-              ))}
-              <tr className="bg-slate-50 font-bold">
-                <td data-label="Mese" className="py-2.5 px-4">Totale {summaryYear}</td>
-                <td data-label="Incassi" className="py-2.5 px-4 text-right">{eur.format(yearTotals.income)}</td>
-                <td data-label="Spese" className="py-2.5 px-4 text-right">{eur.format(yearTotals.expenses)}</td>
-                <td data-label="Netto" className={`py-2.5 px-4 text-right ${yearTotals.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                  {eur.format(yearTotals.net)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-
-      {/* Movimenti */}
-      <MovementsTable
-        title="Movimenti del periodo"
-        description={tab === 'all' ? 'Tutti gli appartamenti' : `${tabName} + spese condivise`}
-        movements={tabMovements}
-        categories={categoryMap}
-        apartmentNames={apartmentNames}
-        showApartment
-        onEdit={(m) => {
-          setEditing({ type: 'movement', item: m });
-          setDialogOpen(true);
-        }}
-        onChanged={reload}
-        actions={
+      {/* Sotto-schede vista: Panoramica | Movimenti | Spese Fisse */}
+      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-5 pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <TabsList className="h-auto p-1 bg-slate-100/90 border border-slate-200/80">
+            <TabsTrigger value="overview" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              📊 Panoramica & Grafici
+            </TabsTrigger>
+            <TabsTrigger value="movements" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              🧾 Elenco Movimenti ({tabMovements.length})
+            </TabsTrigger>
+            <TabsTrigger value="recurring" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              🔄 Spese Fisse & Ricorrenti ({tabRecurring.length})
+            </TabsTrigger>
+          </TabsList>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'income' })}>
-              <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> Incasso
+              <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> + Incasso
             </Button>
             <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'expense' })}>
-              <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> Spesa
+              <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> + Spesa
             </Button>
           </div>
-        }
-      />
+        </div>
 
-      <RecurringList
-        rules={tabRecurring}
-        categories={categoryMap}
-        apartmentNames={apartmentNames}
-        showApartment
-        onEdit={(r) => {
-          setEditing({ type: 'recurring', item: r });
-          setDialogOpen(true);
-        }}
-        onChanged={reload}
-        onAdd={() => openNew({ direction: 'expense', recurrence: 'monthly' })}
-      />
+        <TabsContent value="overview" className="space-y-6 mt-0">
+          {/* Confronto appartamenti */}
+          {tab === 'all' && perApartment.length > 0 && (
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" /> Confronto fra appartamenti · {periodLabel}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 overflow-x-auto">
+                <table className="stack-table w-full text-xs text-left">
+                  <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                    <tr>
+                      <th className="py-2.5 px-4">Appartamento</th>
+                      <th className="py-2.5 px-4 text-right">Fatturati</th>
+                      <th className="py-2.5 px-4 text-right">Diretti</th>
+                      <th className="py-2.5 px-4 text-right">Incassi</th>
+                      <th className="py-2.5 px-4 text-right">Spese</th>
+                      <th className="py-2.5 px-4 text-right">Netto</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {perApartment.map(({ apt, s }) => (
+                      <tr key={apt.id} className="hover:bg-slate-50/80 cursor-pointer" onClick={() => setTab(apt.id)}>
+                        <td data-label="Appartamento" className="py-2.5 px-4 font-bold text-slate-800">{apt.name}</td>
+                        <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(s.invoiced)}</td>
+                        <td data-label="Diretti" className="py-2.5 px-4 text-right text-amber-700">{eur.format(s.toInvoice)}</td>
+                        <td data-label="Incassi" className="py-2.5 px-4 text-right font-semibold">{eur.format(s.income)}</td>
+                        <td data-label="Spese" className="py-2.5 px-4 text-right text-rose-600">{eur.format(s.expenses)}</td>
+                        <td data-label="Netto" className={`py-2.5 px-4 text-right font-bold ${s.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          {eur.format(s.net)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="bg-slate-50 font-bold">
+                      <td data-label="Appartamento" className="py-2.5 px-4">Totale</td>
+                      <td data-label="Fatturati" className="py-2.5 px-4 text-right">{eur.format(summary.invoiced)}</td>
+                      <td data-label="Diretti" className="py-2.5 px-4 text-right">{eur.format(summary.toInvoice)}</td>
+                      <td data-label="Incassi" className="py-2.5 px-4 text-right">{eur.format(summary.income)}</td>
+                      <td data-label="Spese" className="py-2.5 px-4 text-right">{eur.format(summary.expenses)}</td>
+                      <td data-label="Netto" className={`py-2.5 px-4 text-right ${summary.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        {eur.format(summary.net)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Spese per categoria */}
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-bold text-slate-900">Spese per categoria</CardTitle>
+                <CardDescription className="text-xs">{tabName} · {periodLabel}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CategoryBreakdown items={expenseItems} empty="Nessuna spesa registrata nel periodo." />
+              </CardContent>
+            </Card>
+
+            {/* Grafico andamento */}
+            <Card className="xl:col-span-2 border-slate-200 shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <LineChartIcon className="h-4 w-4 text-primary" /> Andamento entrate, uscite e risultato
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {tabName} · {monthLabel(chartMonths[0], true)} – {monthLabel(chartMonths[chartMonths.length - 1], true)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => eur.format(v)} />
+                      <Tooltip formatter={(v: number) => eur.format(v)} contentStyle={CHART_TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
+                      <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                      <Bar dataKey="income" name="Incassi" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                      <Bar dataKey="expenses" name="Spese" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                      <Line type="monotone" dataKey="net" name="Netto" stroke="#0f172a" strokeWidth={2} dot={{ r: 3 }} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Riepilogo annuale */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <CalendarRange className="h-4 w-4 text-primary" /> Riepilogo annuale {summaryYear} · {tabName}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="stack-table w-full text-xs text-left">
+                <thead className="bg-slate-50 border-y border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                  <tr>
+                    <th className="py-2.5 px-4">Mese</th>
+                    <th className="py-2.5 px-4 text-right">Incassi</th>
+                    <th className="py-2.5 px-4 text-right">Spese</th>
+                    <th className="py-2.5 px-4 text-right">Netto</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {yearRows.map((r) => (
+                    <tr key={r.key} className="hover:bg-slate-50/80">
+                      <td data-label="Mese" className="py-2 px-4 font-semibold text-slate-700">{monthLabel(r.key, true)}</td>
+                      <td data-label="Incassi" className="py-2 px-4 text-right">{eur.format(r.income)}</td>
+                      <td data-label="Spese" className="py-2 px-4 text-right text-rose-600">{eur.format(r.expenses)}</td>
+                      <td data-label="Netto" className={`py-2 px-4 text-right font-bold ${r.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        {eur.format(r.net)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-slate-50 font-bold">
+                    <td data-label="Mese" className="py-2.5 px-4">Totale {summaryYear}</td>
+                    <td data-label="Incassi" className="py-2.5 px-4 text-right">{eur.format(yearTotals.income)}</td>
+                    <td data-label="Spese" className="py-2.5 px-4 text-right">{eur.format(yearTotals.expenses)}</td>
+                    <td data-label="Netto" className={`py-2.5 px-4 text-right ${yearTotals.net < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      {eur.format(yearTotals.net)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="movements" className="mt-0">
+          <MovementsTable
+            title="Movimenti del periodo"
+            description={tab === 'all' ? 'Tutti gli appartamenti' : `${tabName} + spese condivise`}
+            movements={tabMovements}
+            categories={categoryMap}
+            apartmentNames={apartmentNames}
+            showApartment
+            onEdit={(m) => {
+              setEditing({ type: 'movement', item: m });
+              setDialogOpen(true);
+            }}
+            onChanged={reload}
+            actions={
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'income' })}>
+                  <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> Incasso
+                </Button>
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'expense' })}>
+                  <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> Spesa
+                </Button>
+              </div>
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="recurring" className="mt-0">
+          <RecurringList
+            rules={tabRecurring}
+            categories={categoryMap}
+            apartmentNames={apartmentNames}
+            showApartment
+            onEdit={(r) => {
+              setEditing({ type: 'recurring', item: r });
+              setDialogOpen(true);
+            }}
+            onChanged={reload}
+            onAdd={() => openNew({ direction: 'expense', recurrence: 'monthly' })}
+          />
+        </TabsContent>
+      </Tabs>
 
       {data && (
         <>

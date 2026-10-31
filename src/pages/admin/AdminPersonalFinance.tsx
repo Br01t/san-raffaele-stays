@@ -19,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -61,6 +62,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 export const AdminPersonalFinance: React.FC = () => {
   const { data, error, loading, reload, categoryMap } = useFinanceData();
   const { state: periodState, setState: setPeriodState, period, label: periodLabel } = usePeriod('month');
+  const [viewTab, setViewTab] = useState<'overview' | 'movements' | 'recurring'>('overview');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<EditTarget>(null);
   const [defaults, setDefaults] = useState<MovementDefaults | undefined>();
@@ -203,235 +205,266 @@ export const AdminPersonalFinance: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 2.1 Entrate */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
-            <SectionTitle icon={Wallet} title="Entrate personali" description={`${periodLabel} · anno ${year}: ${eur.format(yearSummary.income)}`} />
-            <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={() => openNew({ direction: 'income' })}>
-              <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> Entrata
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <CategoryBreakdown items={items('income')} color="bg-emerald-500" empty="Nessuna entrata nel periodo." />
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <div className="text-slate-500 font-semibold">{periodState.mode === 'month' ? 'Questo mese' : 'Periodo'}</div>
-                <div className="text-base font-bold text-slate-900">{eur.format(summary.income)}</div>
-              </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <div className="text-slate-500 font-semibold">Anno {year}</div>
-                <div className="text-base font-bold text-slate-900">{eur.format(yearSummary.income)}</div>
+      {/* Revolut Card sempre in evidenza */}
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+          <SectionTitle
+            icon={CreditCard}
+            title="Revolut – budget spese quotidiane"
+            description="Spesa, benzina, svago, acquisti personali, spese ordinarie"
+          />
+          <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={openBudget}>
+            <Pencil className="h-3 w-3" /> Budget
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+              <div className="text-slate-500 font-semibold">Budget</div>
+              <div className="text-base font-bold text-slate-900">{eur.format(revolutBudget)}</div>
+            </div>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+              <div className="text-slate-500 font-semibold">Speso</div>
+              <div className="text-base font-bold text-rose-600">{eur.format(summary.revolut)}</div>
+            </div>
+            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+              <div className="text-slate-500 font-semibold">Residuo</div>
+              <div className={`text-base font-bold ${revolutLeft < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                {eur.format(revolutLeft)}
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Revolut */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
-            <SectionTitle
-              icon={CreditCard}
-              title="Revolut – budget spese quotidiane"
-              description="Spesa, benzina, svago, acquisti personali, spese ordinarie"
+          </div>
+          <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden" aria-label={`Budget usato al ${Math.round(revolutPct)}%`}>
+            <div
+              className={`h-full rounded-full ${revolutPct >= 100 ? 'bg-rose-500' : revolutPct > 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+              style={{ width: `${revolutPct}%` }}
             />
-            <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={openBudget}>
-              <Pencil className="h-3 w-3" /> Budget
+          </div>
+          <CategoryBreakdown items={items('revolut')} color="bg-sky-500" empty="Nessuna spesa Revolut registrata." />
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 border-t border-slate-100 pt-3">
+            <span className="flex items-center gap-1">
+              <ArrowRightLeft className="h-3 w-3" /> Trasferiti su Revolut: <strong>{eur2.format(summary.transfers)}</strong> (non
+              conteggiati come spesa)
+            </span>
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => openNew({ direction: 'transfer' })}>
+                + Giroconto
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs"
+                onClick={() =>
+                  openNew({ direction: 'expense', categoryId: categories.find((c) => c.cat_group === 'revolut' && c.is_active)?.id })
+                }
+              >
+                + Spesa Revolut
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sotto-schede vista: Categorie & Grafico | Movimenti | Spese Fisse & Annuali */}
+      <Tabs value={viewTab} onValueChange={(v) => setViewTab(v as typeof viewTab)} className="space-y-5 pt-2">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <TabsList className="h-auto p-1 bg-slate-100/90 border border-slate-200/80">
+            <TabsTrigger value="overview" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              📊 Categorie & Grafico
+            </TabsTrigger>
+            <TabsTrigger value="movements" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              🧾 Elenco Movimenti ({periodMovements.length})
+            </TabsTrigger>
+            <TabsTrigger value="recurring" className="text-xs font-semibold px-3.5 py-2 gap-1.5">
+              🔄 Spese Fisse & Annuali ({recurring.length})
+            </TabsTrigger>
+          </TabsList>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'income' })}>
+              <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> + Entrata
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <div className="text-slate-500 font-semibold">Budget</div>
-                <div className="text-base font-bold text-slate-900">{eur.format(revolutBudget)}</div>
-              </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <div className="text-slate-500 font-semibold">Speso</div>
-                <div className="text-base font-bold text-rose-600">{eur.format(summary.revolut)}</div>
-              </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                <div className="text-slate-500 font-semibold">Residuo</div>
-                <div className={`text-base font-bold ${revolutLeft < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                  {eur.format(revolutLeft)}
-                </div>
-              </div>
-            </div>
-            <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden" aria-label={`Budget usato al ${Math.round(revolutPct)}%`}>
-              <div
-                className={`h-full rounded-full ${revolutPct >= 100 ? 'bg-rose-500' : revolutPct > 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                style={{ width: `${revolutPct}%` }}
-              />
-            </div>
-            <CategoryBreakdown items={items('revolut')} color="bg-sky-500" empty="Nessuna spesa Revolut registrata." />
-            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 border-t border-slate-100 pt-3">
-              <span className="flex items-center gap-1">
-                <ArrowRightLeft className="h-3 w-3" /> Trasferiti su Revolut: <strong>{eur2.format(summary.transfers)}</strong> (non
-                conteggiati come spesa)
-              </span>
-              <div className="flex gap-1.5">
-                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => openNew({ direction: 'transfer' })}>
-                  + Giroconto
+            <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => openNew({ direction: 'expense' })}>
+              <PlusCircle className="h-3.5 w-3.5 text-rose-600" /> + Spesa
+            </Button>
+          </div>
+        </div>
+
+        <TabsContent value="overview" className="space-y-6 mt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 2.1 Entrate */}
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+                <SectionTitle icon={Wallet} title="Entrate personali" description={`${periodLabel} · anno ${year}: ${eur.format(yearSummary.income)}`} />
+                <Button size="sm" variant="outline" className="text-xs h-7 gap-1" onClick={() => openNew({ direction: 'income' })}>
+                  <PlusCircle className="h-3.5 w-3.5 text-emerald-600" /> Entrata
                 </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <CategoryBreakdown items={items('income')} color="bg-emerald-500" empty="Nessuna entrata nel periodo." />
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="text-slate-500 font-semibold">{periodState.mode === 'month' ? 'Questo mese' : 'Periodo'}</div>
+                    <div className="text-base font-bold text-slate-900">{eur.format(summary.income)}</div>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <div className="text-slate-500 font-semibold">Anno {year}</div>
+                    <div className="text-base font-bold text-slate-900">{eur.format(yearSummary.income)}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 2.2 Fisse */}
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+                <SectionTitle icon={Lock} title="Spese fisse" description={`Totale: ${eur.format(summary.fixed)}`} />
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-7 text-xs"
+                  className="text-xs h-7 gap-1"
                   onClick={() =>
-                    openNew({ direction: 'expense', categoryId: categories.find((c) => c.cat_group === 'revolut' && c.is_active)?.id })
+                    openNew({ direction: 'expense', recurrence: 'monthly', categoryId: categories.find((c) => c.cat_group === 'fixed')?.id })
                   }
                 >
-                  + Spesa Revolut
+                  <PlusCircle className="h-3.5 w-3.5" /> Fissa ricorrente
                 </Button>
+              </CardHeader>
+              <CardContent>
+                <CategoryBreakdown items={items('fixed')} color="bg-slate-500" empty="Nessuna spesa fissa nel periodo." />
+              </CardContent>
+            </Card>
+
+            {/* 2.3 Variabili */}
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+                <SectionTitle icon={Shuffle} title="Spese variabili" description={`Totale: ${eur.format(summary.variable)}`} />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs h-7 gap-1"
+                  onClick={() =>
+                    openNew({ direction: 'expense', categoryId: categories.find((c) => c.cat_group === 'variable')?.id })
+                  }
+                >
+                  <PlusCircle className="h-3.5 w-3.5" /> Variabile
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <CategoryBreakdown items={variableItems} color="bg-violet-500" empty="Nessuna spesa variabile nel periodo." />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Grafico */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <LineChartIcon className="h-4 w-4 text-primary" /> Entrate e spese personali per mese
+              </CardTitle>
+              <CardDescription className="text-xs">
+                {monthLabel(chartMonths[0], true)} – {monthLabel(chartMonths[chartMonths.length - 1], true)} · solo dati effettivi
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => eur.format(v)} />
+                    <Tooltip formatter={(v: number) => eur.format(v)} contentStyle={CHART_TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                    <Bar dataKey="Entrate" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                    <Bar dataKey="Spese" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={28} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        {/* 2.2 Fisse */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
-            <SectionTitle icon={Lock} title="Spese fisse" description={`Totale: ${eur.format(summary.fixed)}`} />
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs h-7 gap-1"
-              onClick={() =>
-                openNew({ direction: 'expense', recurrence: 'monthly', categoryId: categories.find((c) => c.cat_group === 'fixed')?.id })
-              }
-            >
-              <PlusCircle className="h-3.5 w-3.5" /> Fissa ricorrente
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <CategoryBreakdown items={items('fixed')} color="bg-slate-500" empty="Nessuna spesa fissa nel periodo." />
-          </CardContent>
-        </Card>
+        <TabsContent value="movements" className="mt-0">
+          <MovementsTable
+            title="Movimenti del periodo"
+            movements={periodMovements}
+            categories={categoryMap}
+            onEdit={(m) => {
+              setEditing({ type: 'movement', item: m });
+              setDialogOpen(true);
+            }}
+            onChanged={reload}
+          />
+        </TabsContent>
 
-        {/* 2.3 Variabili */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
-            <SectionTitle icon={Shuffle} title="Spese variabili" description={`Totale: ${eur.format(summary.variable)}`} />
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-xs h-7 gap-1"
-              onClick={() =>
-                openNew({ direction: 'expense', categoryId: categories.find((c) => c.cat_group === 'variable')?.id })
-              }
-            >
-              <PlusCircle className="h-3.5 w-3.5" /> Variabile
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <CategoryBreakdown items={variableItems} color="bg-violet-500" empty="Nessuna spesa variabile nel periodo." />
-          </CardContent>
-        </Card>
-      </div>
+        <TabsContent value="recurring" className="space-y-6 mt-0">
+          {/* Spese annuali */}
+          <Card className="border-slate-200 shadow-sm">
+            <CardHeader className="pb-2 flex flex-col sm:flex-row sm:items-start justify-between gap-3 space-y-0">
+              <div>
+                <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <CalendarClock className="h-4 w-4 text-primary" /> Spese annuali
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Assicurazioni e altre uscite non mensili. Pesano in media <strong>{eur2.format(yearlyMonthlyAvg)}</strong> al
+                  mese; il pagamento resta registrato nella sua data reale.
+                </CardDescription>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs gap-1"
+                onClick={() =>
+                  openNew({ direction: 'expense', recurrence: 'yearly', categoryId: categories.find((c) => c.system_key === 'per_insurance')?.id })
+                }
+              >
+                <PlusCircle className="h-3.5 w-3.5" /> Spesa annuale
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {yearlyRules.length === 0 ? (
+                <p className="text-xs text-slate-400 py-2">Nessuna spesa annuale configurata.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {yearlyRules.map((r) => {
+                    const next = nextOccurrence(r);
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => {
+                          setEditing({ type: 'recurring', item: r });
+                          setDialogOpen(true);
+                        }}
+                        className={`text-left p-3 rounded-lg border border-slate-200 hover:border-primary/40 transition-colors ${r.is_active ? '' : 'opacity-50'}`}
+                      >
+                        <div className="text-xs font-bold text-slate-800">{categoryMap.get(r.category_id)?.name}</div>
+                        {r.description && <div className="text-[11px] text-slate-500 truncate">{r.description}</div>}
+                        <div className="mt-2 flex items-baseline justify-between">
+                          <span className="text-base font-bold text-slate-900">{eur.format(Number(r.amount))}</span>
+                          <span className="text-[11px] text-slate-500">{eur2.format(monthlyAverage(r))}/mese</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-1">
+                          Prossimo pagamento: {next ? next.split('-').reverse().join('/') : '—'}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-      {/* Spese annuali */}
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader className="pb-2 flex flex-col sm:flex-row sm:items-start justify-between gap-3 space-y-0">
-          <div>
-            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <CalendarClock className="h-4 w-4 text-primary" /> Spese annuali
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Assicurazioni e altre uscite non mensili. Pesano in media <strong>{eur2.format(yearlyMonthlyAvg)}</strong> al
-              mese; il pagamento resta registrato nella sua data reale.
-            </CardDescription>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="text-xs gap-1"
-            onClick={() =>
-              openNew({ direction: 'expense', recurrence: 'yearly', categoryId: categories.find((c) => c.system_key === 'per_insurance')?.id })
-            }
-          >
-            <PlusCircle className="h-3.5 w-3.5" /> Spesa annuale
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {yearlyRules.length === 0 ? (
-            <p className="text-xs text-slate-400 py-2">Nessuna spesa annuale configurata.</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {yearlyRules.map((r) => {
-                const next = nextOccurrence(r);
-                return (
-                  <button
-                    key={r.id}
-                    onClick={() => {
-                      setEditing({ type: 'recurring', item: r });
-                      setDialogOpen(true);
-                    }}
-                    className={`text-left p-3 rounded-lg border border-slate-200 hover:border-primary/40 transition-colors ${r.is_active ? '' : 'opacity-50'}`}
-                  >
-                    <div className="text-xs font-bold text-slate-800">{categoryMap.get(r.category_id)?.name}</div>
-                    {r.description && <div className="text-[11px] text-slate-500 truncate">{r.description}</div>}
-                    <div className="mt-2 flex items-baseline justify-between">
-                      <span className="text-base font-bold text-slate-900">{eur.format(Number(r.amount))}</span>
-                      <span className="text-[11px] text-slate-500">{eur2.format(monthlyAverage(r))}/mese</span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-1">
-                      Prossimo pagamento: {next ? next.split('-').reverse().join('/') : '—'}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Grafico */}
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <LineChartIcon className="h-4 w-4 text-primary" /> Entrate e spese personali per mese
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {monthLabel(chartMonths[0], true)} – {monthLabel(chartMonths[chartMonths.length - 1], true)} · solo dati effettivi
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="label" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => eur.format(v)} />
-                <Tooltip formatter={(v: number) => eur.format(v)} contentStyle={CHART_TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-                <Bar dataKey="Entrate" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="Spese" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={28} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      <MovementsTable
-        title="Movimenti del periodo"
-        movements={periodMovements}
-        categories={categoryMap}
-        onEdit={(m) => {
-          setEditing({ type: 'movement', item: m });
-          setDialogOpen(true);
-        }}
-        onChanged={reload}
-      />
-
-      <RecurringList
-        rules={recurring}
-        categories={categoryMap}
-        onEdit={(r) => {
-          setEditing({ type: 'recurring', item: r });
-          setDialogOpen(true);
-        }}
-        onChanged={reload}
-        onAdd={() => openNew({ direction: 'expense', recurrence: 'monthly' })}
-      />
+          <RecurringList
+            rules={recurring}
+            categories={categoryMap}
+            onEdit={(r) => {
+              setEditing({ type: 'recurring', item: r });
+              setDialogOpen(true);
+            }}
+            onChanged={reload}
+            onAdd={() => openNew({ direction: 'expense', recurrence: 'monthly' })}
+          />
+        </TabsContent>
+      </Tabs>
 
       {data && (
         <>
