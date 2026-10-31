@@ -90,6 +90,10 @@ export interface DiscountLine {
   ruleId: string;
   label: string;
   amount: number;
+  amountType?: 'fixed' | 'percent';
+  rawValue?: number;
+  thresholdNights?: number | null;
+  badgeText?: string;
 }
 
 export interface StayExtras {
@@ -140,14 +144,64 @@ export function computeStayExtras(input: {
   for (const r of applicable.filter((x) => getRuleType(x) === 'discount')) {
     if (nights < (r.threshold_nights ?? 0)) continue;
     const value = Number(r.amount ?? 0);
-    const raw = r.amount_type === 'percent' ? (nightsTotal * value) / 100 : value;
+    const amountType = r.amount_type ?? 'percent';
+    const raw = amountType === 'percent' ? (nightsTotal * value) / 100 : value;
     const amount = round2(Math.min(Math.max(raw, 0), nightsTotal));
+    const badgeText = amountType === 'percent' ? `${value}%` : `${value} €`;
     if (amount > 0 && (!best || amount > best.amount)) {
-      best = { ruleId: r.id, label: r.description || 'Sconto', amount };
+      best = {
+        ruleId: r.id,
+        label: r.description || 'Sconto',
+        amount,
+        amountType,
+        rawValue: value,
+        thresholdNights: r.threshold_nights ?? null,
+        badgeText,
+      };
     }
   }
 
   return { fees, feesTotal, discount: best, discountTotal: best?.amount ?? 0 };
+}
+
+/**
+ * Restituisce tutte le fasce di sconto attive per un alloggio, ordinate per numero di notti crescente.
+ */
+export function getActiveDiscountTiersForApartment(
+  rules: MinStayRule[],
+  apartmentId: string
+): MinStayRule[] {
+  return rules
+    .filter((r) => getRuleType(r) === 'discount' && isRuleActive(r) && appliesToApartment(r, apartmentId))
+    .filter((r) => Number(r.amount ?? 0) > 0)
+    .sort((a, b) => (a.threshold_nights ?? 0) - (b.threshold_nights ?? 0) || Number(a.amount ?? 0) - Number(b.amount ?? 0));
+}
+
+/**
+ * Se l'utente non ha ancora raggiunto la soglia di uno sconto superiore, restituisce il prossimo sconto sbloccabile.
+ */
+export function getNextDiscountTierHint(
+  rules: MinStayRule[],
+  apartmentId: string,
+  dates: string[]
+): { missingNights: number; thresholdNights: number; rule: MinStayRule; discountLabel: string } | null {
+  const nights = dates.length;
+  const candidates = rules
+    .filter((r) => getRuleType(r) === 'discount' && isRuleActive(r) && appliesToApartment(r, apartmentId))
+    .filter((r) => (dates.length === 0 ? true : overlapsDates(r, dates)))
+    .filter((r) => (r.threshold_nights ?? 0) > nights && Number(r.amount ?? 0) > 0)
+    .sort((a, b) => (a.threshold_nights ?? 0) - (b.threshold_nights ?? 0));
+
+  const next = candidates[0];
+  if (!next || !next.threshold_nights) return null;
+  const val = Number(next.amount ?? 0);
+  const discountLabel = next.amount_type === 'fixed' ? `${val} €` : `${val}%`;
+  return {
+    missingNights: next.threshold_nights - nights,
+    thresholdNights: next.threshold_nights,
+    rule: next,
+    discountLabel,
+  };
 }
 
 /** Descrizione leggibile della regola, per elenchi e riepiloghi. */

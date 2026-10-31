@@ -31,6 +31,8 @@ interface Props {
   apartments: Apartment[];
   /** Chiamata dopo ogni creazione / modifica / eliminazione, per ricaricare l'elenco. */
   onChanged: () => Promise<void> | void;
+  /** Se specificato, mette in primo piano la sezione corrispondente (es. 'discount' per Fasce di Sconto). */
+  focusType?: StayRuleType;
 }
 
 interface FormState {
@@ -92,7 +94,7 @@ const EXAMPLES: Record<StayRuleType, string> = {
   discount: 'Es. "Sconto settimana: 10% da 7 notti" oppure "-30 € da 5 notti". Si applica lo sconto più vantaggioso.',
 };
 
-export const StayRulesDialog: React.FC<Props> = ({ open, onOpenChange, rules, apartments, onChanged }) => {
+export const StayRulesDialog: React.FC<Props> = ({ open, onOpenChange, rules, apartments, onChanged, focusType }) => {
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -100,10 +102,25 @@ export const StayRulesDialog: React.FC<Props> = ({ open, onOpenChange, rules, ap
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
-  const grouped = (['min_stay', 'fee', 'discount'] as StayRuleType[]).map((type) => ({
+  const orderedTypes: StayRuleType[] =
+    focusType === 'discount'
+      ? ['discount', 'min_stay', 'fee']
+      : (['min_stay', 'discount', 'fee'] as StayRuleType[]);
+
+  const grouped = orderedTypes.map((type) => ({
     type,
     items: rules.filter((r) => getRuleType(r) === type),
   }));
+
+  const openDiscountPreset = (nights: number, percent: number) => {
+    setForm({
+      ...emptyForm('discount', 'all'),
+      name: `Sconto soggiorno ${nights}+ notti (-${percent}%)`,
+      amountType: 'percent',
+      amount: String(percent),
+      thresholdNights: String(nights),
+    });
+  };
 
   const handleSave = async () => {
     if (!form) return;
@@ -198,11 +215,10 @@ export const StayRulesDialog: React.FC<Props> = ({ open, onOpenChange, rules, ap
         <DialogHeader>
           <DialogTitle className="text-base font-bold flex items-center gap-2">
             <Sliders className="h-4 w-4 text-primary" />
-            Regole di soggiorno
+            Fasce di Sconto & Regole di Soggiorno
           </DialogTitle>
           <DialogDescription className="text-xs">
-            Soggiorno minimo, costi aggiuntivi (es. pulizie) e sconti. Ogni regola può valere per tutti gli alloggi o
-            per uno solo, sempre o in un periodo.
+            Configura le fasce di sconto automatiche per il calcolatore preventivi (es. 10 notti = -5%), il soggiorno minimo e i costi aggiuntivi.
           </DialogDescription>
         </DialogHeader>
 
@@ -355,6 +371,53 @@ export const StayRulesDialog: React.FC<Props> = ({ open, onOpenChange, rules, ap
         ) : (
           /* ------------------------------ Elenco ------------------------------ */
           <div className="space-y-5 py-1">
+            {/* Box Rapido Fasce di Sconto */}
+            <div className="rounded-xl bg-emerald-50/70 border border-emerald-200 p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                  <Percent className="h-3.5 w-3.5 text-emerald-600" />
+                  Aggiungi rapidamente una Fascia di Sconto per il Calcolatore Preventivi
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs font-semibold bg-white border-emerald-300 text-emerald-900 hover:bg-emerald-100"
+                  onClick={() => openDiscountPreset(7, 3)}
+                >
+                  + Da 7 notti (-3%)
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs font-semibold bg-white border-emerald-300 text-emerald-900 hover:bg-emerald-100"
+                  onClick={() => openDiscountPreset(10, 5)}
+                >
+                  + Da 10 notti (-5%)
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs font-semibold bg-white border-emerald-300 text-emerald-900 hover:bg-emerald-100"
+                  onClick={() => openDiscountPreset(14, 10)}
+                >
+                  + Da 14 notti (-10%)
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 text-xs font-semibold gap-1"
+                  onClick={() => setForm(emptyForm('discount'))}
+                >
+                  <Plus className="h-3.5 w-3.5" /> Sconto personalizzato
+                </Button>
+              </div>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               {(Object.keys(RULE_TYPE_LABELS) as StayRuleType[]).map((t) => (
                 <Button

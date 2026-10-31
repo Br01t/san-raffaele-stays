@@ -82,6 +82,11 @@ interface PublicApartmentCalendarProps {
   availability: Availability[];
   stayRules: MinStayRule[];
   rateTiers: RateTier[];
+  onOpenCalculator?: (params: {
+    checkIn: string | null;
+    checkOut: string | null;
+    guests: 2 | 3 | 4;
+  }) => void;
 }
 
 export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = ({
@@ -90,6 +95,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   availability,
   stayRules,
   rateTiers,
+  onOpenCalculator,
 }) => {
   const now = useMemo(() => new Date(), []);
   const todayIso = useMemo(() => toIso(now.getFullYear(), now.getMonth(), now.getDate()), [now]);
@@ -501,7 +507,20 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
         <Button
           type="button"
           variant="outline"
-          className="rounded-full px-7 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold gap-2 shadow-sm"
+          onClick={() => {
+            if (onOpenCalculator) {
+              onOpenCalculator({
+                checkIn,
+                checkOut,
+                guests: (guests >= 4 ? 4 : guests === 3 ? 3 : 2) as 2 | 3 | 4,
+              });
+            } else {
+              document
+                .getElementById('calcolatore-preventivo')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }}
+          className="rounded-full px-7 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold gap-2 shadow-sm cursor-pointer"
           data-track-label="alloggi_calcola_preventivo"
           data-track-apartment={apartment.name}
         >

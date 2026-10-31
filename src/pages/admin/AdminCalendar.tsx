@@ -291,7 +291,7 @@ export const AdminCalendar: React.FC = () => {
           </Button>
           <Button variant="outline" size="sm" onClick={() => setRulesOpen(true)} className="gap-1.5 text-xs font-semibold">
             <Sliders className="h-3.5 w-3.5 text-slate-500" />
-            Regole di Soggiorno ({activeRulesCount})
+            Fasce di Sconto & Regole ({activeRulesCount})
           </Button>
           <Button variant="outline" size="sm" onClick={() => setHistoryOpen(true)} className="gap-1.5 text-xs font-semibold">
             <History className="h-3.5 w-3.5 text-slate-500" />

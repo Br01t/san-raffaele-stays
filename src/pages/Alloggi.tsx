@@ -1,9 +1,27 @@
 import { useEffect, useState } from "react";
-import { Bed, Car, MapPin, Check, Sparkles, Wind, Gift } from "lucide-react";
+import {
+  Bed,
+  Car,
+  MapPin,
+  Check,
+  Sparkles,
+  Wind,
+  Gift,
+  Tag,
+  ArrowRight,
+  Tv,
+  Wifi,
+  UtensilsCrossed,
+  Bath,
+  ShowerHead,
+  Shirt,
+  Sun,
+} from "lucide-react";
 import AmenityStrip from "@/components/AmenityStrip";
 import Gallery from "@/components/Gallery";
 import SEO from "@/components/SEO";
 import { PublicApartmentCalendar } from "@/components/PublicApartmentCalendar";
+import { PublicQuoteCalculator } from "@/components/PublicQuoteCalculator";
 import { INITIAL_APARTMENTS, INITIAL_MIN_STAY_RULES } from "@/lib/mock-data";
 import {
   getAllPublicCalendarData,
@@ -122,12 +140,56 @@ const APARTMENT_META: ApartmentCardMeta[] = [
   },
 ];
 
+function formatServiceLabel(raw: string): string {
+  const upper = raw.trim().toUpperCase();
+  if (upper === "DOCCA" || upper === "DOCCIA") return "Doccia";
+  if (upper === "TV") return "TV Schermo Piatto";
+  if (upper === "WI-FI" || upper === "WIFI") return "Wi-Fi Veloce";
+  if (upper === "ARIA CONDIZIONATA") return "Aria Condizionata";
+  if (upper === "PHON IN CAMERA") return "Phon in Camera";
+  if (upper === "CUCINA ATTREZZATA") return "Cucina Attrezzata";
+  if (upper === "BAGNO PRIVATO") return "Bagno Privato";
+  if (upper === "LAVATRICE") return "Lavatrice";
+  if (upper === "TERRAZZO") return "Terrazzo Privato";
+  return raw;
+}
+
+function getServiceIcon(raw: string) {
+  const upper = raw.trim().toUpperCase();
+  if (upper === "TV") return Tv;
+  if (upper === "WI-FI" || upper === "WIFI") return Wifi;
+  if (upper === "ARIA CONDIZIONATA") return Wind;
+  if (upper === "CUCINA ATTREZZATA") return UtensilsCrossed;
+  if (upper === "BAGNO PRIVATO") return Bath;
+  if (upper === "DOCCA" || upper === "DOCCIA") return ShowerHead;
+  if (upper === "LAVATRICE") return Shirt;
+  if (upper === "TERRAZZO") return Sun;
+  return Check;
+}
+
 const Alloggi = () => {
   const [dbApartments, setDbApartments] = useState<Apartment[]>(INITIAL_APARTMENTS);
   const [dailyRates, setDailyRates] = useState<DailyRate[]>([]);
   const [availability, setAvailability] = useState<Availability[]>([]);
   const [stayRules, setStayRules] = useState<MinStayRule[]>(INITIAL_MIN_STAY_RULES);
   const [rateTiers, setRateTiers] = useState<RateTier[]>([]);
+  const [calcApartmentSlug, setCalcApartmentSlug] = useState<string>("amici-1");
+  const [calcCheckIn, setCalcCheckIn] = useState<string | null>(null);
+  const [calcCheckOut, setCalcCheckOut] = useState<string | null>(null);
+  const [calcGuests, setCalcGuests] = useState<2 | 3 | 4>(2);
+
+  const openCalculatorFor = (
+    slug: string,
+    opts?: { checkIn?: string | null; checkOut?: string | null; guests?: 2 | 3 | 4 }
+  ) => {
+    setCalcApartmentSlug(slug);
+    if (opts?.checkIn !== undefined) setCalcCheckIn(opts.checkIn);
+    if (opts?.checkOut !== undefined) setCalcCheckOut(opts.checkOut);
+    if (opts?.guests !== undefined) setCalcGuests(opts.guests);
+    document
+      .getElementById("calcolatore-preventivo")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   useEffect(() => {
     let active = true;
@@ -149,7 +211,11 @@ const Alloggi = () => {
       if (apts.length > 0) setDbApartments(apts);
       setDailyRates(cal.rates);
       setAvailability(cal.availability);
-      setStayRules(rules);
+      const hasDiscountRule = rules.some((r) => r.rule_type === "discount");
+      const mergedRules = hasDiscountRule
+        ? rules
+        : [...rules, ...INITIAL_MIN_STAY_RULES.filter((r) => r.rule_type === "discount")];
+      setStayRules(mergedRules);
       setRateTiers(tiers);
     });
     return () => {
@@ -226,16 +292,19 @@ const Alloggi = () => {
                         availability={availability}
                         stayRules={stayRules}
                         rateTiers={rateTiers}
+                        onOpenCalculator={({ checkIn, checkOut, guests }) =>
+                          openCalculatorFor(meta.slug, { checkIn, checkOut, guests })
+                        }
                       />
                     </div>
                   </div>
 
-                  {/* Riga Inferiore (sotto le immagini): 2 Card Orizzontali affiancate (Ubicazione | Servizi) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 pt-6 border-t border-border/70">
+                  {/* Riga Inferiore (sotto le immagini): 2 Card Orizzontali affiancate (Ubicazione | Servizi & Posti Letto) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 pt-6 border-t border-border/70 items-stretch">
                     {/* Card 1: Ubicazione schematica */}
                     <div className="bg-muted/35 rounded-xl p-4 sm:p-5 border border-border/60 flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center gap-2.5 mb-3">
+                        <div className="flex items-center gap-2.5 mb-3.5">
                           <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0">
                             <MapPin className="w-4 h-4 text-primary" />
                           </div>
@@ -243,11 +312,11 @@ const Alloggi = () => {
                             Ubicazione
                           </h3>
                         </div>
-                        <ul className="space-y-2">
+                        <ul className="space-y-2.5">
                           {meta.locationPoints.map((pt) => (
                             <li
                               key={pt}
-                              className="flex items-start gap-2 text-xs sm:text-sm text-foreground/90 leading-snug"
+                              className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground/90 leading-snug bg-background/70 rounded-lg px-3 py-2 border border-border/50"
                             >
                               <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                               <span>{pt}</span>
@@ -257,40 +326,87 @@ const Alloggi = () => {
                       </div>
                     </div>
 
-                    {/* Card 2: Servizi e Configurazione Letti */}
-                    <div className="bg-muted/35 rounded-xl p-4 sm:p-5 border border-border/60 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2.5 mb-3">
-                          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                            <Sparkles className="w-4 h-4 text-primary" />
+                    {/* Card 2: Servizi & Posti Letto migliorata + Box Sconto Calcolatore */}
+                    <div className="bg-muted/35 rounded-xl p-4 sm:p-5 border border-border/60 flex flex-col justify-between gap-3.5">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0">
+                              <Sparkles className="w-4 h-4 text-primary" />
+                            </div>
+                            <h3 className="font-display text-primary text-base sm:text-lg">
+                              Servizi & Posti Letto
+                            </h3>
                           </div>
-                          <h3 className="font-display text-primary text-base sm:text-lg">
-                            Servizi & Posti Letto
-                          </h3>
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary bg-background/80 rounded-lg px-3 py-2 border border-border/60 mb-3">
-                          <Bed className="w-4 h-4 shrink-0" />
-                          <span>{meta.bedsSummary}</span>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1.5">
-                          {servicesList.map((srv) => (
-                            <span
-                              key={srv}
-                              className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium bg-background text-foreground/90 px-2.5 py-1 rounded-md border border-border/60"
-                            >
-                              <Check className="w-3 h-3 text-primary shrink-0" />
-                              {srv}
+                        {/* Box Posti Letto ben strutturato */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-background rounded-xl px-3.5 py-2.5 border border-primary/20 shadow-2xs">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-primary">
+                            <Bed className="w-4 h-4 shrink-0 text-primary" />
+                            <span>{meta.bedsSummary.split("·")[0]?.trim()}</span>
+                          </div>
+                          {meta.bedsSummary.split("·")[1] && (
+                            <span className="text-[11px] sm:text-xs font-medium text-muted-foreground bg-muted/60 px-2.5 py-0.5 rounded-full">
+                              {meta.bedsSummary.split("·")[1]?.trim()}
                             </span>
-                          ))}
+                          )}
+                        </div>
+
+                        {/* Griglia Servizi ordinata */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {servicesList.map((srv) => {
+                            const IconComp = getServiceIcon(srv);
+                            return (
+                              <div
+                                key={srv}
+                                className="flex items-center gap-2 text-xs font-medium bg-background text-foreground/90 px-2.5 py-2 rounded-lg border border-border/60 shadow-2xs"
+                              >
+                                <IconComp className="w-3.5 h-3.5 text-primary shrink-0" />
+                                <span className="truncate">{formatServiceLabel(srv)}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
+
+                      {/* Invito cliccabile: Scopri nel calcolatore se hai diritto a uno sconto */}
+                      <button
+                        type="button"
+                        onClick={() => openCalculatorFor(meta.slug)}
+                        className="w-full flex items-center justify-between gap-2 bg-emerald-50/90 hover:bg-emerald-100/90 border border-emerald-300/80 text-emerald-950 rounded-xl px-3.5 py-2.5 text-left transition-colors group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0">
+                            <Tag className="w-3.5 h-3.5 text-emerald-700" />
+                          </div>
+                          <span className="text-xs sm:text-[13px] font-semibold text-emerald-900 leading-snug">
+                            Scopri nel calcolatore se hai diritto a uno <strong>sconto sul preventivo</strong>
+                          </span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-emerald-700 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
                     </div>
                   </div>
                 </article>
               );
             })}
+          </div>
+
+          {/* Sezione Calcolatore Preventivo & Sconti in fondo agli alloggi */}
+          <div className="mt-12 sm:mt-16">
+            <PublicQuoteCalculator
+              apartments={dbApartments}
+              selectedApartmentSlug={calcApartmentSlug}
+              onSelectApartmentSlug={setCalcApartmentSlug}
+              externalCheckIn={calcCheckIn}
+              externalCheckOut={calcCheckOut}
+              externalGuests={calcGuests}
+              dailyRates={dailyRates}
+              availability={availability}
+              stayRules={stayRules}
+              rateTiers={rateTiers}
+            />
           </div>
 
           <h3 className="font-display text-primary text-xl text-center mt-12 mb-6">

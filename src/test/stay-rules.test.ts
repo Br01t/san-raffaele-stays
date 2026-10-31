@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { computeStayExtras, getMinNightsForStay, getMinStayRuleFor, getAlwaysMinStayRule, describeRule } from "@/lib/stay-rules";
+import {
+  computeStayExtras,
+  getMinNightsForStay,
+  getMinStayRuleFor,
+  getAlwaysMinStayRule,
+  describeRule,
+  getActiveDiscountTiersForApartment,
+  getNextDiscountTierHint,
+} from "@/lib/stay-rules";
 import { calculateStayQuote } from "@/lib/pricing-calculator";
 import { MinStayRule, Apartment } from "@/types/database";
 
@@ -126,5 +134,38 @@ describe("regola notti minime sempre valida (testo accanto al calendario)", () =
   });
   it("senza regole restituisce null", () => {
     expect(getAlwaysMinStayRule([seasonal], APT)).toBeNull();
+  });
+});
+
+describe("fasce di sconto per il calcolatore preventivi (es. 10 notti = -5%)", () => {
+  const discount10Nights5Pct = rule({
+    rule_type: "discount",
+    description: "Sconto soggiorno 10+ notti",
+    amount: 5,
+    amount_type: "percent",
+    threshold_nights: 10,
+    is_active: true,
+  });
+
+  it("applica il 5% di sconto per soggiorni di 10 notti e mostra suggerimento sotto 10 notti", () => {
+    const activeTiers = getActiveDiscountTiersForApartment([discount10Nights5Pct], APT);
+    expect(activeTiers).toHaveLength(1);
+    expect(activeTiers[0].threshold_nights).toBe(10);
+
+    // 8 notti: suggerisce che mancano 2 notti per lo sconto del 5%
+    const hint = getNextDiscountTierHint([discount10Nights5Pct], APT, days(1, 8));
+    expect(hint?.missingNights).toBe(2);
+    expect(hint?.discountLabel).toBe("5%");
+
+    // 10 notti a 90€/notte (900€): applica -5% (-45€) => 855€
+    const res10 = computeStayExtras({
+      rules: [discount10Nights5Pct],
+      apartmentId: APT,
+      dates: days(1, 10),
+      guests: 2,
+      nightsTotal: 900,
+    });
+    expect(res10.discount?.badgeText).toBe("5%");
+    expect(res10.discountTotal).toBe(45);
   });
 });

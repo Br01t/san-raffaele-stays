@@ -11,6 +11,7 @@ import {
   Sparkles,
   Info,
   Layers,
+  Percent,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,9 +28,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { getApartments, getRateTiers, updateApartment } from '@/lib/admin-api';
-import { Apartment, RateTier } from '@/types/database';
+import { getApartments, getRateTiers, getStayRules, updateApartment } from '@/lib/admin-api';
+import { Apartment, MinStayRule, RateTier } from '@/types/database';
 import { RateTiersDialog } from '@/components/admin/RateTiersDialog';
+import { StayRulesDialog } from '@/components/admin/StayRulesDialog';
 
 export const AdminApartments: React.FC = () => {
   const [apartments, setApartments] = useState<Apartment[]>([]);
@@ -38,13 +40,19 @@ export const AdminApartments: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [tiers, setTiers] = useState<RateTier[]>([]);
   const [tiersAptId, setTiersAptId] = useState<string | null>(null);
+  const [stayRules, setStayRules] = useState<MinStayRule[]>([]);
+  const [discountsOpen, setDiscountsOpen] = useState(false);
 
   const loadTiers = React.useCallback(() => {
     getRateTiers().then(setTiers).catch(() => setTiers([]));
   }, []);
+  const loadRules = React.useCallback(() => {
+    getStayRules().then(setStayRules).catch(() => setStayRules([]));
+  }, []);
   useEffect(() => {
     loadTiers();
-  }, [loadTiers]);
+    loadRules();
+  }, [loadTiers, loadRules]);
 
   useEffect(() => {
     loadApartments();
@@ -101,9 +109,19 @@ export const AdminApartments: React.FC = () => {
             Gestione Alloggi
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Visualizza e modifica le informazioni base, tariffe standard e capienza dei 3 alloggi.
+            Visualizza e modifica le informazioni base, tariffe standard, scaglioni e fasce di sconto dei 3 alloggi.
           </p>
         </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setDiscountsOpen(true)}
+          className="gap-1.5 text-xs font-semibold border-emerald-300 bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100"
+        >
+          <Percent className="h-3.5 w-3.5 text-emerald-600" />
+          Fasce di Sconto & Regole ({stayRules.filter((r) => r.rule_type === 'discount' && r.is_active !== false).length} sconti attivi)
+        </Button>
       </div>
 
       {/* Grid of 3 Apartments */}
@@ -365,6 +383,15 @@ export const AdminApartments: React.FC = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      <StayRulesDialog
+        open={discountsOpen}
+        onOpenChange={setDiscountsOpen}
+        rules={stayRules}
+        apartments={apartments}
+        onChanged={loadRules}
+        focusType="discount"
+      />
     </div>
   );
 };

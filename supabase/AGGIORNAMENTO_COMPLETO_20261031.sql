@@ -288,6 +288,24 @@ DROP POLICY IF EXISTS "rate_tiers_is_admin" ON public.rate_tiers;
 CREATE POLICY "rate_tiers_is_admin" ON public.rate_tiers
     FOR ALL TO authenticated USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
 
+-- Estensione regole di soggiorno per Fasce di Sconto e Costi Extra (idempotente)
+ALTER TABLE public.min_stay_rules
+    ADD COLUMN IF NOT EXISTS rule_type TEXT NOT NULL DEFAULT 'min_stay',
+    ADD COLUMN IF NOT EXISTS amount NUMERIC(10, 2),
+    ADD COLUMN IF NOT EXISTS amount_type TEXT,
+    ADD COLUMN IF NOT EXISTS charge_basis TEXT,
+    ADD COLUMN IF NOT EXISTS threshold_nights INTEGER,
+    ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE public.min_stay_rules ALTER COLUMN min_nights DROP NOT NULL;
+
+-- Inserisce la fascia di sconto predefinita (10+ notti = -5%) se non ci sono ancora sconti configurati
+INSERT INTO public.min_stay_rules (rule_type, apartment_id, min_nights, amount, amount_type, threshold_nights, is_active, priority, description)
+SELECT 'discount', NULL, NULL, 5, 'percent', 10, true, 5, 'Sconto soggiorno 10+ notti'
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.min_stay_rules WHERE rule_type = 'discount'
+);
+
 NOTIFY pgrst, 'reload schema';
 
 COMMIT;
