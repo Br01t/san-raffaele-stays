@@ -11,6 +11,7 @@ import {
   RateHistory,
   MonthlyDataHistory,
   SiteEvent,
+  RateTier,
 } from '@/types/database';
 import {
   INITIAL_APARTMENTS,
@@ -246,6 +247,8 @@ export async function bulkUpdateCalendar(
   dates: string[],
   updates: {
     price?: number;
+    /** Scaglione da assegnare (con price = suo prezzo 2 persone); null = prezzo manuale */
+    tierId?: string | null;
     is_available?: boolean;
     is_high_demand?: boolean;
     notes?: string;
@@ -273,13 +276,24 @@ export async function bulkUpdateCalendar(
         price_per_night: updates.price as number,
         is_manual_override: true,
         source,
+        ...(updates.tierId !== undefined && !tiersTableMissing ? { tier_id: updates.tierId } : {}),
         updated_at: nowIso,
       }));
       // NB: onConflict senza spazi, altrimenti PostgREST cerca la colonna " rate_date"
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('daily_rates')
         .upsert(rows, { onConflict: 'apartment_id,rate_date' })
         .select();
+      if (error && updates.tierId !== undefined && isMissingTierTable(error)) {
+        tiersTableMissing = true;
+        const rowsWithoutTier = rows.map(({ tier_id: _omit, ...rest }) => rest);
+        const retry = await supabase
+          .from('daily_rates')
+          .upsert(rowsWithoutTier, { onConflict: 'apartment_id,rate_date' })
+          .select();
+        data = retry.data;
+        error = retry.error;
+      }
       if (error) throw dbError('Salvataggio tariffe', error);
       savedRates = (data ?? []) as DailyRate[];
 
@@ -345,6 +359,7 @@ export async function bulkUpdateCalendar(
           price_per_night: updates.price,
           is_manual_override: true,
           source,
+          ...(updates.tierId !== undefined ? { tier_id: updates.tierId } : {}),
           updated_at: nowIso,
         };
         if (oldPrice !== updates.price) {
@@ -368,6 +383,7 @@ export async function bulkUpdateCalendar(
           price_per_night: updates.price,
           is_manual_override: true,
           source,
+          tier_id: updates.tierId ?? null,
           created_at: nowIso,
           updated_at: nowIso,
         };
@@ -399,6 +415,149 @@ export async function bulkUpdateCalendar(
   setLocal(LS_RATE_HISTORY, history);
   setLocal(LS_AVAIL, allAvail);
   return { rates: savedRates, availability: savedAvail };
+}
+
+// ==============================================================================
+// SCAGLIONI TARIFFARI (prezzi per 2/3/4 persone assegnabili ai giorni)
+// ==============================================================================
+const LS_TIERS = 'srs_rate_tiers';
+export type RateTierInput = Omit<RateTier, 'id' | 'created_at' | 'updated_at'>;
+
+function validateTier(t: Partial<RateTierInput>) {
+  if (t.name !== undefined && !t.name.trim()) throw new Error('Dai un nome allo scaglione.');
+  for (const k of ['price_2p', 'price_3p', 'price_4p'] as const) {
+    if (t[k] !== undefined && (!Number.isFinite(Number(t[k])) || Number(t[k]) < 0)) {
+      throw new Error('Prezzi dello scaglione non validi.');
+    }
+  }
+}
+
+let tiersTableMissing = false;
+
+function isMissingTierTable(error: DbErrorLike): boolean {
+  return (
+    error.code === '42P01' ||
+    error.code === 'PGRST205' ||
+    error.code === '42703' ||
+    /rate_tiers|tier_id|does not exist|schema cache/i.test(error.message)
+  );
+}
+
+function useTiersDb(): boolean {
+  return isSupabaseConfigured() && !tiersTableMissing;
+}
+
+function tierError(action: string, error: DbErrorLike): Error {
+  if (isMissingTierTable(error)) {
+    console.error(`Supabase ${action}:`, error);
+    return new Error(`${action}: esegui la migrazione supabase/migrations/20261031_rate_tiers.sql.`);
+  }
+  if (error.code === '23505') return new Error(`${action}: esiste già uno scaglione con questo nome.`);
+  return dbError(action, error);
+}
+
+const sortTiers = (list: RateTier[]) => [...list].sort((a, b) => Number(a.price_2p) - Number(b.price_2p) || a.name.localeCompare(b.name));
+
+export async function getRateTiers(apartmentId?: string): Promise<RateTier[]> {
+  if (useTiersDb()) {
+    let q = supabase.from('rate_tiers').select('*');
+    if (apartmentId) q = q.eq('apartment_id', apartmentId);
+    const { data, error } = await q;
+    if (!error) return sortTiers((data ?? []) as RateTier[]);
+    if (!isMissingTierTable(error)) throw tierError('Lettura scaglioni', error);
+    tiersTableMissing = true;
+  }
+  const all = getLocal<RateTier[]>(LS_TIERS, []);
+  return sortTiers(apartmentId ? all.filter((t) => t.apartment_id === apartmentId) : all);
+}
+
+export async function createRateTier(input: RateTierInput): Promise<RateTier> {
+  validateTier(input);
+  if (useTiersDb()) {
+    const { data, error } = await supabase.from('rate_tiers').insert(input).select().single();
+    if (!error) return data as RateTier;
+    if (!isMissingTierTable(error)) throw tierError('Creazione scaglione', error);
+    tiersTableMissing = true;
+  }
+  const list = getLocal<RateTier[]>(LS_TIERS, []);
+  if (list.some((t) => t.apartment_id === input.apartment_id && t.name.toLowerCase() === input.name.toLowerCase())) {
+    throw new Error('Creazione scaglione: esiste già uno scaglione con questo nome.');
+  }
+  const nowIso = new Date().toISOString();
+  const created: RateTier = { ...input, id: generateUUID(), created_at: nowIso, updated_at: nowIso };
+  setLocal(LS_TIERS, [...list, created]);
+  return created;
+}
+
+/**
+ * Modifica uno scaglione. Se cambia il prezzo per 2 persone, tutti i giorni del
+ * calendario che lo usano si aggiornano (in Supabase lo fa il trigger del database).
+ */
+export async function updateRateTier(id: string, updates: Partial<RateTierInput>): Promise<RateTier> {
+  validateTier(updates);
+  if (useTiersDb()) {
+    const { data, error } = await supabase.from('rate_tiers').update(updates).eq('id', id).select();
+    if (!error) {
+      if (!data?.length) throw new Error('Modifica scaglione: nessuna riga aggiornata.');
+      return data[0] as RateTier;
+    }
+    if (!isMissingTierTable(error)) throw tierError('Modifica scaglione', error);
+    tiersTableMissing = true;
+  }
+  const list = getLocal<RateTier[]>(LS_TIERS, []);
+  const idx = list.findIndex((t) => t.id === id);
+  if (idx === -1) throw new Error('Scaglione non trovato');
+  const nowIso = new Date().toISOString();
+  const updated = { ...list[idx], ...updates, updated_at: nowIso };
+  list[idx] = updated;
+  setLocal(LS_TIERS, list);
+
+  const rates = getLocal<DailyRate[]>(LS_RATES, []);
+  const history = getLocal<RateHistory[]>(LS_RATE_HISTORY, []);
+  let touched = false;
+  for (const r of rates) {
+    if (r.tier_id !== id || Number(r.price_per_night) === Number(updated.price_2p)) continue;
+    history.unshift({
+      id: generateUUID(),
+      apartment_id: r.apartment_id,
+      daily_rate_id: r.id,
+      rate_date: r.rate_date,
+      old_price: r.price_per_night,
+      new_price: Number(updated.price_2p),
+      change_reason: `Scaglione ${updated.name} modificato`,
+      changed_at: nowIso,
+    });
+    r.price_per_night = Number(updated.price_2p);
+    r.updated_at = nowIso;
+    touched = true;
+  }
+  if (touched) {
+    setLocal(LS_RATES, rates);
+    setLocal(LS_RATE_HISTORY, history);
+  }
+  return updated;
+}
+
+/** Elimina lo scaglione: i giorni che lo usavano mantengono il prezzo, come prezzo manuale. */
+export async function deleteRateTier(id: string): Promise<void> {
+  if (useTiersDb()) {
+    const { error } = await supabase.from('rate_tiers').delete().eq('id', id);
+    if (!error) return;
+    if (!isMissingTierTable(error)) throw tierError('Eliminazione scaglione', error);
+    tiersTableMissing = true;
+  }
+  setLocal(LS_TIERS, getLocal<RateTier[]>(LS_TIERS, []).filter((t) => t.id !== id));
+  setLocal(
+    LS_RATES,
+    getLocal<DailyRate[]>(LS_RATES, []).map((r) => (r.tier_id === id ? { ...r, tier_id: null } : r))
+  );
+}
+
+/** Prezzo di un giorno per numero di ospiti, se il giorno usa uno scaglione. */
+export function tierPriceFor(tier: Pick<RateTier, 'price_2p' | 'price_3p' | 'price_4p'>, guests: number): number {
+  if (guests >= 4) return Number(tier.price_4p);
+  if (guests === 3) return Number(tier.price_3p);
+  return Number(tier.price_2p);
 }
 
 // ==============================================================================
@@ -845,6 +1004,8 @@ export async function exportAllDataJSON(): Promise<string> {
     console.warn('Backup: dati finanziari non disponibili', e);
   }
 
+  const rateTiers = await getRateTiers().catch(() => null);
+
   const payload = {
     exportDate: new Date().toISOString(),
     source: 'Amici del San Raffaele Admin Backup',
@@ -858,6 +1019,7 @@ export async function exportAllDataJSON(): Promise<string> {
       availability,
       rateHistory: history,
       ...(finance ? { finance } : {}),
+      ...(rateTiers ? { rateTiers } : {}),
     },
   };
 

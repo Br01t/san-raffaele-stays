@@ -10,6 +10,7 @@ import {
   Users,
   Sparkles,
   Info,
+  Layers,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,14 +27,24 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { getApartments, updateApartment } from '@/lib/admin-api';
-import { Apartment } from '@/types/database';
+import { getApartments, getRateTiers, updateApartment } from '@/lib/admin-api';
+import { Apartment, RateTier } from '@/types/database';
+import { RateTiersDialog } from '@/components/admin/RateTiersDialog';
 
 export const AdminApartments: React.FC = () => {
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingApt, setEditingApt] = useState<Apartment | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [tiers, setTiers] = useState<RateTier[]>([]);
+  const [tiersAptId, setTiersAptId] = useState<string | null>(null);
+
+  const loadTiers = React.useCallback(() => {
+    getRateTiers().then(setTiers).catch(() => setTiers([]));
+  }, []);
+  useEffect(() => {
+    loadTiers();
+  }, [loadTiers]);
 
   useEffect(() => {
     loadApartments();
@@ -151,6 +162,44 @@ export const AdminApartments: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Scaglioni tariffari */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
+                      <Layers className="h-4 w-4 text-slate-400" />
+                      <span>Scaglioni Tariffari</span>
+                    </div>
+                    <button onClick={() => setTiersAptId(apt.id)} className="text-[11px] font-semibold text-primary hover:underline">
+                      Gestisci
+                    </button>
+                  </div>
+                  {tiers.filter((t) => t.apartment_id === apt.id).length === 0 ? (
+                    <button
+                      onClick={() => setTiersAptId(apt.id)}
+                      className="w-full text-[11px] text-slate-500 border border-dashed border-slate-300 rounded-lg p-2.5 hover:border-primary hover:text-primary"
+                    >
+                      + Crea scaglioni (es. Bassa / Media / Alta) da usare nel calendario
+                    </button>
+                  ) : (
+                    <div className="space-y-1">
+                      {tiers
+                        .filter((t) => t.apartment_id === apt.id)
+                        .map((t) => (
+                          <div key={t.id} className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-50 border border-slate-100">
+                            <span className="flex items-center gap-1.5 font-semibold text-slate-800">
+                              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                              {t.name}
+                            </span>
+                            <span className="text-slate-600">
+                              {Number(t.price_2p)} / {Number(t.price_3p)}
+                              {apt.max_guests >= 4 ? ` / ${Number(t.price_4p)}` : ''} €
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
                 {/* Costi Aggiuntivi */}
                 <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                   <div className="p-2 rounded bg-slate-50 border border-slate-100">
@@ -205,6 +254,14 @@ export const AdminApartments: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      <RateTiersDialog
+        open={!!tiersAptId}
+        onOpenChange={(o) => !o && setTiersAptId(null)}
+        apartment={apartments.find((a) => a.id === tiersAptId)}
+        apartments={apartments}
+        onChanged={loadTiers}
+      />
 
       {/* Edit Modal */}
       {editingApt && (

@@ -50,9 +50,19 @@ interface DbErrorLike {
 export const MIGRATION_HINT =
   'Tabelle della gestione finanziaria mancanti: esegui supabase/migrations/20261031_finance.sql nel SQL Editor di Supabase.';
 
+let financeTableMissing = false;
+
+function isMissingTable(error: DbErrorLike): boolean {
+  return error.code === '42P01' || error.code === 'PGRST205' || /does not exist|schema cache/i.test(error.message);
+}
+
+function useFinanceDb(): boolean {
+  return isSupabaseConfigured() && !financeTableMissing;
+}
+
 function finError(action: string, error: DbErrorLike): Error {
   console.error(`Supabase ${action}:`, error);
-  if (error.code === '42P01' || error.code === 'PGRST205' || /does not exist|schema cache/i.test(error.message)) {
+  if (isMissingTable(error)) {
     return new Error(MIGRATION_HINT);
   }
   if (error.code === '42501' || /row-level security|permission denied/i.test(error.message)) {
@@ -64,7 +74,7 @@ function finError(action: string, error: DbErrorLike): Error {
   return new Error(`${action}: ${error.message}`);
 }
 
-async function fetchAll<T>(table: string, orderBy: string): Promise<T[]> {
+async function fetchAll<T>(table: string, orderBy: string): Promise<T[] | null> {
   const out: T[] = [];
   for (let from = 0; ; from += 1000) {
     const { data, error } = await supabase
@@ -72,7 +82,13 @@ async function fetchAll<T>(table: string, orderBy: string): Promise<T[]> {
       .select('*')
       .order(orderBy, { ascending: true })
       .range(from, from + 999);
-    if (error) throw finError(`Lettura ${table}`, error);
+    if (error) {
+      if (isMissingTable(error)) {
+        financeTableMissing = true;
+        return null;
+      }
+      throw finError(`Lettura ${table}`, error);
+    }
     out.push(...((data ?? []) as T[]));
     if (!data || data.length < 1000) break;
   }
@@ -130,15 +146,19 @@ const sortCategories = (list: FinanceCategory[]) =>
 // CATEGORIE
 // ------------------------------------------------------------------------------
 export async function getCategories(): Promise<FinanceCategory[]> {
-  if (isSupabaseConfigured()) return sortCategories(await fetchAll<FinanceCategory>('finance_categories', 'sort_order'));
+  if (useFinanceDb()) {
+    const rows = await fetchAll<FinanceCategory>('finance_categories', 'sort_order');
+    if (rows !== null) return sortCategories(rows);
+  }
   return sortCategories(localCategories());
 }
 
 export async function createCategory(input: CategoryInput): Promise<FinanceCategory> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_categories').insert(input).select().single();
-    if (error) throw finError('Creazione categoria', error);
-    return data as FinanceCategory;
+    if (!error) return data as FinanceCategory;
+    if (!isMissingTable(error)) throw finError('Creazione categoria', error);
+    financeTableMissing = true;
   }
   const created: FinanceCategory = { ...input, id: generateUUID(), created_at: nowIso(), updated_at: nowIso() };
   setLocal(LS_CATEGORIES, [...localCategories(), created]);
@@ -146,11 +166,14 @@ export async function createCategory(input: CategoryInput): Promise<FinanceCateg
 }
 
 export async function updateCategory(id: string, updates: Partial<CategoryInput>): Promise<FinanceCategory> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_categories').update(updates).eq('id', id).select();
-    if (error) throw finError('Modifica categoria', error);
-    if (!data?.length) throw new Error('Modifica categoria: nessuna riga aggiornata.');
-    return data[0] as FinanceCategory;
+    if (!error) {
+      if (!data?.length) throw new Error('Modifica categoria: nessuna riga aggiornata.');
+      return data[0] as FinanceCategory;
+    }
+    if (!isMissingTable(error)) throw finError('Modifica categoria', error);
+    financeTableMissing = true;
   }
   const list = localCategories();
   const idx = list.findIndex((c) => c.id === id);
@@ -162,10 +185,11 @@ export async function updateCategory(id: string, updates: Partial<CategoryInput>
 
 /** Elimina una categoria solo se non è usata; altrimenti va disattivata. */
 export async function deleteCategory(id: string): Promise<void> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase.from('finance_categories').delete().eq('id', id);
-    if (error) throw finError('Eliminazione categoria', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Eliminazione categoria', error);
+    financeTableMissing = true;
   }
   const used =
     getLocal<FinanceMovement[]>(LS_MOVEMENTS, []).some((m) => m.category_id === id) ||
@@ -190,17 +214,21 @@ function validateMovement(m: Partial<MovementInput>) {
 }
 
 export async function getMovements(): Promise<FinanceMovement[]> {
-  if (isSupabaseConfigured()) return fetchAll<FinanceMovement>('finance_movements', 'movement_date');
+  if (useFinanceDb()) {
+    const rows = await fetchAll<FinanceMovement>('finance_movements', 'movement_date');
+    if (rows !== null) return rows;
+  }
   return getLocal<FinanceMovement[]>(LS_MOVEMENTS, []);
 }
 
 export async function createMovements(inputs: MovementInput[]): Promise<FinanceMovement[]> {
   if (inputs.length === 0) return [];
   inputs.forEach(validateMovement);
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_movements').insert(inputs).select();
-    if (error) throw finError('Salvataggio movimento', error);
-    return (data ?? []) as FinanceMovement[];
+    if (!error) return (data ?? []) as FinanceMovement[];
+    if (!isMissingTable(error)) throw finError('Salvataggio movimento', error);
+    financeTableMissing = true;
   }
   const created = inputs.map((m) => ({ ...m, id: generateUUID(), created_at: nowIso(), updated_at: nowIso() }));
   setLocal(LS_MOVEMENTS, [...getLocal<FinanceMovement[]>(LS_MOVEMENTS, []), ...created]);
@@ -210,12 +238,13 @@ export async function createMovements(inputs: MovementInput[]): Promise<FinanceM
 /** Inserimento dei movimenti automatici: un source_ref già presente viene ignorato (niente duplicati). */
 async function insertAutoMovements(inputs: MovementInput[]): Promise<void> {
   if (inputs.length === 0) return;
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase
       .from('finance_movements')
       .upsert(inputs, { onConflict: 'source_ref', ignoreDuplicates: true });
-    if (error) throw finError('Aggiornamento automatico movimenti', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Aggiornamento automatico movimenti', error);
+    financeTableMissing = true;
   }
   const list = getLocal<FinanceMovement[]>(LS_MOVEMENTS, []);
   const known = new Set(list.map((m) => m.source_ref).filter(Boolean));
@@ -232,11 +261,14 @@ export async function createMovement(input: MovementInput): Promise<FinanceMovem
 
 export async function updateMovement(id: string, updates: Partial<MovementInput>): Promise<FinanceMovement> {
   validateMovement(updates);
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_movements').update(updates).eq('id', id).select();
-    if (error) throw finError('Modifica movimento', error);
-    if (!data?.length) throw new Error('Modifica movimento: nessuna riga aggiornata.');
-    return data[0] as FinanceMovement;
+    if (!error) {
+      if (!data?.length) throw new Error('Modifica movimento: nessuna riga aggiornata.');
+      return data[0] as FinanceMovement;
+    }
+    if (!isMissingTable(error)) throw finError('Modifica movimento', error);
+    financeTableMissing = true;
   }
   const list = getLocal<FinanceMovement[]>(LS_MOVEMENTS, []);
   const idx = list.findIndex((m) => m.id === id);
@@ -258,20 +290,22 @@ export async function deleteMovement(m: FinanceMovement): Promise<void> {
     await updateMovement(m.id, { status: 'skipped' });
     return;
   }
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase.from('finance_movements').delete().eq('id', m.id);
-    if (error) throw finError('Eliminazione movimento', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Eliminazione movimento', error);
+    financeTableMissing = true;
   }
   setLocal(LS_MOVEMENTS, getLocal<FinanceMovement[]>(LS_MOVEMENTS, []).filter((x) => x.id !== m.id));
 }
 
 async function deleteMovementsByIds(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase.from('finance_movements').delete().in('id', ids);
-    if (error) throw finError('Eliminazione movimenti', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Eliminazione movimenti', error);
+    financeTableMissing = true;
   }
   const set = new Set(ids);
   setLocal(LS_MOVEMENTS, getLocal<FinanceMovement[]>(LS_MOVEMENTS, []).filter((m) => !set.has(m.id)));
@@ -281,16 +315,20 @@ async function deleteMovementsByIds(ids: string[]): Promise<void> {
 // RICORRENZE
 // ------------------------------------------------------------------------------
 export async function getRecurring(): Promise<FinanceRecurring[]> {
-  if (isSupabaseConfigured()) return fetchAll<FinanceRecurring>('finance_recurring', 'start_date');
+  if (useFinanceDb()) {
+    const rows = await fetchAll<FinanceRecurring>('finance_recurring', 'start_date');
+    if (rows !== null) return rows;
+  }
   return getLocal<FinanceRecurring[]>(LS_RECURRING, []);
 }
 
 export async function createRecurring(input: RecurringInput): Promise<FinanceRecurring> {
   if (!(Number(input.amount) >= 0)) throw new Error('Importo non valido.');
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_recurring').insert(input).select().single();
-    if (error) throw finError('Salvataggio ricorrenza', error);
-    return data as FinanceRecurring;
+    if (!error) return data as FinanceRecurring;
+    if (!isMissingTable(error)) throw finError('Salvataggio ricorrenza', error);
+    financeTableMissing = true;
   }
   const created: FinanceRecurring = { ...input, id: generateUUID(), created_at: nowIso(), updated_at: nowIso() };
   setLocal(LS_RECURRING, [...getLocal<FinanceRecurring[]>(LS_RECURRING, []), created]);
@@ -298,11 +336,14 @@ export async function createRecurring(input: RecurringInput): Promise<FinanceRec
 }
 
 export async function updateRecurring(id: string, updates: Partial<RecurringInput>): Promise<FinanceRecurring> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_recurring').update(updates).eq('id', id).select();
-    if (error) throw finError('Modifica ricorrenza', error);
-    if (!data?.length) throw new Error('Modifica ricorrenza: nessuna riga aggiornata.');
-    return data[0] as FinanceRecurring;
+    if (!error) {
+      if (!data?.length) throw new Error('Modifica ricorrenza: nessuna riga aggiornata.');
+      return data[0] as FinanceRecurring;
+    }
+    if (!isMissingTable(error)) throw finError('Modifica ricorrenza', error);
+    financeTableMissing = true;
   }
   const list = getLocal<FinanceRecurring[]>(LS_RECURRING, []);
   const idx = list.findIndex((r) => r.id === id);
@@ -321,10 +362,11 @@ export async function deleteRecurring(id: string, removeGenerated = false): Prom
     const ids = (await getMovements()).filter((m) => m.recurring_id === id).map((m) => m.id);
     await deleteMovementsByIds(ids);
   }
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase.from('finance_recurring').delete().eq('id', id);
-    if (error) throw finError('Eliminazione ricorrenza', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Eliminazione ricorrenza', error);
+    financeTableMissing = true;
   }
   setLocal(LS_RECURRING, getLocal<FinanceRecurring[]>(LS_RECURRING, []).filter((r) => r.id !== id));
   setLocal(
@@ -337,19 +379,23 @@ export async function deleteRecurring(id: string, removeGenerated = false): Prom
 // BUDGET E IMPOSTAZIONI
 // ------------------------------------------------------------------------------
 export async function getBudgets(): Promise<FinanceBudget[]> {
-  if (isSupabaseConfigured()) return fetchAll<FinanceBudget>('finance_budgets', 'month');
+  if (useFinanceDb()) {
+    const rows = await fetchAll<FinanceBudget>('finance_budgets', 'month');
+    if (rows !== null) return rows;
+  }
   return getLocal<FinanceBudget[]>(LS_BUDGETS, []);
 }
 
 /** month = 'YYYY-MM' per un mese specifico, 'default' per il valore di tutti i mesi. */
 export async function setBudget(budgetKey: string, month: string, amount: number): Promise<void> {
   if (!(amount >= 0)) throw new Error('Budget non valido.');
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase
       .from('finance_budgets')
       .upsert({ budget_key: budgetKey, month, amount, updated_at: nowIso() }, { onConflict: 'budget_key,month' });
-    if (error) throw finError('Salvataggio budget', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Salvataggio budget', error);
+    financeTableMissing = true;
   }
   const list = getLocal<FinanceBudget[]>(LS_BUDGETS, []);
   const idx = list.findIndex((b) => b.budget_key === budgetKey && b.month === month);
@@ -359,21 +405,23 @@ export async function setBudget(budgetKey: string, month: string, amount: number
 }
 
 export async function getSettings(): Promise<Record<string, unknown>> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { data, error } = await supabase.from('finance_settings').select('*');
-    if (error) throw finError('Lettura impostazioni', error);
-    return Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, r.value]));
+    if (!error) return Object.fromEntries((data ?? []).map((r: { key: string; value: unknown }) => [r.key, r.value]));
+    if (!isMissingTable(error)) throw finError('Lettura impostazioni', error);
+    financeTableMissing = true;
   }
   return getLocal<Record<string, unknown>>(LS_SETTINGS, {});
 }
 
 export async function setSetting(key: string, value: unknown): Promise<void> {
-  if (isSupabaseConfigured()) {
+  if (useFinanceDb()) {
     const { error } = await supabase
       .from('finance_settings')
       .upsert({ key, value, updated_at: nowIso() }, { onConflict: 'key' });
-    if (error) throw finError('Salvataggio impostazione', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw finError('Salvataggio impostazione', error);
+    financeTableMissing = true;
   }
   setLocal(LS_SETTINGS, { ...getLocal<Record<string, unknown>>(LS_SETTINGS, {}), [key]: value });
 }

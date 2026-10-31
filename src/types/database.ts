@@ -34,6 +34,22 @@ export interface DailyRate {
   price_per_night: number;
   is_manual_override: boolean;
   source: 'manual' | 'rule' | 'bulk';
+  /** Scaglione tariffario assegnato al giorno (NULL = prezzo manuale) */
+  tier_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Scaglione tariffario: prezzi per 2, 3 e 4 persone, per appartamento. */
+export interface RateTier {
+  id: string;
+  apartment_id: string;
+  name: string;
+  price_2p: number;
+  price_3p: number;
+  price_4p: number;
+  color: string;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }

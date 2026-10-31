@@ -1,4 +1,4 @@
-import { Apartment, DailyRate, Availability, MinStayRule } from '@/types/database';
+import { Apartment, DailyRate, Availability, MinStayRule, RateTier } from '@/types/database';
 import { computeStayExtras, FeeLine, DiscountLine, getMinNightsForStay } from './stay-rules';
 
 export interface QuoteInput {
@@ -9,6 +9,8 @@ export interface QuoteInput {
   dailyRates?: DailyRate[];
   availability?: Availability[];
   minStayRules?: MinStayRule[];
+  /** Scaglioni tariffari: i giorni con uno scaglione usano il suo prezzo per 2/3/4 persone */
+  rateTiers?: RateTier[];
 }
 
 export interface DayBreakdown {
@@ -61,7 +63,7 @@ export function getStayDates(checkIn: string, checkOut: string): string[] {
  * Calcola la tariffa esatta considerando tariffe giornaliere, numero ospiti, supplementi e pulizie.
  */
 export function calculateStayQuote(input: QuoteInput): QuoteResult {
-  const { apartment, checkIn, checkOut, guests, dailyRates = [], availability = [], minStayRules = [] } = input;
+  const { apartment, checkIn, checkOut, guests, dailyRates = [], availability = [], minStayRules = [], rateTiers = [] } = input;
   const validationErrors: string[] = [];
 
   const stayDates = getStayDates(checkIn, checkOut);
@@ -90,6 +92,8 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
   // Mappa tariffe e disponibilità per giorno
   const dailyBreakdown: DayBreakdown[] = [];
   let nightsTotal = 0;
+  // Notti senza scaglione: solo su queste si applica il supplemento per ospite extra
+  let nightsWithoutTier = 0;
 
   for (const date of stayDates) {
     const rateItem = dailyRates.find((r) => r.rate_date === date);
@@ -104,11 +108,18 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
 
     // Tariffa base per 2 persone o tariffa giornaliera registrata
     let dayRate = rateItem ? Number(rateItem.price_per_night) : Number(apartment.base_price_2p);
+    const tier = rateItem?.tier_id ? rateTiers.find((t) => t.id === rateItem.tier_id) : undefined;
 
-    // Se per 3 o 4 persone senza override manuale, adatta alla tariffa base specifica
-    if (!rateItem) {
-      if (guests === 3) dayRate = Number(apartment.base_price_3p);
-      else if (guests >= 4) dayRate = Number(apartment.base_price_4p);
+    if (tier) {
+      // Scaglione: il prezzo dipende già dal numero di persone
+      dayRate = guests >= 4 ? Number(tier.price_4p) : guests === 3 ? Number(tier.price_3p) : Number(tier.price_2p);
+    } else {
+      nightsWithoutTier++;
+      // Se per 3 o 4 persone senza override manuale, adatta alla tariffa base specifica
+      if (!rateItem) {
+        if (guests === 3) dayRate = Number(apartment.base_price_3p);
+        else if (guests >= 4) dayRate = Number(apartment.base_price_4p);
+      }
     }
 
     nightsTotal += dayRate;
@@ -125,7 +136,7 @@ export function calculateStayQuote(input: QuoteInput): QuoteResult {
   let extraGuestsFee = 0;
   if (guests > apartment.base_guests_included && apartment.extra_guest_supplement > 0) {
     const extraGuestsCount = guests - apartment.base_guests_included;
-    extraGuestsFee = extraGuestsCount * Number(apartment.extra_guest_supplement) * totalNights;
+    extraGuestsFee = extraGuestsCount * Number(apartment.extra_guest_supplement) * nightsWithoutTier;
   }
 
   // Costo pulizia (azzerato se soggiorno >= threshold o se impostato a 0)

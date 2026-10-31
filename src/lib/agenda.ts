@@ -208,9 +208,19 @@ function getLocal(): AgendaEvent[] {
 }
 const setLocal = (list: AgendaEvent[]) => localStorage.setItem(LS_AGENDA, JSON.stringify(list));
 
+let agendaTableMissing = false;
+
+function isMissingTable(error: { message: string; code?: string }): boolean {
+  return error.code === '42P01' || error.code === 'PGRST205' || /does not exist|schema cache/i.test(error.message);
+}
+
+function useAgendaDb(): boolean {
+  return isSupabaseConfigured() && !agendaTableMissing;
+}
+
 function agendaError(action: string, error: { message: string; code?: string }): Error {
   console.error(`Supabase ${action}:`, error);
-  if (error.code === '42P01' || error.code === 'PGRST205' || /does not exist|schema cache/i.test(error.message)) {
+  if (isMissingTable(error)) {
     return new Error('Tabella agenda mancante: esegui supabase/migrations/20261031_agenda.sql nel SQL Editor di Supabase.');
   }
   return new Error(`${action}: ${error.message}`);
@@ -239,29 +249,38 @@ function validate(e: Partial<AgendaEventInput>) {
 }
 
 export async function getAgendaEvents(): Promise<AgendaEvent[]> {
-  if (isSupabaseConfigured()) {
+  if (useAgendaDb()) {
     const out: AgendaEvent[] = [];
+    let fallback = false;
     for (let from = 0; ; from += 1000) {
       const { data, error } = await supabase
         .from('agenda_events')
         .select('*')
         .order('start_date', { ascending: true })
         .range(from, from + 999);
-      if (error) throw agendaError('Lettura agenda', error);
+      if (error) {
+        if (isMissingTable(error)) {
+          agendaTableMissing = true;
+          fallback = true;
+          break;
+        }
+        throw agendaError('Lettura agenda', error);
+      }
       out.push(...((data ?? []) as AgendaEvent[]));
       if (!data || data.length < 1000) break;
     }
-    return out.map(normalize);
+    if (!fallback) return out.map(normalize);
   }
   return getLocal().map(normalize);
 }
 
 export async function createAgendaEvent(input: AgendaEventInput): Promise<AgendaEvent> {
   validate(input);
-  if (isSupabaseConfigured()) {
+  if (useAgendaDb()) {
     const { data, error } = await supabase.from('agenda_events').insert(input).select().single();
-    if (error) throw agendaError('Creazione evento', error);
-    return normalize(data as AgendaEvent);
+    if (!error) return normalize(data as AgendaEvent);
+    if (!isMissingTable(error)) throw agendaError('Creazione evento', error);
+    agendaTableMissing = true;
   }
   const created: AgendaEvent = { ...input, id: generateUUID(), created_at: nowIso(), updated_at: nowIso() };
   setLocal([...getLocal(), created]);
@@ -270,11 +289,14 @@ export async function createAgendaEvent(input: AgendaEventInput): Promise<Agenda
 
 export async function updateAgendaEvent(id: string, updates: Partial<AgendaEventInput>): Promise<AgendaEvent> {
   validate(updates);
-  if (isSupabaseConfigured()) {
+  if (useAgendaDb()) {
     const { data, error } = await supabase.from('agenda_events').update(updates).eq('id', id).select();
-    if (error) throw agendaError('Modifica evento', error);
-    if (!data?.length) throw new Error('Modifica evento: nessuna riga aggiornata.');
-    return normalize(data[0] as AgendaEvent);
+    if (!error) {
+      if (!data?.length) throw new Error('Modifica evento: nessuna riga aggiornata.');
+      return normalize(data[0] as AgendaEvent);
+    }
+    if (!isMissingTable(error)) throw agendaError('Modifica evento', error);
+    agendaTableMissing = true;
   }
   const list = getLocal();
   const idx = list.findIndex((e) => e.id === id);
@@ -285,10 +307,11 @@ export async function updateAgendaEvent(id: string, updates: Partial<AgendaEvent
 }
 
 export async function deleteAgendaEvent(id: string): Promise<void> {
-  if (isSupabaseConfigured()) {
+  if (useAgendaDb()) {
     const { error } = await supabase.from('agenda_events').delete().eq('id', id);
-    if (error) throw agendaError('Eliminazione evento', error);
-    return;
+    if (!error) return;
+    if (!isMissingTable(error)) throw agendaError('Eliminazione evento', error);
+    agendaTableMissing = true;
   }
   setLocal(getLocal().filter((e) => e.id !== id));
 }

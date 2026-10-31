@@ -11,6 +11,7 @@ import {
   DollarSign,
   StickyNote,
   AlertCircle,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +34,9 @@ import {
   getEvents,
   getNotes,
   getStayRules,
+  getRateTiers,
 } from '@/lib/admin-api';
+import { RateTiersDialog } from '@/components/admin/RateTiersDialog';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { monthRange, toDateStr } from '@/lib/date-utils';
 import { CalendarSidePanel } from '@/components/admin/CalendarSidePanel';
@@ -47,6 +50,7 @@ import {
   EventItem,
   InternalNote,
   MinStayRule,
+  RateTier,
 } from '@/types/database';
 
 const monthNames = [
@@ -67,6 +71,11 @@ export const AdminCalendar: React.FC = () => {
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [tiers, setTiers] = useState<RateTier[]>([]);
+  const [tiersOpen, setTiersOpen] = useState(false);
+  // Scaglione scelto nel dialog: '' = invariato, 'manual' = prezzo scritto a mano, altrimenti id scaglione
+  const [editTier, setEditTier] = useState<string>('');
+  const [initialTier, setInitialTier] = useState<string>('');
   const dbConnected = isSupabaseConfigured();
 
   // Range selection & bulk edit
@@ -122,6 +131,8 @@ export const AdminCalendar: React.FC = () => {
       const data = await getCalendarData(selectedAptId, monthStart, monthEnd);
       setRates(data.rates);
       setAvailability(data.availability);
+      // Gli scaglioni sono facoltativi: se la tabella non esiste ancora il calendario funziona comunque
+      getRateTiers(selectedAptId).then(setTiers).catch(() => setTiers([]));
       setRateHistory(await getRateHistory(selectedAptId));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Caricamento calendario non riuscito.');
@@ -194,6 +205,11 @@ export const AdminCalendar: React.FC = () => {
     setInitialPrice(priceStr);
     setPriceMixed(prices.size > 1);
 
+    const tierIds = new Set(selectedDates.map((d) => rates.find((r) => r.rate_date === d)?.tier_id ?? 'manual'));
+    const tierStr = tierIds.size === 1 ? [...tierIds][0] : '';
+    setEditTier(tierStr);
+    setInitialTier(tierStr);
+
     const avail = new Set(selectedDates.map((d) => availability.find((a) => a.avail_date === d)?.is_available ?? true));
     setEditAvailable(avail.size === 1 ? [...avail][0] : true);
     setAvailMixed(avail.size > 1);
@@ -210,21 +226,24 @@ export const AdminCalendar: React.FC = () => {
   const handleApplyBulk = async () => {
     if (!selectedAptId || selectedDates.length === 0) return;
 
-    const priceChanged = editPrice.trim() !== '' && editPrice !== initialPrice;
+    const chosenTier = tiers.find((t) => t.id === editTier);
+    const tierChanged = !!chosenTier && editTier !== initialTier;
+    const priceChanged = !chosenTier && editPrice.trim() !== '' && (editPrice !== initialPrice || editTier !== initialTier);
     if (priceChanged && (!Number.isFinite(Number(editPrice)) || Number(editPrice) < 0)) {
       toast.error('Inserisci un prezzo valido.');
       return;
     }
-    if (!priceChanged && !availTouched && !demandTouched) {
+    if (!priceChanged && !tierChanged && !availTouched && !demandTouched) {
       toast.info('Nessuna modifica da applicare.');
       return;
     }
 
     setIsApplying(true);
     try {
-      if (priceChanged || availTouched || demandTouched) {
+      if (priceChanged || tierChanged || availTouched || demandTouched) {
         await bulkUpdateCalendar(selectedAptId, selectedDates, {
-          ...(priceChanged ? { price: Number(editPrice) } : {}),
+          ...(tierChanged && chosenTier ? { price: Number(chosenTier.price_2p), tierId: chosenTier.id } : {}),
+          ...(priceChanged ? { price: Number(editPrice), ...(tiers.length > 0 || initialTier !== 'manual' ? { tierId: null } : {}) } : {}),
           ...(availTouched ? { is_available: editAvailable } : {}),
           ...(demandTouched ? { is_high_demand: editHighDemand } : {}),
         });
@@ -266,6 +285,10 @@ export const AdminCalendar: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setTiersOpen(true)} className="gap-1.5 text-xs font-semibold">
+            <Layers className="h-3.5 w-3.5 text-slate-500" />
+            Scaglioni ({tiers.length})
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setRulesOpen(true)} className="gap-1.5 text-xs font-semibold">
             <Sliders className="h-3.5 w-3.5 text-slate-500" />
             Regole di Soggiorno ({activeRulesCount})
@@ -346,6 +369,27 @@ export const AdminCalendar: React.FC = () => {
             onChanged={reloadRules}
           />
 
+          {/* Scaglioni dell'appartamento */}
+          {tiers.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-1">
+              <span className="text-xs font-semibold text-slate-600">Scaglioni:</span>
+              {tiers.map((t) => (
+                <span
+                  key={t.id}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-700"
+                >
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                  <strong>{t.name}</strong>
+                  <span className="text-slate-500">
+                    {Number(t.price_2p)} / {Number(t.price_3p)}
+                    {(selectedApt?.max_guests ?? 4) >= 4 ? ` / ${Number(t.price_4p)}` : ''} €
+                  </span>
+                </span>
+              ))}
+              <span className="text-[10px] text-slate-400">(2 / 3{(selectedApt?.max_guests ?? 4) >= 4 ? ' / 4' : ''} persone)</span>
+            </div>
+          )}
+
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 px-1">
             <div className="flex items-center gap-1.5">
@@ -392,6 +436,7 @@ export const AdminCalendar: React.FC = () => {
 
                 const rateObj = rates.find((r) => r.rate_date === dateStr);
                 const price = rateObj?.price_per_night ?? selectedApt?.base_price_2p ?? 90;
+                const tier = rateObj?.tier_id ? tiers.find((t) => t.id === rateObj.tier_id) : undefined;
 
                 const availObj = availability.find((a) => a.avail_date === dateStr);
                 const isAvailable = availObj ? availObj.is_available : true;
@@ -464,10 +509,26 @@ export const AdminCalendar: React.FC = () => {
                       </div>
                     )}
 
-                    <div className={`mt-2 pt-1 border-t flex items-center justify-between ${isAvailable ? 'border-emerald-200' : 'border-rose-200'}`}>
-                      <span className={`text-xs font-extrabold ${isAvailable ? 'text-emerald-950' : 'text-rose-400'}`}>
-                        {price} €
-                      </span>
+                    <div className={`mt-2 pt-1 border-t ${isAvailable ? 'border-emerald-200' : 'border-rose-200'}`}>
+                      {tier ? (
+                        <div className={isAvailable ? '' : 'opacity-60'}>
+                          <span
+                            className="inline-block max-w-full truncate rounded px-1.5 py-[1px] text-[10px] font-bold text-white"
+                            style={{ backgroundColor: tier.color }}
+                            title={`Scaglione ${tier.name}`}
+                          >
+                            {tier.name}
+                          </span>
+                          <div className={`text-[10px] leading-tight mt-0.5 font-semibold ${isAvailable ? 'text-emerald-950' : 'text-rose-400'}`}>
+                            {Number(tier.price_2p)}·{Number(tier.price_3p)}
+                            {(selectedApt?.max_guests ?? 4) >= 4 ? `·${Number(tier.price_4p)}` : ''} €
+                          </div>
+                        </div>
+                      ) : (
+                        <span className={`text-xs font-extrabold ${isAvailable ? 'text-emerald-950' : 'text-rose-400'}`}>
+                          {price} €
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -499,6 +560,47 @@ export const AdminCalendar: React.FC = () => {
           </DialogHeader>
 
           <div className="space-y-4 py-3">
+            {tiers.length > 0 && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold">Scaglione</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {tiers.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setEditTier(t.id)}
+                      className={`text-left rounded-lg border p-2 transition-all ${
+                        editTier === t.id ? 'border-primary ring-2 ring-primary/30 bg-primary/5' : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                        {t.name}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        2p {Number(t.price_2p)} € · 3p {Number(t.price_3p)} €
+                        {(selectedApt?.max_guests ?? 4) >= 4 ? ` · 4p ${Number(t.price_4p)} €` : ''}
+                      </div>
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setEditTier('manual')}
+                    className={`text-left rounded-lg border p-2 transition-all ${
+                      editTier === 'manual' ? 'border-primary ring-2 ring-primary/30 bg-primary/5' : 'border-dashed border-slate-300 hover:border-slate-400'
+                    }`}
+                  >
+                    <div className="text-xs font-bold text-slate-800">Prezzo manuale</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">Scrivi tu il prezzo</div>
+                  </button>
+                </div>
+                {editTier === '' && (
+                  <p className="text-[11px] text-amber-700">Scaglioni diversi nella selezione: invariati finché non ne scegli uno.</p>
+                )}
+              </div>
+            )}
+
+            {(tiers.length === 0 || editTier === 'manual') && (
             <div className="space-y-1.5">
               <Label htmlFor="bulkPrice" className="text-xs font-semibold">
                 Tariffa Giornaliera (€ a notte)
@@ -522,6 +624,12 @@ export const AdminCalendar: React.FC = () => {
                 </p>
               )}
             </div>
+            )}
+            {tiers.length === 0 && (
+              <button type="button" onClick={() => setTiersOpen(true)} className="text-[11px] text-primary font-semibold hover:underline">
+                + Crea scaglioni (prezzi per 2, 3 e 4 persone) per non dover scrivere il prezzo ogni volta
+              </button>
+            )}
 
             <div className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50">
               <div>
@@ -612,6 +720,14 @@ export const AdminCalendar: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <RateTiersDialog
+        open={tiersOpen}
+        onOpenChange={setTiersOpen}
+        apartment={selectedApt}
+        apartments={apartments}
+        onChanged={loadCalendar}
+      />
 
       {/* Regole di soggiorno */}
       <StayRulesDialog
