@@ -181,11 +181,11 @@ const Alloggi = () => {
               return (
                 <article
                   key={meta.name}
-                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 card-shadow"
+                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-teal-500/35 ring-1 ring-cyan-500/20 shadow-[0_0_32px_-4px_rgba(20,184,166,0.22)] transition-shadow"
                 >
-                  {/* Riga Superiore: Sinistra (Titolo + Foto + 2 Mini-card) | Destra (Calendario collegato + Richiedi disponibilità) */}
+                  {/* Riga Superiore: Sinistra (Titolo + Foto + 2 Mini-card) | Destra (Calendario leggermente più in basso + 2 tasti) */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
-                    {/* Colonna Sinistra: Titolo allineato col calendario + Galleria + 2 Mini Card sotto le foto */}
+                    {/* Colonna Sinistra: Titolo + Galleria + 2 Mini Card sotto le foto */}
                     <div className="flex flex-col gap-3">
                       <h2 className="font-display text-primary text-xl sm:text-2xl leading-tight">
                         {aptObj.name || meta.name}
@@ -217,8 +217,8 @@ const Alloggi = () => {
                       </div>
                     </div>
 
-                    {/* Colonna Destra: Calendario e Disponibilità sulla stessa linea del titolo */}
-                    <div className="w-full">
+                    {/* Colonna Destra: Calendario portato leggermente più in basso per allinearsi con foto e mini-card */}
+                    <div className="w-full lg:mt-10">
                       <PublicApartmentCalendar
                         apartment={aptObj}
                         dailyRates={dailyRates}

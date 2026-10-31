@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Flame,
   Moon,
+  Calculator,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Apartment, Availability, DailyRate, MinStayRule, RateTier } from '@/types/database';
@@ -220,22 +221,22 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   }, [apartment.name, checkIn, checkOut, quote, guests]);
 
   return (
-    <div className="flex flex-col justify-between h-full bg-muted/30 rounded-2xl p-3.5 sm:p-4 border border-border/70">
-      <div className="space-y-2.5">
-        {/* Intestazione compatta: Titolo su una riga + Selettore Ospiti */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-border/60">
-          <div className="min-w-0">
-            <h3 className="font-display text-primary text-sm sm:text-base font-bold flex items-center gap-1.5 whitespace-nowrap">
-              <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+    <div className="flex flex-col justify-between h-full bg-muted/30 rounded-2xl p-5 sm:p-6 border border-primary/15 shadow-sm">
+      <div className="space-y-4">
+        {/* Intestazione più ariosa: Titolo + Selettore Ospiti */}
+        <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-border/60">
+          <div className="min-w-0 space-y-1">
+            <h3 className="font-display text-primary text-base sm:text-lg font-bold flex items-center gap-2 whitespace-nowrap">
+              <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
               Calendario Disponibilità & Prezzi
             </h3>
-            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+            <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
               Scegli gli ospiti e clicca Check-in e Check-out
             </p>
           </div>
 
           {/* Selettore 2 / 3 / 4 persone */}
-          <div className="inline-flex items-center bg-background rounded-full p-0.5 border border-border shadow-sm shrink-0">
+          <div className="inline-flex items-center bg-background rounded-full p-1 border border-border shadow-sm shrink-0">
             {guestOptions.map((g) => {
               const active = guests === g;
               return (
@@ -243,13 +244,13 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   key={g}
                   type="button"
                   onClick={() => setGuests(g)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                     active
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Users className="w-3 h-3" />
+                  <Users className="w-3.5 h-3.5" />
                   {g} Pers.
                 </button>
               );
@@ -258,17 +259,17 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
         </div>
 
         {/* Controlli Mese */}
-        <div className="flex items-center justify-between bg-background rounded-xl px-3 py-1.5 border border-border/60">
+        <div className="flex items-center justify-between bg-background rounded-xl px-3.5 py-2 border border-border/60">
           <button
             type="button"
             onClick={prevMonth}
             aria-label="Mese precedente"
-            className="p-1 rounded-lg hover:bg-muted text-foreground transition-colors"
+            className="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-2">
-            <span className="font-display text-primary text-sm sm:text-base font-bold">
+            <span className="font-display text-primary text-base sm:text-lg font-bold">
               {MONTHS_IT[viewMonth]} {viewYear}
             </span>
             {(viewYear !== now.getFullYear() || viewMonth !== now.getMonth()) && (
@@ -278,7 +279,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   setViewYear(now.getFullYear());
                   setViewMonth(now.getMonth());
                 }}
-                className="text-[11px] font-semibold text-primary underline hover:no-underline"
+                className="text-xs font-semibold text-primary underline hover:no-underline"
               >
                 Oggi
               </button>
@@ -288,7 +289,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
             type="button"
             onClick={nextMonth}
             aria-label="Mese successivo"
-            className="p-1 rounded-lg hover:bg-muted text-foreground transition-colors"
+            className="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -300,7 +301,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
             {WEEKDAYS.map((day, idx) => (
               <div
                 key={day}
-                className={`py-1 text-center text-[10px] font-bold uppercase tracking-wider ${
+                className={`py-1.5 text-center text-[11px] font-bold uppercase tracking-wider ${
                   idx >= 5 ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
@@ -312,7 +313,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
           <div className="grid grid-cols-7 gap-px bg-border/40">
             {calendarCells.map((cell, idx) => {
               if (!cell) {
-                return <div key={`empty-${idx}`} className="bg-muted/20 min-h-[42px] sm:min-h-[46px]" />;
+                return <div key={`empty-${idx}`} className="bg-muted/20 min-h-[46px] sm:min-h-[50px]" />;
               }
 
               const isStart = checkIn === cell.dateIso;
@@ -340,7 +341,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   type="button"
                   disabled={cell.isPast || (!cell.isAvailable && !checkIn)}
                   onClick={() => handleDayClick(cell.dateIso, cell.isPast, cell.isAvailable)}
-                  className={`relative min-h-[42px] sm:min-h-[46px] p-1 flex flex-col items-center justify-between transition-colors ${cellStyle}`}
+                  className={`relative min-h-[46px] sm:min-h-[50px] p-1.5 flex flex-col items-center justify-between transition-colors ${cellStyle}`}
                   title={
                     cell.isPast
                       ? 'Data passata'
@@ -353,7 +354,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                 >
                   <div className="w-full flex items-center justify-between px-0.5">
                     <span
-                      className={`text-[11px] leading-none ${
+                      className={`text-[11px] sm:text-xs leading-none ${
                         cell.dateIso === todayIso && !isSelected
                           ? 'font-extrabold text-primary underline'
                           : 'font-medium'
@@ -380,14 +381,14 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   </div>
 
                   {cell.isPast ? (
-                    <span className="text-[9px] text-muted-foreground/40">—</span>
+                    <span className="text-[10px] text-muted-foreground/40">—</span>
                   ) : !cell.isAvailable ? (
-                    <span className="text-[9px] font-semibold text-rose-500 leading-tight">
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-rose-500 leading-tight">
                       Occupato
                     </span>
                   ) : (
                     <span
-                      className={`text-[10px] sm:text-[11px] font-bold leading-tight ${
+                      className={`text-[10px] sm:text-xs font-bold leading-tight ${
                         isSelected ? 'text-primary-foreground' : 'text-emerald-800'
                       }`}
                     >
@@ -400,23 +401,23 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
           </div>
         </div>
 
-        {/* Legenda completa: Disponibile | Occupato | Alta richiesta (fuoco) | Soggiorno minimo */}
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground px-0.5 pt-0.5">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="inline-flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-400 shrink-0" />
+        {/* Legenda ingrandita: Disponibile | Occupato | Alta richiesta (fuoco) | Soggiorno minimo */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs sm:text-[13px] text-muted-foreground px-1 pt-1">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            <span className="inline-flex items-center gap-1.5 font-medium text-foreground/85">
+              <span className="w-3 h-3 rounded-full bg-emerald-100 border border-emerald-500 shrink-0" />
               Disponibile ({guests} pers.)
             </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm bg-rose-100 border border-rose-300 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 font-medium text-foreground/85">
+              <span className="w-3 h-3 rounded-full bg-rose-100 border border-rose-400 shrink-0" />
               Occupato
             </span>
-            <span className="inline-flex items-center gap-1">
-              <Flame className="w-3 h-3 text-amber-500 fill-amber-400 shrink-0" />
+            <span className="inline-flex items-center gap-1.5 font-medium text-foreground/85">
+              <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-400 shrink-0" />
               Alta richiesta
             </span>
-            <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
-              <Moon className="w-3 h-3 text-primary shrink-0" />
+            <span className="inline-flex items-center gap-1.5 font-semibold text-primary">
+              <Moon className="w-3.5 h-3.5 text-primary shrink-0" />
               Soggiorno min. {minNightsDefault} notti
             </span>
           </div>
@@ -427,16 +428,16 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                 setCheckIn(null);
                 setCheckOut(null);
               }}
-              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-semibold text-primary hover:underline"
             >
-              <RotateCcw className="w-3 h-3" /> Azzera
+              <RotateCcw className="w-3.5 h-3.5" /> Azzera
             </button>
           )}
         </div>
 
         {/* Box Preventivo se l'utente ha selezionato date */}
         {checkIn && !checkOut && (
-          <div className="rounded-xl bg-accent/60 border border-primary/20 px-3 py-2 text-xs text-primary flex items-center justify-between">
+          <div className="rounded-xl bg-accent/60 border border-primary/20 px-3.5 py-2.5 text-xs sm:text-sm text-primary flex items-center justify-between">
             <span>
               Check-in: <strong>{formatIt(checkIn)}</strong> — clicca ora la data di <strong>Check-out</strong>
             </span>
@@ -445,7 +446,7 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
 
         {checkIn && checkOut && quote && (
           <div
-            className={`rounded-xl px-3 py-2.5 border text-xs space-y-1 ${
+            className={`rounded-xl px-3.5 py-3 border text-xs sm:text-sm space-y-1 ${
               quote.isValid
                 ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
                 : 'bg-amber-50/80 border-amber-200 text-amber-950'
@@ -461,25 +462,25 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                 {formatIt(checkIn)} → {formatIt(checkOut)} ({quote.totalNights}{' '}
                 {quote.totalNights === 1 ? 'notte' : 'notti'}, {guests} pers.)
               </span>
-              <span className="text-sm font-extrabold text-primary">
+              <span className="text-sm sm:text-base font-extrabold text-primary">
                 Totale: {quote.grandTotal.toFixed(0)}€
               </span>
             </div>
             {quote.discount && (
-              <p className="text-[11px] text-emerald-700 font-medium">
+              <p className="text-xs text-emerald-700 font-medium">
                 Sconto applicato ({quote.discount.label}): -{quote.discount.amount.toFixed(0)}€
               </p>
             )}
             {!quote.isValid && (
-              <p className="text-[11px] text-amber-800">{quote.validationErrors.join(' ')}</p>
+              <p className="text-xs text-amber-800">{quote.validationErrors.join(' ')}</p>
             )}
           </div>
         )}
       </div>
 
-      {/* Sotto il calendario: Pulsante Richiedi disponibilità */}
-      <div className="pt-3 mt-3 border-t border-border/60 flex justify-center">
-        <Button asChild className="rounded-full px-8 w-full sm:w-auto shadow-sm">
+      {/* Sotto il calendario: Pulsanti Richiedi disponibilità e Calcola preventivo */}
+      <div className="pt-4 mt-4 border-t border-border/60 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Button asChild className="rounded-full px-7 w-full sm:w-auto shadow-sm">
           <a
             href={whatsappHref}
             target="_blank"
@@ -491,6 +492,17 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
               ? `Richiedi disponibilità (${formatIt(checkIn)} - ${formatIt(checkOut)})`
               : 'Richiedi disponibilità'}
           </a>
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-full px-7 w-full sm:w-auto border-primary/40 text-primary hover:bg-primary/10 hover:text-primary font-semibold gap-2 shadow-sm"
+          data-track-label="alloggi_calcola_preventivo"
+          data-track-apartment={apartment.name}
+        >
+          <Calculator className="w-4 h-4" />
+          Calcola preventivo
         </Button>
       </div>
     </div>
