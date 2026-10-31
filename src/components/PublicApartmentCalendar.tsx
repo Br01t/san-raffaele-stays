@@ -221,22 +221,26 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
   }, [apartment.name, checkIn, checkOut, quote, guests]);
 
   return (
-    <div className="flex flex-col justify-between h-full bg-muted/30 rounded-2xl p-5 sm:p-6 border border-primary/15 shadow-sm">
-      <div className="space-y-4">
-        {/* Intestazione più ariosa: Titolo + Selettore Ospiti */}
-        <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-border/60">
+    <div className="flex flex-col justify-between h-full w-full min-w-0 overflow-hidden bg-muted/30 rounded-2xl p-3.5 sm:p-6 border border-primary/15 shadow-sm">
+      <div className="space-y-4 min-w-0">
+        {/* Intestazione più ariosa: Titolo + Selettore Ospiti responsive su mobile */}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-border/60 min-w-0">
           <div className="min-w-0 space-y-1">
-            <h3 className="font-display text-primary text-base sm:text-lg font-bold flex items-center gap-2 whitespace-nowrap">
+            <h3 className="font-display text-primary text-sm sm:text-lg font-bold flex items-center gap-2 leading-snug">
               <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
-              Calendario Disponibilità & Prezzi
+              <span>Calendario Disponibilità & Prezzi</span>
             </h3>
             <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
               Scegli gli ospiti e clicca Check-in e Check-out
             </p>
           </div>
 
-          {/* Selettore 2 / 3 / 4 persone */}
-          <div className="inline-flex items-center bg-background rounded-full p-1 border border-border shadow-sm shrink-0">
+          {/* Selettore 2 / 3 / 4 persone: 100% larghezza su mobile, compatto su desktop */}
+          <div
+            className={`grid ${
+              guestOptions.length === 3 ? 'grid-cols-3' : 'grid-cols-2'
+            } sm:inline-flex items-center bg-background rounded-full p-1 border border-border shadow-sm w-full sm:w-auto shrink-0`}
+          >
             {guestOptions.map((g) => {
               const active = guests === g;
               return (
@@ -244,13 +248,13 @@ export const PublicApartmentCalendar: React.FC<PublicApartmentCalendarProps> = (
                   key={g}
                   type="button"
                   onClick={() => setGuests(g)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                     active
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <Users className="w-3.5 h-3.5" />
+                  <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
                   {g} Pers.
                 </button>
               );
